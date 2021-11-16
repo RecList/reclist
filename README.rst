@@ -6,19 +6,24 @@ RecList
 .. image:: https://img.shields.io/pypi/v/reclist.svg
         :target: https://pypi.python.org/pypi/reclist
 
-.. image:: https://img.shields.io/travis/vinid/reclist.svg
-        :target: https://travis-ci.com/vinid/reclist
-
 .. image:: https://readthedocs.org/projects/reclist/badge/?version=latest
         :target: https://reclist.readthedocs.io/en/latest/?version=latest
         :alt: Documentation Status
 
+.. image:: https://github.com/MilaNLProc/contextualized-topic-models/workflows/Python%20package/badge.svg
+        :target: https://github.com/MilaNLProc/contextualized-topic-models/actions
 
-.. image:: https://pyup.io/repos/github/vinid/reclist/shield.svg
-     :target: https://pyup.io/repos/github/vinid/reclist/
-     :alt: Updates
+.. image:: https://img.shields.io/github/contributors/jacopotagliabue/reclist
+        :target: https://github.com/MilaNLProc/jacopotagliabue/graphs/contributors/
+        :alt: Contributors
 
+.. image:: https://img.shields.io/badge/License-MIT-blue.svg
+        :target: https://lbesson.mit-license.org/
+        :alt: License
 
+.. image:: https://pepy.tech/badge/reclist
+        :target: https://pepy.tech/project/reclist
+        :alt: Downloads
 
 RecList
 
