@@ -54,11 +54,11 @@ Summary
 
 This doc is structured as follows:
 
-* [Quick Start](#quick-start)
-* [A Guided Tour](#a-guided-tour)
-* [Roadmap](#roadmap)
-* [Acknowledgments](#acknowledgments)
-* [License and Citation](#license-and-citation)
+* `Quick Start`_
+* `A Guided Tour`_
+* `Roadmap`_
+* `Acknowledgments`_
+* `License and Citation`_
 
 Quick Start
 -----------
