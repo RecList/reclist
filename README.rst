@@ -95,13 +95,13 @@ Acknowledgments
 
 The main contributors are:
 
-* Patrick John Chia - [LinkedIn](https://www.linkedin.com/in/patrick-john-chia-b0a34019b/), [GitHub](https://github.com/patrickjohncyh)
+* Patrick John Chia - `LinkedIn <https://www.linkedin.com/in/patrick-john-chia-b0a34019b/>`__, `GitHub <https://github.com/patrickjohncyh>`__
 * Jacopo Tagliabue - [LinkedIn](https://www.linkedin.com/in/jacopotagliabue/), [GitHub](https://github.com/jacopotagliabue)
 * Federico Bianchi - [LinkedIn](https://www.linkedin.com/in/federico-bianchi-3b7998121/), [GitHub](https://github.com/vinid)
 * Chloe He - [LinkedIn](https://www.linkedin.com/in/chloe-he/),[GitHub](https://github.com/chloeh13q)
 * Brian Ko - [LinkedIn](https://www.linkedin.com/in/briankosw/), [GitHub](https://github.com/briankosw)
 
-If you have questions or feedback, please reach out to: `jacopo dot tagliabue at tooso dot ai`.
+If you have questions or feedback, please reach out to: :code:`jacopo dot tagliabue at tooso dot ai`.
 
 License and Citation
 --------------------
