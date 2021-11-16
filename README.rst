@@ -10,11 +10,11 @@ RecList
         :target: https://reclist.readthedocs.io/en/latest/?version=latest
         :alt: Documentation Status
 
-.. image:: https://github.com/MilaNLProc/contextualized-topic-models/workflows/Python%20package/badge.svg
-        :target: https://github.com/MilaNLProc/contextualized-topic-models/actions
+.. image:: https://github.com/jacopotagliabue/reclist/workflows/Python%20package/badge.svg
+        :target: https://github.com/jacopotagliabue/reclist/actions
 
 .. image:: https://img.shields.io/github/contributors/jacopotagliabue/reclist
-        :target: https://github.com/MilaNLProc/jacopotagliabue/graphs/contributors/
+        :target: https://github.com/jacopotagliabue/reclist/graphs/contributors/
         :alt: Contributors
 
 .. image:: https://img.shields.io/badge/License-MIT-blue.svg
