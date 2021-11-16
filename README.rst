@@ -40,7 +40,7 @@ If you are not familiar with the library, we suggest first taking our small [tou
 Project updates
 ~~~~~~~~~~~~~~~
 
-_Nov. 2021: the library is currently in alpha. We welcome contributions (see below) and feedback, but please be advised that the package may change substantially in the upcoming months. A pre-print of the companion paper is planned to be released before Dec. 2021_
+_Nov. 2021: the library is currently in alpha. We welcome contributions (see below) and feedback, but please be advised that the package may change substantially in the upcoming months. A pre-print of the companion paper is planned to be released before Dec. 2021
 
 As the project is in active development, come back often for updates.
 
@@ -103,14 +103,14 @@ License and Citation
 
 All the code is released under an open MIT license. If you found *RecList* useful, or you are using it to benchmark/debug your model, please cite our pre-print (forhtcoming):
 
-```
+.. code-block::
+
     @article{recListPre2021,
       title={Beyond NDCG: behavioral testing of recommender systems with RecList},
       author={Patrick John Chia and Jacopo Tagliabue and Federico Bianchi and Chloe He and Brian Ko},
       journal={ArXiv},
       year={forthcoming}
     }
-```
 
 Credits
 -------

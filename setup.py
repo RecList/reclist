@@ -10,7 +10,10 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = [ ]
+with open('requirements.txt') as f:
+    requirements = f.read().splitlines()
+
+setup_requirements = ['pytest-runner', ]
 
 test_requirements = ['pytest>=3', ]
 
@@ -32,13 +35,14 @@ setup(
     install_requires=requirements,
     license="MIT license",
     long_description=readme + '\n\n' + history,
+    long_description_content_type='text/x-rst',
     include_package_data=True,
     keywords='reclist',
     name='reclist',
     packages=find_packages(include=['reclist', 'reclist.*']),
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/vinid/reclist',
+    url='https://github.com/jacopotagliabue/reclist',
     version='0.1.0',
     zip_safe=False,
 )
