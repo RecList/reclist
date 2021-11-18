@@ -8,7 +8,7 @@ from reclist.metrics.standard_metrics import mrr_at_k
 def test_basic_dataset_downloading():
     CoveoDataset()
     MovieLensDataset()
-    SpotifyDataset()
+
 
 
 def test_mrr():
