@@ -7,18 +7,23 @@ import pytest
 
 from reclist import reclist
 
+from reclist.datasets import *
+from reclist.rectest.standard_metrics import mrr_at_k
 
-@pytest.fixture
-def response():
-    """Sample pytest fixture.
+def test_basic_dataset_downloading():
+    CoveoDataset()
+    MovieLensDataset()
+    SpotifyDataset()
 
-    See more at: http://doc.pytest.org/en/latest/fixture.html
+
+def test_mrr():
     """
-    # import requests
-    # return requests.get('https://github.com/audreyr/cookiecutter-pypackage')
+    Testing MRR works as intended
+    """
+    list_a = [[0], [1]]
+    list_b = [[0, 1], [1, 0]]
+    list_c = [[2, 3], [0, 1]]
 
-
-def test_content(response):
-    """Sample pytest test function with the pytest fixture as an argument."""
-    # from bs4 import BeautifulSoup
-    # assert 'GitHub' in BeautifulSoup(response.content).title.string
+    assert mrr_at_k(list_b, list_a, 0) == 1
+    assert mrr_at_k(list_c, list_a, 20) == 0.25
+    assert mrr_at_k(list_c, list_a, 0) == 0
