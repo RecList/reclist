@@ -8,7 +8,9 @@ if __name__ == "__main__":
     coveo_dataset = CoveoDataset()
     print(len(coveo_dataset.x_train))
 
-    embeddings = train_embeddings(sessions=coveo_dataset.x_train)
+    # get skus from training sessions
+    x_train_skus = [[e['product_sku'] for e in s] for s in coveo_dataset.x_train]
+    embeddings = train_embeddings(sessions=x_train_skus)
     model = P2VRecModel(model=embeddings)
 
     # instantiate rec_list object
