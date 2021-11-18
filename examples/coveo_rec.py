@@ -1,7 +1,7 @@
 from reclist.datasets import CoveoDataset
 from reclist.recommenders.prod2vec import P2VRecModel
 from reclist.utils.train_w2v import train_embeddings
-from reclist.rlists import CoveoCartRecList
+from reclist.reclist import CoveoCartRecList
 
 if __name__ == "__main__":
 
