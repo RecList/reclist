@@ -10,6 +10,7 @@ import time
 import json
 from reclist.utils.train_w2v import train_embeddings
 
+
 class RecDataset(ABC):
 
     def __init__(self, x_train: list, y_train: list, x_test: list, y_test: list, catalog: dict):
@@ -57,8 +58,6 @@ class RecModel(ABC):
         return self._model
 
 
-
-
 def rec_test(rec_type: str, test_type: str):
     """
     Rec test decorator
@@ -88,22 +87,6 @@ def rec_test(rec_type: str, test_type: str):
     return decorator
 
 
-class StepVisitor(ast.NodeVisitor):
-    """
-    Select nodes which have is_test attribute
-    """
-
-    def __init__(self, nodes, flow):
-        self.nodes = nodes
-        self.flow = flow
-        super(StepVisitor, self).__init__()
-
-    def visit_FunctionDef(self, node):
-        func = getattr(self.flow, node.name)
-        if hasattr(func, 'is_test'):
-            self.nodes[node.name] = func
-
-
 class RecList(ABC):
     META_DATA_FOLDER = '.reclist'
 
@@ -125,9 +108,9 @@ class RecList(ABC):
         assert len(self._y_test) == len(self._y_preds)
 
     def train_dense_repr(self, type_name: str, type_fn):
-        '''
+        """
         Train a dense representation over a type of meta-data & store into object
-        '''
+        """
 
         # type_fn: given a SKU returns some type i.e. brand
         x_train_transformed = [[type_fn(e) for e in session if type_fn(e)] for session in self._x_train]
@@ -139,13 +122,14 @@ class RecList(ABC):
         '''
         Helper to extract methods decorated with rec_test
         '''
-        m = __import__(self.__class__.__module__)
-        tree = ast.parse(inspect.getsource(m)).body
-
-        root = [n for n in tree
-                if isinstance(n, ast.ClassDef) and n.name == self.name][0]
         nodes = {}
-        StepVisitor(nodes, self).visit(root)
+        for _ in self.__dir__():
+            if not hasattr(self,_):
+                continue
+            func = getattr(self, _)
+            if hasattr(func, 'is_test'):
+                nodes[func.name] = func
+
         return nodes
 
     def __call__(self, verbose=True, *args, **kwargs):
