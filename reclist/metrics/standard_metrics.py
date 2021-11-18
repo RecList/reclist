@@ -1,6 +1,7 @@
 import random
 import itertools
 import numpy as np
+import collections
 
 
 def statistics(x_train, y_train, x_test, y_test, y_pred):
@@ -9,27 +10,41 @@ def statistics(x_train, y_train, x_test, y_test, y_pred):
     # num non-zero preds
     num_preds = len([p for p in y_pred if p])
     return {
-        'train_size': train_size,
-        'test_size': test_size,
-        'num_preds': num_preds
+        'training_set__size': train_size,
+        'test_set_size': test_size,
+        'num_non_null_predictions': num_preds
     }
 
 
-def sample_hits_at_k(y_preds, y_test, k=3, size=3):
+def sample_hits_at_k(y_preds, y_test, x_test=None, k=3, size=3):
     hits = []
-    for _p, _y in zip(y_preds, y_test):
+    for idx, (_p, _y) in enumerate(zip(y_preds, y_test)):
         if _y[0] in _p[:k]:
-            hits.append({'Y_TEST': [_y[0]], 'Y_PRED': _p[:k]})
+            hit_info = {
+                'Y_TEST': [_y[0]],
+                'Y_PRED': _p[:k],
+            }
+            if x_test:
+                hit_info['X_TEST'] = [x_test[idx][0]]
+            hits.append(hit_info)
+
     if len(hits) < size or size == -1:
         return hits
     return random.sample(hits, k=size)
 
 
-def sample_misses_at_k(y_preds, y_test, k=3, size=3):
+def sample_misses_at_k(y_preds, y_test, x_test=None, k=3, size=3):
     misses = []
-    for _p, _y in zip(y_preds, y_test):
+    for idx, (_p, _y) in enumerate(zip(y_preds, y_test)):
         if _y[0] not in _p[:k]:
-            misses.append({'Y_TEST': [_y[0]], 'Y_PRED': _p[:k]})
+            miss_info =  {
+                'Y_TEST': [_y[0]],
+                'Y_PRED': _p[:k],
+            }
+            if x_test:
+                miss_info['X_TEST'] = [x_test[idx][0]]
+            misses.append(miss_info)
+
     if len(misses) < size or size == -1:
         return misses
     return random.sample(misses, k=size)
@@ -68,3 +83,20 @@ def coverage_at_k(y_preds, product_data, k=3):
     nb_overlap_skus = len(pred_skus.intersection(all_skus))
 
     return nb_overlap_skus / len(all_skus)
+
+
+def popularity_bias_at_k(y_preds, x_train, k=3):
+    # estimate popularity from training data
+    pop_map = collections.defaultdict(lambda : 0)
+    num_interactions = 0
+    for session in x_train:
+        for event in session:
+            pop_map[event] += 1
+            num_interactions += 1
+    # normalize popularity
+    pop_map = {k:v/num_interactions for k,v in pop_map.items()}
+    all_popularity = []
+    for p in y_preds:
+        average_pop = sum(pop_map.get(_, 0.0) for _ in p[:k]) / len(p) if len(p) > 0 else 0
+        all_popularity.append(average_pop)
+    return sum(all_popularity) / len(y_preds)
