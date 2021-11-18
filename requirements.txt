@@ -11,4 +11,4 @@ numpy==1.21.2
 pathos==0.2.8
 flask==2.0.2
 networkx==2.6.3
-python-Levenshtein=0.12.2
+python-Levenshtein==0.12.2
