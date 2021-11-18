@@ -61,6 +61,7 @@ This doc is structured as follows:
 
 * `Quick Start`_
 * `A Guided Tour`_
+* `Capabilities`_
 * `Roadmap`_
 * `Acknowledgments`_
 * `License and Citation`_
@@ -69,15 +70,19 @@ Quick Start
 -----------
 
 If you want to see *RecList* in action, clone the repository, create and activate a virtual env, and install
-the required packages from root. Executing `examples/coveo_complementary_rec.py` will download a 
-public e-commerce dataset, train a machine learning model on it, and 
-use a pre-made suite of behavioral tests to show a typical run.
+the required packages from root. 
+
+Sample scripts are divided by use-cases: similar items, complementary items or 
+session-based recommendations. When executing one, a suitable public dataset will be downloaded, 
+and a baseline ML model trained: finally, the script will run a pre-made suite of behavioral tests 
+to show typical results.
 
 .. code-block::
-        python3 -m venv venv
-        source venv/bin/activate
-        pip install -e .
-        python examples/coveo_complementary_rec.py
+
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install -e .
+    python examples/coveo_complementary_rec.py
 
 Running *your* model on one of the supported dataset, leveraging the pre-made tests, is as easy as implementing
 a simple interface, *RecModel*.
@@ -88,12 +93,12 @@ the abstractions and the out-of-the-box capabilities of *RecList*.
 A Guided Tour
 -------------
 
-TBC
+*Coming soon!*
 
 Capabilities
 ------------
 
-TBC
+*Coming soon!*
 
 Datasets
 ~~~~~~~~
@@ -102,18 +107,18 @@ RecList features convenient wrappers around popular datasets, to help test model
 in a standardized way. 
 
 * `Coveo Data Challenge <https://github.com/coveooss/SIGIR-ecom-data-challenge>`__
-* `The Million Playlist Dataset <https://engineering.atspotify.com/2018/05/30/introducing-the-million-playlist-dataset-and-recsys-challenge-2018/`__ (*coming soon*)
+* `The Million Playlist Dataset <https://engineering.atspotify.com/2018/05/30/introducing-the-million-playlist-dataset-and-recsys-challenge-2018/>`__ (*coming soon*)
 * `MovieLens <https://grouplens.org/datasets/movielens/>`__ (*coming soon*)
 
 Behavioral Tests
 ~~~~~~~~~~~~~~~~
 
-TBC
+*Coming soon!*
 
 Roadmap
 -------
 
-TBC
+*Coming soon!*
 
 Contributing
 ~~~~~~~~~~~~
