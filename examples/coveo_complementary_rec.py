@@ -19,7 +19,8 @@ from reclist.reclist import CoveoCartRecList
 if __name__ == "__main__":
 
     # get the coveo data challenge dataset as a RecDataset object
-    coveo_dataset = CoveoDataset()
+    # force download will make sure you download it when the code is executed
+    coveo_dataset = CoveoDataset(force_download=True)
     print(len(coveo_dataset.x_train))
 
     # get skus from training sessions
