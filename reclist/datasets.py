@@ -13,15 +13,14 @@ class MovieLensDataset(RecDataset):
     Reference: https://files.grouplens.org/datasets/movielens/ml-25m-README.html
     """
 
-    def __init__(self):
-        x_train, y_train, x_test, y_test, catalog = self._load_movielens_dataset()
-        super().__init__(x_train, y_train, x_test, y_test, catalog)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
-    def _load_movielens_dataset(self):
+    def load(self):
         cache_dir = get_cache_directory()
         filepath = os.path.join(cache_dir, "movielens_25m.zip")
 
-        if not os.path.exists(filepath):
+        if not os.path.exists(filepath) or self.force_download:
             download_with_progress(MOVIELENS_DATASET_S3_URL, filepath)
 
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -29,22 +28,26 @@ class MovieLensDataset(RecDataset):
                 zip_file.extractall(temp_dir)
             with open(os.path.join(temp_dir, "dataset.json")) as f:
                 data = json.load(f)
-        return data["x_train"], None, data["x_test"], data["y_test"], data["catalog"]
+
+        self._x_train = data["x_train"]
+        self._y_train = None
+        self._x_test = data["x_test"]
+        self._y_test = data["y_test"]
+        self._catalog = data["catalog"]
 
 
 class CoveoDataset(RecDataset):
     """
     Coveo SIGIR data challenge dataset
     """
-    def __init__(self):
-        x_train, y_train, x_test, y_test, catalog = self.load_coveo_interaction_dataset()
-        super().__init__(x_train, y_train, x_test, y_test, catalog)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
-    def load_coveo_interaction_dataset(self):
+    def load(self):
         cache_directory = get_cache_directory()
         filename = os.path.join(cache_directory, "coveo_sigir.zip")  # TODO: make var somewhere
 
-        if not os.path.exists(filename):
+        if not os.path.exists(filename) or self.force_download:
             download_with_progress(COVEO_INTERACTION_DATASET_S3_URL, filename)
 
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -53,34 +56,41 @@ class CoveoDataset(RecDataset):
             with open(os.path.join(temp_dir, 'dataset.json')) as f:
                 data = json.load(f)
 
-        return data['x_train'], None, data['x_test'], data['y_test'], data['catalog']
-
+        self._x_train = data["x_train"]
+        self._y_train = None
+        self._x_test = data["x_test"]
+        self._y_test = data["y_test"]
+        self._catalog = data["catalog"]
 
 class SpotifyDataset(RecDataset):
 
-    def __init__(self, k: int = 5):
+    def __init__(self, k: int = 5, **kwargs):
         self.k = k
-        self.load_spotify_playlist_dataset()
+        super().__init__(**kwargs)
+
+    def load(self):
+        data = self.load_spotify_playlist_dataset()
         x_test, y_test = self.preprocess_spotify_playlist_data()
-        super().__init__(self.data['train'], None,
-                         x_test, y_test, self.data['metadata'])
+        self._x_train = data["x_train"]
+        self._y_train = None
+        self._x_test = x_test
+        self._y_test = y_test
+        self._catalog = data["metadata"]
 
     def load_spotify_playlist_dataset(self):
 
         cache_directory = get_cache_directory()
         filename = os.path.join(cache_directory, "spotify_playlist.zip")   # TODO: make var somewhere
 
-        if not os.path.exists(filename):
+        if not os.path.exists(filename) or self.force_download:
             download_with_progress(SPOTIFY_PLAYLIST_DATASET_S3_URL, filename)
 
         with tempfile.TemporaryDirectory() as temp_dir:
             with zipfile.ZipFile(filename, 'r') as zip_ref:
                 zip_ref.extractall(temp_dir)
-            # with gzip.open(filename, 'rb') as f_in:
-            #     with open(temp_dir, 'wb') as f_out:
-            #         shutil.copyfileobj(f_in, f_out)
             with open(os.path.join(temp_dir, 'dataset.json')) as f:
-                self.data = json.load(f)
+                data = json.load(f)
+        return data
 
     def preprocess_spotify_playlist_data(
         self,

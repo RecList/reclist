@@ -13,12 +13,18 @@ from reclist.utils.train_w2v import train_embeddings
 
 class RecDataset(ABC):
 
-    def __init__(self, x_train: list, y_train: list, x_test: list, y_test: list, catalog: dict):
-        self._x_train = x_train
-        self._y_train = y_train
-        self._x_test = x_test
-        self._y_test = y_test
-        self._catalog = catalog
+    def __init__(self, force_download=False):
+        self._x_train = None
+        self._y_train = None
+        self._x_test = None
+        self._y_test = None
+        self._catalog = None
+        self.force_download = force_download
+        self.load()
+
+    @abstractmethod
+    def load(self):
+        return
 
     @property
     def x_train(self):
