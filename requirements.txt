@@ -1,12 +1,11 @@
-snowflake-connector-python==2.1.2
 gensim==4.0.1
 jinja2==3.0.2
 algoliasearch==2.6.0
 appdirs==1.4.4
 wget==3.2
 pytest==6.2.5
-requests
-tqdm
+requests==2.22.0
+tqdm==4.62.3
 matplotlib==3.4.3
 numpy==1.21.2
 pathos==0.2.8
