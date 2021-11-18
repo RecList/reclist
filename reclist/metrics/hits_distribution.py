@@ -1,5 +1,5 @@
 from collections import Counter, defaultdict
-from reclist.tests.standard_metrics import hit_rate_at_k
+from reclist.metrics.standard_metrics import hit_rate_at_k
 import matplotlib.pyplot as plt
 import numpy as np
 import math
@@ -12,7 +12,7 @@ def roundup(x: int):
 
 def hits_distribution(x_train, x_test, y_test, y_preds, k=3, debug=False):
 
-    prod_interaction_cnt = Counter([_.split('_')[0] for x in x_train for _ in x])
+    prod_interaction_cnt = Counter([_ for x in x_train for _ in x])
     hit_per_interaction_cnt = defaultdict(list)
     for _x, _y_test, _y_pred in zip(x_test, y_test, y_preds):
         _x_cnt = prod_interaction_cnt[_x[0].split('_')[0]]
