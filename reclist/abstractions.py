@@ -64,7 +64,7 @@ class RecModel(ABC):
         return self._model
 
 
-def rec_test(rec_type: str, test_type: str):
+def rec_test(test_type: str):
     """
     Rec test decorator
     """
@@ -76,7 +76,6 @@ def rec_test(rec_type: str, test_type: str):
 
         # add attributes to f
         w.is_test = True
-        w.rec_type = rec_type
         w.test_type = test_type
         try:
             w.test_desc = f.__doc__.lstrip().rstrip()
