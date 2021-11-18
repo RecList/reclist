@@ -22,7 +22,7 @@ class P2VRecModel(RecModel):
             # we assume here that every X is a list of one-element, the product already in the cart
             # i.e. our prediction_input list is [[sku_1], [sku_3], ...]
             key_item = _x[0]['product_sku']
-            nn_products = self._model.most_similar(key_item, topn=3) if key_item in self._model else None
+            nn_products = self._model.most_similar(key_item, topn=10) if key_item in self._model else None
             if nn_products:
                 predictions.append([{'product_sku':_[0]} for _ in nn_products])
             else:
