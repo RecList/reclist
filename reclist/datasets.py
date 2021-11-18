@@ -42,7 +42,7 @@ class CoveoDataset(RecDataset):
 
     def load_coveo_interaction_dataset(self):
         cache_directory = get_cache_directory()
-        filename = os.path.join(cache_directory, "coveo_interaction.zip")  # TODO: make var somewhere
+        filename = os.path.join(cache_directory, "coveo_sigir.zip")  # TODO: make var somewhere
 
         if not os.path.exists(filename):
             download_with_progress(COVEO_INTERACTION_DATASET_S3_URL, filename)

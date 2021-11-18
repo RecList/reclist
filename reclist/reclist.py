@@ -94,6 +94,7 @@ class RecList(ABC):
         '''
         m = __import__(self.__class__.__module__)
         tree = ast.parse(inspect.getsource(m)).body
+
         root = [n for n in tree
                 if isinstance(n, ast.ClassDef) and n.name == self.name][0]
         nodes = {}
