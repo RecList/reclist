@@ -1,5 +1,5 @@
 from collections import Counter, defaultdict
-from reclist.rectest.standard_metrics import hit_rate_at_k, sample_hits_at_k, sample_misses_at_k
+from reclist.metrics.standard_metrics import hit_rate_at_k, sample_hits_at_k, sample_misses_at_k
 import matplotlib.pyplot as plt
 
 

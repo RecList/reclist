@@ -2,13 +2,8 @@
 
 """Tests for `reclist` package."""
 
-import pytest
-
-
-from reclist import reclist
-
 from reclist.datasets import *
-from reclist.rectest.standard_metrics import mrr_at_k
+from reclist.metrics.standard_metrics import mrr_at_k
 
 def test_basic_dataset_downloading():
     CoveoDataset()

@@ -7,6 +7,7 @@ if __name__ == "__main__":
 
     coveo_dataset = CoveoDataset()
     print(len(coveo_dataset.x_train))
+
     embeddings = train_embeddings(sessions=coveo_dataset.x_train)
     model = P2VRecModel(model=embeddings)
 

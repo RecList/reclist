@@ -1,22 +1,19 @@
 import numpy as np
-from reclist.rectest.standard_metrics import sample_misses_at_k, sample_hits_at_k
+from reclist.metrics.standard_metrics import sample_misses_at_k
 from scipy.spatial.distance import cosine
 import matplotlib.pyplot as plt
 
-def generic_cosine_distance(embeddings: dict,
-                            type_fn,
-                            y_test,
-                            y_preds,
-                            k=10,
-                            bins=25,
-                            debug=False):
-
+def error_by_cosine_distance(model, y_test, y_preds, k=3, bins=25, debug=False):
+    if not(hasattr(model.__class__, 'get_vector') and callable(getattr(model.__class__, 'get_vector'))):
+        error_msg = "Error : Model {} does not support retrieval of vector embeddings".format(model.__class__)
+        print(error_msg)
+        return error_msg
     misses = sample_misses_at_k(y_preds, y_test, k=k, size=-1)
     cos_distances = []
     for m in misses:
-        if m['Y_TEST'] and m['Y_PRED'] and type_fn(m['Y_TEST'][0]) and type_fn(m['Y_PRED'][0]):
-            vector_test = embeddings.get(type_fn(m['Y_TEST'][0]), None)
-            vector_pred = embeddings.get(type_fn(m['Y_PRED'][0]), None)
+        if m['Y_PRED']:
+            vector_test = model.get_vector(m['Y_TEST'][0])
+            vector_pred = model.get_vector(m['Y_PRED'][0])
             if vector_pred and vector_test:
                 cos_dist = cosine(vector_pred, vector_test)
                 cos_distances.append(cos_dist)
@@ -28,7 +25,8 @@ def generic_cosine_distance(embeddings: dict,
     # debug / viz
     if debug:
         plt.hist(cos_distances, bins=bins)
-        plt.title('cosine distance misses')
+        plt.title('dist over cosine distance prod space')
         plt.show()
+
     return {'mean': np.mean(cos_distances), 'histogram': histogram}
 

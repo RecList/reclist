@@ -2,7 +2,7 @@ import json
 import networkx as nx
 from networkx.algorithms.shortest_paths.generic import shortest_path
 from statistics import mean
-from reclist.rectest.standard_metrics import sample_misses_at_k, sample_hits_at_k
+from reclist.metrics.standard_metrics import sample_misses_at_k, sample_hits_at_k
 import numpy as np
 
 

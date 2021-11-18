@@ -1,177 +1,119 @@
-import ast
-from datetime import datetime
-import inspect
-import os
-from abc import ABC, abstractmethod
-from functools import wraps
-from pathlib import Path
-from reclist.abstractions import RecModel
-from reclist.abstractions import RecDataset
-import time
-import json
-from reclist.utils.train_w2v import train_embeddings
+from reclist.abstractions import RecList, rec_test
+from typing import List
 
+class CoveoCartRecList(RecList):
 
-def rec_test(rec_type: str, test_type: str):
-    """
-    Rec test decorator
-    """
+    @rec_test(rec_type='session', test_type='stats')
+    def basic_stats(self):
+        from reclist.metrics.standard_metrics import statistics
+        return statistics(self._x_train,
+                          self._y_train,
+                          self._x_test,
+                          self._y_test,
+                          self._y_preds)
 
-    def decorator(f):
-        @wraps(f)
-        def w(*args, **kwargs):
-            return f(*args, **kwargs)
+    @rec_test(rec_type='session', test_type='coverage')
+    def coverage_at_k(self):
+        """
+        Coverage is the proportion of all possible products which the RS
+        recommends based on a set of sessions
+        """
+        from reclist.metrics.standard_metrics import coverage_at_k
+        return coverage_at_k(self.sku_only(self._y_preds), self.product_data, k=3)
 
-        # add attributes to f
-        w.is_test = True
-        w.rec_type = rec_type
-        w.test_type = test_type
-        try:
-            w.test_desc = f.__doc__.lstrip().rstrip()
-        except:
-            w.test_desc = ""
-        try:
-            # python 3
-            w.name = w.__name__
-        except:
-            # python 2
-            w.name = w.__func__.func_name
-        return w
+    @rec_test(rec_type='session', test_type='HR@10')
+    def hit_rate_at_k(self):
+        """
+        Computes the rate in which the top-k predictions contain the item to be predicted
+        """
+        from reclist.metrics.standard_metrics import hit_rate_at_k
+        return hit_rate_at_k(self.sku_only(self._y_preds), self.sku_only(self._y_test), k=3)
 
-    return decorator
+    @rec_test(rec_type='session', test_type='hits_distribution')
+    def hits_distribution(self):
+        """
+        Computes the distribution of hit-rate across product frequency in training data
+        """
+        from reclist.metrics.hits_distribution import hits_distribution
+        return hits_distribution(self.sku_only(self._x_train),
+                                 self.sku_only(self._x_test),
+                                 self.sku_only(self._y_test),
+                                 self.sku_only(self._y_preds),
+                                 debug=True)
 
+    @rec_test(rec_type='cart', test_type='category_distance')
+    def cat_distance(self):
+        """
+        Measures the graph distance between prediction and ground truth
+        """
+        from reclist.metrics.graph_distance_test import graph_distance_test
 
-class StepVisitor(ast.NodeVisitor):
-    """
-    Select nodes which have is_test attribute
-    """
+        return graph_distance_test(self.sku_only(self._y_test),
+                                   self.sku_only(self._y_preds),
+                                   self.product_data)
 
-    def __init__(self, nodes, flow):
-        self.nodes = nodes
-        self.flow = flow
-        super(StepVisitor, self).__init__()
+    @rec_test(rec_type='session', test_type='brand_cosine_distance')
+    def brand_cosine_distance(self):
+        from reclist.metrics.generic_cosine_distance import generic_cosine_distance
+        # function to return property/type of a product
+        def type_fn(event):
+            if event['product_sku'] in self.product_data:
+                return self.product_data[event['product_sku']]['STANDARDIZED_BRAND']
+            else:
+                return None
 
-    def visit_FunctionDef(self, node):
-        func = getattr(self.flow, node.name)
-        if hasattr(func, 'is_test'):
-            self.nodes[node.name] = func
+        # train a dense space with word2vec
+        self.train_dense_repr('BRAND', type_fn)
 
+        return generic_cosine_distance(embeddings=self._dense_repr['BRAND'],
+                                       type_fn=type_fn,
+                                       y_test=self._y_test,
+                                       y_preds=self._y_preds,
+                                       debug=True)
 
-class RecList(ABC):
-    META_DATA_FOLDER = '.reclist'
+    @rec_test(rec_type='session', test_type='cosine_distance')
+    def cosine_distance(self):
+        """
+        Computes the average cosine distance for missed predictions
+        """
+        from reclist.metrics.error_by_cosine_distance import error_by_cosine_distance
 
-    def __init__(self, model: RecModel, dataset: RecDataset, y_preds: list = None):
+        result = error_by_cosine_distance(self.rec_model,
+                                         self.sku_only(self._y_test),
+                                         self.sku_only(self._y_preds),
+                                         debug=True)
+        return result
 
-        self.name = self.__class__.__name__
-        self._rec_tests = self.get_tests()
-        self._x_train = dataset.x_train
-        self._y_train = dataset.y_train
-        self._x_test = dataset.x_test
-        self._y_test = dataset.y_test
-        self._y_preds = y_preds if y_preds else model.predict(dataset.x_test)
-        self.rec_model = model
-        self.product_data = dataset.catalog
-        self._test_results = []
-        self._test_data = {}
-        self._dense_repr = {}
+    @rec_test(rec_type='session', test_type='price_homogeneity')
+    def price_homogeneity(self):
+        """
+        Computes the average absolute log ratio of predicted item and item in cart
+        """
+        from reclist.metrics.price_homogeneity import price_homogeneity_test
 
-        assert len(self._y_test) == len(self._y_preds)
+        return price_homogeneity_test(self.sku_only(self._y_test),
+                                      self.sku_only(self._y_preds),
+                                      self.product_data)
 
-    def train_dense_repr(self, type_name: str, type_fn):
-        '''
-        Train a dense representation over a type of meta-data & store into object
-        '''
+    @rec_test(rec_type='session', test_type='hits_slices')
+    def hits_slices(self):
+        """
+        Computes the distribution of hit-rate across various sliceS of data in training data
+        """
+        from reclist.metrics.hits_slice import hits_distribution_by_slice
 
-        # type_fn: given a SKU returns some type i.e. brand
-        x_train_transformed = [[type_fn(e) for e in session if type_fn(e)] for session in self._x_train]
-        wv = train_embeddings(x_train_transformed)
-        # store a dict
-        self._dense_repr[type_name] = {word: list(wv.get_vector(word)) for word in wv.key_to_index}
-
-    def get_tests(self):
-        '''
-        Helper to extract methods decorated with rec_test
-        '''
-        m = __import__(self.__class__.__module__)
-        tree = ast.parse(inspect.getsource(m)).body
-
-        root = [n for n in tree
-                if isinstance(n, ast.ClassDef) and n.name == self.name][0]
-        nodes = {}
-        StepVisitor(nodes, self).visit(root)
-        return nodes
-
-    def __call__(self, verbose=True, *args, **kwargs):
-        run_epoch_time_ms = round(time.time() * 1000)
-        # iterate through tests
-        for test_func_name, test in self._rec_tests.items():
-            test_result = test(*args, **kwargs)
-            # we could store the results in the test function itself
-            # test.__func__.test_result = test_result
-            self._test_results.append({
-                'test_name': test.test_type,
-                'description': test.test_desc,
-                'test_result': test_result}
-            )
-            if verbose:
-                print("============= TEST RESULTS ===============")
-                print("Test Type        : {}".format(test.test_type))
-                print("Test Description : {}".format(test.test_desc))
-                print("Test Result      : {}\n".format(test_result))
-        # at the end, we dump it locally
-        if verbose:
-            print("Generating reports at {}".format(datetime.utcnow()))
-        self.generate_report(run_epoch_time_ms)
-
-    def generate_report(self, epoch_time_ms: int):
-        # create path first: META_DATA_FOLDER / RecList / Model / Run Time
-        report_path = os.path.join(
-            self.META_DATA_FOLDER,
-            self.name,
-            self.rec_model.__class__.__name__,
-            str(epoch_time_ms)
-        )
-        # now, dump results
-        self.dump_results_to_json(self._test_results, report_path, epoch_time_ms)
-        # now, store artifacts
-        self.store_artifacts(report_path)
-
-    def store_artifacts(self, report_path: str):
-        target_path = os.path.join(report_path, 'artifacts')
-        # make sure the folder is there, with all intermediate parents
-        Path(target_path).mkdir(parents=True, exist_ok=True)
-        # store predictions
-        with open(os.path.join(target_path, 'model_predictions.json'), 'w') as f:
-            json.dump({
-                'x_test': self._x_test,
-                'y_test': self._y_test,
-                'y_preds': self._y_preds
-            }, f)
-
-    def dump_results_to_json(self, test_results: list, report_path: str, epoch_time_ms: int):
-        target_path = os.path.join(report_path, 'results')
-        # make sure the folder is there, with all intermediate parents
-        Path(target_path).mkdir(parents=True, exist_ok=True)
-        report = {
-            'metadata': {
-                'run_time': epoch_time_ms,
-                'model_name': self.rec_model.__class__.__name__,
-                'reclist': self.name,
-                'tests': list(self._rec_tests.keys())
-            },
-            'data': test_results
+        slice_fns = {
+            'nike': lambda _: _['STANDARDIZED_BRAND'] == 'nike',
+            'adidas': lambda _: _['STANDARDIZED_BRAND'] == 'adidas',
+            'asics': lambda _: _['STANDARDIZED_BRAND'] == 'asics',
+            'puma': lambda _: _['STANDARDIZED_BRAND'] == 'puma',
+            'under armour': lambda _: _['STANDARDIZED_BRAND'] == 'under armour',
         }
-        with open(os.path.join(target_path, 'report.json'), 'w') as f:
-            json.dump(report, f)
 
-    @property
-    def test_results(self):
-        return self._test_results
+        return hits_distribution_by_slice(slice_fns,
+                                          self.sku_only(self._y_test),
+                                          self.sku_only(self._y_preds),
+                                          self.product_data)
 
-    @property
-    def test_data(self):
-        return self._test_data
-
-    @property
-    def rec_tests(self):
-        return self._rec_tests
+    def sku_only(self, l:List[List]):
+        return [[e['product_sku'] for e in s] for s in l]
