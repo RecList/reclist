@@ -93,13 +93,100 @@ the abstractions and the out-of-the-box capabilities of *RecList*.
 A Guided Tour
 -------------
 
-*Coming soon!*
+An instance of `RecList <https://github.com/jacopotagliabue/reclist/blob/main/reclist/reclist.py>`__ represents a suite of tests for recommender systems: given
+a dataset (more appropriately, an instance of `RecDataset <https://github.com/jacopotagliabue/reclist/blob/main/reclist/abstractions.py>`__)
+and a model (more appropriately, an instance of `RecModel <https://github.com/jacopotagliabue/reclist/blob/main/reclist/abstractions.py>`__), it will
+run the specified tests on the target dataset, using the supplied model. For example, the following code instantiates a pre-made
+suite of tests that contains sensible defaults for a `cart recommendation use case <https://github.com/jacopotagliabue/reclist/blob/main/reclist/reclist.py>`__:
+
+.. code-block:: python
+   
+   rec_list = CoveoCartRecList(
+        model=model,
+        dataset=coveo_dataset
+    )
+    # invoke rec_list to run tests
+    rec_list(verbose=True)
+
+Our library pre-packages standard recSys KPIs and important behavioral tests, divided by use cases (check the paper!), but it is built with 
+extensibility in mind: you can re-use tests in new suites, you can re-use suites and extend them with new tests, or you can write new
+domain-specific suites and tests. Any suite must inherit the *RecList* interface, and then declare with Pytonic decorators its tests: in this case,
+the test re-uses a standard KPI provided in the package:
+
+.. code-block:: python
+   
+    class MyRecList(RecList):
+
+        @rec_test(test_type='stats')
+        def basic_stats(self):
+            """
+            Basic statistics on training, test and prediction data
+            """
+            from reclist.metrics.standard_metrics import statistics
+            return statistics(self._x_train,
+                self._y_train,
+                self._x_test,
+                self._y_test,
+                self._y_preds)
+
+
+Any model can be tested, as long as its predictions are wrapped in a *RecModel*. This allows for pure "black-box" testings, as for example
+a SaaS provider can be tested just by wrapping the proper API call in the method:
+
+.. code-block:: python
+   
+    class MyModel(RecModel):
+    
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+
+        def predict(self, prediction_input: list, *args, **kwargs):
+            """
+            Implement the abstract method, accepting a list of lists, each list being
+            the content of a cart: the predictions returned by the model are the top K
+            items suggested to complete the cart.
+            """
+
+            return
+
+While many standard KPIs are available in the package, the philosophy behind *RecList* is that metrics like HR@10 provide only a partial picture
+of the expected behavior of recommenders in the wild: two models with very similar accuracy can have very different behavior on, say, the long-tail, or
+model A can be better than model B overall, but at the expense of providing disastrous performance on a set of inputs that are particularly important in production. 
+*RecList* recognized that outside of academic benchmarks, not all mistakes are equally worse, and not all inputs are created equal: it tries
+to operationalize with scalable code, when possible, important behavioral insights for in-depth debugging and error analysis of recommender systems; and it tries to 
+provide nice extensible abstraction when domain knowledge is needed and custom tests need to be written.
+
+Once you run a suite of tests, results are dumped automatically and versioned in a local folder, structured as follows
+(name of the suite, name of the model, run timestamp):
+
+.. code-block::
+
+    .reclist
+        myList
+            myModel
+                1637357392
+                1637357404
+
+We provide a simple (and *very* WIP) UI to easily compare runs and models. After you run two times one of the example scripts,
+you can do:
+
+.. code-block::
+
+    cd app
+    python app.py
+
+to start a local web app that lets you explore test results:    
 
 .. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/explorer.png
-   :height: 300
+   :height: 200
+
+If you select more than model, the app will automatically build comparison tables:
 
 .. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/comparison.png
-   :height: 300
+   :height: 200
+
+If you start using *RecList* as part of your standard testings - either for research or production purposes - you can use the JSON report
+for machine-to-machine communication with downstream system (e.g. you may want to automatically fail the model pipeline if certain behavioral tests are not passed).
 
 Capabilities
 ------------
