@@ -96,8 +96,10 @@ A Guided Tour
 *Coming soon!*
 
 .. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/explorer.png
+   :height: 300
 
 .. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/comparison.png
+   :height: 300
 
 Capabilities
 ------------
