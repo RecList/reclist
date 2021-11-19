@@ -6,12 +6,12 @@ Welcome to RecList's documentation!
    :caption: Contents:
 
    readme
-   installation
-   usage
-   modules
+   abstractions
    contributing
    authors
    history
+
+
 
 Indices and tables
 ==================

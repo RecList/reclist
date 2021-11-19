@@ -12,8 +12,14 @@ from reclist.utils.train_w2v import train_embeddings
 
 
 class RecDataset(ABC):
-
+    """
+    Implements an abstract class for the dataset
+    """
     def __init__(self, force_download=False):
+        """
+        :param force_download: allows to force the download of the dataset in case it is needed.
+        :type: force_download: bool, optional
+        """
         self._x_train = None
         self._y_train = None
         self._x_test = None
@@ -24,6 +30,10 @@ class RecDataset(ABC):
 
     @abstractmethod
     def load(self):
+        """
+        Abstract method that should implement dataset loading
+        @return:
+        """
         return
 
     @property
@@ -68,7 +78,6 @@ def rec_test(test_type: str):
     """
     Rec test decorator
     """
-
     def decorator(f):
         @wraps(f)
         def w(*args, **kwargs):
@@ -96,7 +105,11 @@ class RecList(ABC):
     META_DATA_FOLDER = '.reclist'
 
     def __init__(self, model: RecModel, dataset: RecDataset, y_preds: list = None):
-
+        """
+        :param model:
+        :param dataset:
+        :param y_preds:
+        """
         self.name = self.__class__.__name__
         self._rec_tests = self.get_tests()
         self._x_train = dataset.x_train
@@ -116,7 +129,6 @@ class RecList(ABC):
         """
         Train a dense representation over a type of meta-data & store into object
         """
-
         # type_fn: given a SKU returns some type i.e. brand
         x_train_transformed = [[type_fn(e) for e in session if type_fn(e)] for session in self._x_train]
         wv = train_embeddings(x_train_transformed)
