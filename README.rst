@@ -95,23 +95,26 @@ A Guided Tour
 
 An instance of `RecList <https://github.com/jacopotagliabue/reclist/blob/main/reclist/reclist.py>`__ represents a suite of tests for recommender systems: given
 a dataset (more appropriately, an instance of `RecDataset <https://github.com/jacopotagliabue/reclist/blob/main/reclist/abstractions.py>`__)
-and a model (more appropriately, an instance of `RecModel <https://github.com/jacopotagliabue/reclist/blob/main/reclist/abstractions.py>`__), it will
-run the specified tests on the target dataset, using the supplied model. For example, the following code instantiates a pre-made
-suite of tests that contains sensible defaults for a `cart recommendation use case <https://github.com/jacopotagliabue/reclist/blob/main/reclist/reclist.py>`__:
+and a model (an instance of `RecModel <https://github.com/jacopotagliabue/reclist/blob/main/reclist/abstractions.py>`__), it will
+run the specified tests on the target dataset, using the supplied model. 
+
+For example, the following code instantiates a pre-made suite of tests that contains sensible defaults 
+for a `cart recommendation use case <https://github.com/jacopotagliabue/reclist/blob/main/reclist/reclist.py>`__:
 
 .. code-block:: python
    
-   rec_list = CoveoCartRecList(
+    rec_list = CoveoCartRecList(
         model=model,
         dataset=coveo_dataset
     )
     # invoke rec_list to run tests
     rec_list(verbose=True)
 
-Our library pre-packages standard recSys KPIs and important behavioral tests, divided by use cases (check the paper!), but it is built with 
-extensibility in mind: you can re-use tests in new suites, you can re-use suites and extend them with new tests, or you can write new
-domain-specific suites and tests. Any suite must inherit the *RecList* interface, and then declare with Pytonic decorators its tests: in this case,
-the test re-uses a standard KPI provided in the package:
+Our library pre-packages standard recSys KPIs and important behavioral tests, divided by use cases, but it is built with 
+extensibility in mind: you can re-use tests in new suites, or you can write new domain-specific suites and tests. 
+
+Any suite must inherit the *RecList* interface, and then declare with Pytonic decorators its tests: 
+in this case, the test re-uses a standard function:
 
 .. code-block:: python
    
@@ -130,12 +133,12 @@ the test re-uses a standard KPI provided in the package:
                 self._y_preds)
 
 
-Any model can be tested, as long as its predictions are wrapped in a *RecModel*. This allows for pure "black-box" testings, as for example
+Any model can be tested, as long as its predictions are wrapped in a *RecModel*. This allows for pure "black-box" testings, 
 a SaaS provider can be tested just by wrapping the proper API call in the method:
 
 .. code-block:: python
    
-    class MyModel(RecModel):
+    class MyCartModel(RecModel):
     
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
@@ -149,28 +152,29 @@ a SaaS provider can be tested just by wrapping the proper API call in the method
 
             return
 
-While many standard KPIs are available in the package, the philosophy behind *RecList* is that metrics like HR@10 provide only a partial picture
+While many standard KPIs are available in the package, the philosophy behind *RecList* is that metrics like Hit Rate provide only a partial picture
 of the expected behavior of recommenders in the wild: two models with very similar accuracy can have very different behavior on, say, the long-tail, or
 model A can be better than model B overall, but at the expense of providing disastrous performance on a set of inputs that are particularly important in production. 
-*RecList* recognized that outside of academic benchmarks, not all mistakes are equally worse, and not all inputs are created equal: it tries
-to operationalize with scalable code, when possible, important behavioral insights for in-depth debugging and error analysis of recommender systems; and it tries to 
-provide nice extensible abstraction when domain knowledge is needed and custom tests need to be written.
+
+*RecList* recognized that outside of academic benchmarks, some mistakes are worse than others, and not all inputs are created equal: when possible, it tries
+to operationalize through scalable code important behavioral insights for in-depth debugging and error analysis; it 
+provides extensible abstractions when domain knowledge and custom logic are needed.
 
 Once you run a suite of tests, results are dumped automatically and versioned in a local folder, structured as follows
 (name of the suite, name of the model, run timestamp):
 
-.. code-block::
+.. code-block:: 
 
-    .reclist
-        myList
-            myModel
-                1637357392
-                1637357404
+    .reclist/
+      myList/
+        myModel
+          1637357392
+          1637357404
 
 We provide a simple (and *very* WIP) UI to easily compare runs and models. After you run two times one of the example scripts,
 you can do:
 
-.. code-block::
+.. code-block:: bash
 
     cd app
     python app.py
@@ -194,8 +198,7 @@ Capabilities
 *RecList* provides a dataset and model agnostic framework to scale up behavioral tests. As long as the proper abstractions
 are implemented, all the out-of-the-box components can be re-used. For example:
 
-* you can use a public dataset provided by *RecList* to train your new cart recommender model, and then use the *RecTests* we
-provide for that use case;
+* you can use a public dataset provided by *RecList* to train your new cart recommender model, and then use the *RecTests* we provide for that use case;
 
 * you can use some baseline model on your custom dataset, to establish a baseline for your project;
 
