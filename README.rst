@@ -31,25 +31,23 @@ RecList
 * Free software: MIT license
 * Documentation: https://reclist.readthedocs.io.
 
-
-
 Overview
 --------
 
-*RecList* is an open source library providing behavioral, "black-box" testing for recommender systems. Inspired by the pioneering work of 
-`Ribeiro et al. 2020 <https://aclanthology.org/2020.acl-main.442.pdf>`__ in NLP, we introduce a general plug-and-play procedure to scale up behavioral testing, 
+*RecList* is an open source library providing behavioral, "black-box" testing for recommender systems. Inspired by the pioneering work of
+`Ribeiro et al. 2020 <https://aclanthology.org/2020.acl-main.442.pdf>`__ in NLP, we introduce a general plug-and-play procedure to scale up behavioral testing,
 with an easy-to-extend interface for custom use cases.
 
-*RecList* ships with some popular datasets and ready-made behavioral tests: check the paper (forthcoming) 
+*RecList* ships with some popular datasets and ready-made behavioral tests: check the paper (forthcoming)
 for more details on the relevant literature and the philosophical motivations behind the project.
 
-If you are not familiar with the library, we suggest first taking our small [tour](#a-guided-tour) 
+If you are not familiar with the library, we suggest first taking our small [tour](#a-guided-tour)
 to get acquainted with the main abstractions through ready-made models and public datasets.
 
 Project updates
 ~~~~~~~~~~~~~~~
 
-*Nov. 2021*: the library is currently in alpha. We welcome contributions and feedback, but please be advised that the package 
+*Nov. 2021*: the library is currently in alpha. We welcome contributions and feedback, but please be advised that the package
 may change substantially in the upcoming months. A pre-print of the companion paper is planned to be released before Dec. 2021
 
 As the project is in active development, come back often for updates.
@@ -70,15 +68,17 @@ Quick Start
 -----------
 
 If you want to see *RecList* in action, clone the repository, create and activate a virtual env, and install
-the required packages from root. 
+the required packages from root.
 
-Sample scripts are divided by use-cases: similar items, complementary items or 
-session-based recommendations. When executing one, a suitable public dataset will be downloaded, 
-and a baseline ML model trained: finally, the script will run a pre-made suite of behavioral tests 
+Sample scripts are divided by use-cases: similar items, complementary items or
+session-based recommendations. When executing one, a suitable public dataset will be downloaded,
+and a baseline ML model trained: finally, the script will run a pre-made suite of behavioral tests
 to show typical results.
 
 .. code-block::
 
+    git clone https://github.com/jacopotagliabue/reclist
+    cd reclist
     python3 -m venv venv
     source venv/bin/activate
     pip install -e .
@@ -103,8 +103,8 @@ Capabilities
 Datasets
 ~~~~~~~~
 
-RecList features convenient wrappers around popular datasets, to help test models over known benchmarks 
-in a standardized way. 
+RecList features convenient wrappers around popular datasets, to help test models over known benchmarks
+in a standardized way.
 
 * `Coveo Data Challenge <https://github.com/coveooss/SIGIR-ecom-data-challenge>`__
 * `The Million Playlist Dataset <https://engineering.atspotify.com/2018/05/30/introducing-the-million-playlist-dataset-and-recsys-challenge-2018/>`__ (*coming soon*)
@@ -123,7 +123,7 @@ Roadmap
 Contributing
 ~~~~~~~~~~~~
 
-We will update this repo with some guidelines for contributions as soon as the codebase becomes more stable. 
+We will update this repo with some guidelines for contributions as soon as the codebase becomes more stable.
 Check back often for updates!
 
 Acknowledgments
