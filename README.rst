@@ -174,12 +174,14 @@ License and Citation
 
 All the code is released under an open MIT license. If you found *RecList* useful, or you are using it to benchmark/debug your model, please cite our pre-print (forhtcoming):
 
+.. code-block:: bash
 
     @article{recListPre2021,
       title={Beyond NDCG: behavioral testing of recommender systems with RecList},
       author={Patrick John Chia and Jacopo Tagliabue and Federico Bianchi and Chloe He and Brian Ko},
       journal={ArXiv},
-      year={forthcoming}}
+      year={forthcoming}
+    }
 
 Credits
 -------
