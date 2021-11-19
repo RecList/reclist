@@ -156,8 +156,8 @@ While many standard KPIs are available in the package, the philosophy behind *Re
 of the expected behavior of recommenders in the wild: two models with very similar accuracy can have very different behavior on, say, the long-tail, or
 model A can be better than model B overall, but at the expense of providing disastrous performance on a set of inputs that are particularly important in production. 
 
-*RecList* recognized that outside of academic benchmarks, some mistakes are worse than others, and not all inputs are created equal: when possible, it tries
-to operationalize through scalable code important behavioral insights for in-depth debugging and error analysis; it 
+*RecList* recognizes that outside of academic benchmarks, some mistakes are worse than others, and not all inputs are created equal: when possible, it tries
+to operationalize through scalable code behavioral insights for debugging and error analysis; it also
 provides extensible abstractions when domain knowledge and custom logic are needed.
 
 Once you run a suite of tests, results are dumped automatically and versioned in a local folder, structured as follows
@@ -167,9 +167,9 @@ Once you run a suite of tests, results are dumped automatically and versioned in
 
     .reclist/
       myList/
-        myModel
-          1637357392
-          1637357404
+        myModel/
+          1637357392/
+          1637357404/
 
 We provide a simple (and *very* WIP) UI to easily compare runs and models. After you run two times one of the example scripts,
 you can do:
@@ -202,9 +202,7 @@ are implemented, all the out-of-the-box components can be re-used. For example:
 
 * you can use some baseline model on your custom dataset, to establish a baseline for your project;
 
-* you can use a custom model, on a private dataset and define from scratch a new suite of tests, mixing existing methods and domain-specific tests
-
-* and so on...
+* you can use a custom model, on a private dataset and define from scratch a new suite of tests, mixing existing methods and domain-specific tests.
 
 We list below what we currently support out-of-the-box, with particular focus on datasets and tests, as the models we provide
 are convenient baselines, but they are not meant to be SOTA research models.
