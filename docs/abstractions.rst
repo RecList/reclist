@@ -1,6 +1,10 @@
-=======
+============
+Abstractions
+============
+
+
 RecTest
-=======
+-------
 
 The RecTest is probably the most fundamental abstraction in RecList.
 
@@ -21,9 +25,7 @@ The RecTest is probably the most fundamental abstraction in RecList.
                               self._y_test,
                               self._y_preds)
 
-============
-Abstractions
-============
+
 
 .. automodule:: reclist.abstractions
     :members:

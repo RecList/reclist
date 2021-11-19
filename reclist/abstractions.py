@@ -63,10 +63,22 @@ class RecModel(ABC):
     """
 
     def __init__(self, model=None):
+        """
+
+        :param model: a model that can be used in the predict function
+        """
         self._model = model
 
     @abstractmethod
     def predict(self, prediction_input: list, *args, **kwargs):
+        """
+        The predict function should implement the behaviour of the model at inference time.
+
+        :param prediction_input: the input that is used to to do the prediction
+        :param args:
+        :param kwargs:
+        :return:
+        """
         return NotImplementedError
 
     @property
@@ -136,9 +148,10 @@ class RecList(ABC):
         self._dense_repr[type_name] = {word: list(wv.get_vector(word)) for word in wv.key_to_index}
 
     def get_tests(self):
-        '''
+        """
         Helper to extract methods decorated with rec_test
-        '''
+        """
+
         nodes = {}
         for _ in self.__dir__():
             if not hasattr(self,_):
