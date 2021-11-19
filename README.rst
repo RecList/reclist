@@ -41,8 +41,8 @@ with an easy-to-extend interface for custom use cases.
 *RecList* ships with some popular datasets and ready-made behavioral tests: check the paper (forthcoming)
 for more details on the relevant literature and the philosophical motivations behind the project.
 
-If you are not familiar with the library, we suggest first taking our small [tour](#a-guided-tour)
-to get acquainted with the main abstractions through ready-made models and public datasets.
+If you are not familiar with the library, we suggest first taking our small tour to get acquainted with the main 
+abstractions through ready-made models and public datasets.
 
 Project updates
 ~~~~~~~~~~~~~~~
@@ -98,7 +98,21 @@ A Guided Tour
 Capabilities
 ------------
 
-*Coming soon!*
+*RecList* provides a dataset and model agnostic framework to scale up behavioral tests. As long as the proper abstractions
+are implemented, all the out-of-the-box components can be re-used. For example:
+
+* you can use a public dataset provided by *RecList* to train your new cart recommender model, and then use the *RecTests* we 
+provide for that use case;
+
+* you can use some baseline model provided in this repo on your custom dataset, to establish a baseline for your project;
+
+* you can use a custom model, on a private dataset and define from scratch a new suite of tests, mixing existing methods and domain-specific
+tests
+
+* and so on...
+
+We list below what we currently support out-of-the-box, with particular focus on datasets and tests, as the models we provide
+are convenient baselines, but they are not meant to be SOTA research models.
 
 Datasets
 ~~~~~~~~
@@ -118,7 +132,18 @@ Behavioral Tests
 Roadmap
 -------
 
-*Coming soon!*
+To do:
+
+* the app is just a stub: improve the report "contract" and extend the app capabilities, possibly including it in the 
+library itself;
+
+* continue adding default *RecTests* by use cases, and test them on public datasets;
+
+* improving our test suites and refactor some abstractions;
+
+* adding Colab tutorials, extensive documentation and a blog-like write-up to explain the basic usage.
+
+We maintain a small Trello board on the project which we plan on sharing with the community: *more details coming soon*!
 
 Contributing
 ~~~~~~~~~~~~

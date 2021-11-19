@@ -109,3 +109,6 @@ ENV/
 
 # local dump of reclist runs
 .reclist
+
+# mac file
+.DS_Store
