@@ -41,7 +41,7 @@ with an easy-to-extend interface for custom use cases.
 *RecList* ships with some popular datasets and ready-made behavioral tests: check the paper (forthcoming)
 for more details on the relevant literature and the philosophical motivations behind the project.
 
-If you are not familiar with the library, we suggest first taking our small tour to get acquainted with the main 
+If you are not familiar with the library, we suggest first taking our small tour to get acquainted with the main
 abstractions through ready-made models and public datasets.
 
 Project updates
@@ -75,7 +75,7 @@ session-based recommendations. When executing one, a suitable public dataset wil
 and a baseline ML model trained: finally, the script will run a pre-made suite of behavioral tests
 to show typical results.
 
-.. code-block::
+.. code-block:: bash
 
     git clone https://github.com/jacopotagliabue/reclist
     cd reclist
@@ -194,7 +194,8 @@ Capabilities
 *RecList* provides a dataset and model agnostic framework to scale up behavioral tests. As long as the proper abstractions
 are implemented, all the out-of-the-box components can be re-used. For example:
 
-* you can use a public dataset provided by *RecList* to train your new cart recommender model, and then use the *RecTests* we provide for that use case;
+* you can use a public dataset provided by *RecList* to train your new cart recommender model, and then use the *RecTests* we
+provide for that use case;
 
 * you can use some baseline model on your custom dataset, to establish a baseline for your project;
 
@@ -225,7 +226,7 @@ Roadmap
 
 To do:
 
-* the app is just a stub: improve the report "contract" and extend the app capabilities, possibly including it in the 
+* the app is just a stub: improve the report "contract" and extend the app capabilities, possibly including it in the
 library itself;
 
 * continue adding default *RecTests* by use cases, and test them on public datasets;
@@ -260,14 +261,12 @@ License and Citation
 
 All the code is released under an open MIT license. If you found *RecList* useful, or you are using it to benchmark/debug your model, please cite our pre-print (forhtcoming):
 
-.. code-block::
 
     @article{recListPre2021,
       title={Beyond NDCG: behavioral testing of recommender systems with RecList},
       author={Patrick John Chia and Jacopo Tagliabue and Federico Bianchi and Chloe He and Brian Ko},
       journal={ArXiv},
-      year={forthcoming}
-    }
+      year={forthcoming}}
 
 Credits
 -------
