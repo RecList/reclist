@@ -87,7 +87,7 @@ to show typical results.
 Running *your* model on one of the supported dataset, leveraging the pre-made tests, is as easy as implementing
 a simple interface, *RecModel*.
 
-Once you've run successfully the sample script, take the quick guided tour (coming soon) below to learn more about
+Once you've run successfully the sample script, take the quick guided tour below to learn more about
 the abstractions and the out-of-the-box capabilities of *RecList*.
 
 A Guided Tour
@@ -95,19 +95,21 @@ A Guided Tour
 
 *Coming soon!*
 
+.. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/explorer.png
+
+.. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/comparison.png
+
 Capabilities
 ------------
 
 *RecList* provides a dataset and model agnostic framework to scale up behavioral tests. As long as the proper abstractions
 are implemented, all the out-of-the-box components can be re-used. For example:
 
-* you can use a public dataset provided by *RecList* to train your new cart recommender model, and then use the *RecTests* we 
-provide for that use case;
+* you can use a public dataset provided by *RecList* to train your new cart recommender model, and then use the *RecTests* we provide for that use case;
 
-* you can use some baseline model provided in this repo on your custom dataset, to establish a baseline for your project;
+* you can use some baseline model on your custom dataset, to establish a baseline for your project;
 
-* you can use a custom model, on a private dataset and define from scratch a new suite of tests, mixing existing methods and domain-specific
-tests
+* you can use a custom model, on a private dataset and define from scratch a new suite of tests, mixing existing methods and domain-specific tests
 
 * and so on...
 
