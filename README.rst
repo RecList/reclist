@@ -44,6 +44,13 @@ for more details on the relevant literature and the philosophical motivations be
 If you are not familiar with the library, we suggest first taking our small tour to get acquainted with the main
 abstractions through ready-made models and public datasets.
 
+Quick Links
+~~~~~~~~~~~
+
+* Our paper (forthcoming), with in-depth analysis, detailed use cases and scholarly references.
+* A `colab notebook <https://colab.research.google.com/drive/1Wn5mm0csEkyWqmBBDxNBkfGR6CNfWeH-?usp=sharing>`__ (work in progress), showing how to train a cart recommender model from scratch and use the library to test it.
+* Our blog post (forthcoming), with examples and practical tips. 
+
 Project updates
 ~~~~~~~~~~~~~~~
 
@@ -68,7 +75,8 @@ Quick Start
 -----------
 
 If you want to see *RecList* in action, clone the repository, create and activate a virtual env, and install
-the required packages from root.
+the required packages from root. If you prefer to experiment in an interactive, no-installation-required fashion,
+try out our `colab notebook <https://colab.research.google.com/drive/1Wn5mm0csEkyWqmBBDxNBkfGR6CNfWeH-?usp=sharing>`__.
 
 Sample scripts are divided by use-cases: similar items, complementary items or
 session-based recommendations. When executing one, a suitable public dataset will be downloaded,
@@ -87,7 +95,7 @@ to show typical results.
 Running *your* model on one of the supported dataset, leveraging the pre-made tests, is as easy as implementing
 a simple interface, *RecModel*.
 
-Once you've run successfully the sample script, take the quick guided tour below to learn more about
+Once you've run successfully the sample script, take the guided tour below to learn more about
 the abstractions and the out-of-the-box capabilities of *RecList*.
 
 A Guided Tour
