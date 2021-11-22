@@ -38,7 +38,7 @@ Overview
 `Ribeiro et al. 2020 <https://aclanthology.org/2020.acl-main.442.pdf>`__ in NLP, we introduce a general plug-and-play procedure to scale up behavioral testing,
 with an easy-to-extend interface for custom use cases.
 
-*RecList* ships with some popular datasets and ready-made behavioral tests: check the paper (forthcoming)
+*RecList* ships with some popular datasets and ready-made behavioral tests: check the `paper <https://arxiv.org/abs/2111.09963>`__
 for more details on the relevant literature and the philosophical motivations behind the project.
 
 If you are not familiar with the library, we suggest first taking our small tour to get acquainted with the main
@@ -47,15 +47,15 @@ abstractions through ready-made models and public datasets.
 Quick Links
 ~~~~~~~~~~~
 
-* Our paper (forthcoming), with in-depth analysis, detailed use cases and scholarly references.
-* A `colab notebook <https://colab.research.google.com/drive/1Wn5mm0csEkyWqmBBDxNBkfGR6CNfWeH-?usp=sharing>`__ (work in progress), showing how to train a cart recommender model from scratch and use the library to test it.
+* Our `paper <https://arxiv.org/abs/2111.09963>`__, with in-depth analysis, detailed use cases and scholarly references.
+* A `colab notebook <https://colab.research.google.com/drive/1Wn5mm0csEkyWqmBBDxNBkfGR6CNfWeH-?usp=sharing>`__ (WIP), showing how to train a cart recommender model from scratch and use the library to test it.
 * Our blog post (forthcoming), with examples and practical tips. 
 
 Project updates
 ~~~~~~~~~~~~~~~
 
 *Nov. 2021*: the library is currently in alpha. We welcome contributions and feedback, but please be advised that the package
-may change substantially in the upcoming months. A pre-print of the companion paper is planned to be released before Dec. 2021
+may change substantially in the upcoming months.
 
 As the project is in active development, come back often for updates.
 
@@ -272,12 +272,11 @@ All the code is released under an open MIT license. If you found *RecList* usefu
 
 .. code-block:: bash
 
-    @article{recListPre2021,
-      title={Beyond NDCG: behavioral testing of recommender systems with RecList},
-      author={Patrick John Chia and Jacopo Tagliabue and Federico Bianchi and Chloe He and Brian Ko},
-      journal={ArXiv},
-      year={forthcoming}
-    }
+ @inproceedings{Chia2021BeyondNB,
+   title={Beyond NDCG: behavioral testing of recommender systems with RecList},
+   author={Patrick John Chia and Jacopo Tagliabue and Federico Bianchi and Chloe He and Brian Ko},
+   year={2021}
+ }
 
 Credits
 -------
