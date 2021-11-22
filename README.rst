@@ -235,8 +235,7 @@ Roadmap
 
 To do:
 
-* the app is just a stub: improve the report "contract" and extend the app capabilities, possibly including it in the
-library itself;
+* the app is just a stub: improve the report "contract" and extend the app capabilities, possibly including it in the library itself;
 
 * continue adding default *RecTests* by use cases, and test them on public datasets;
 
