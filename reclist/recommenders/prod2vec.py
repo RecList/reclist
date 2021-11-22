@@ -1,6 +1,7 @@
 from reclist.abstractions import RecModel
+from reclist.utils.train_w2v import train_embeddings
 
-class P2VRecModel(RecModel):
+class CoveoP2VRecModel(RecModel):
     """
     Implement of the prod2vec model through the standard RecModel interface.
 
@@ -11,6 +12,11 @@ class P2VRecModel(RecModel):
         super().__init__(**kwargs)
 
     model_name = "prod2vec"
+
+    def train(self, products):
+        x_train_skus = [[e['product_sku'] for e in s] for s in products]
+        self._model = train_embeddings(x_train_skus)
+
     def predict(self, prediction_input: list, *args, **kwargs):
         """
         Implement the abstract method, accepting a list of lists, each list being

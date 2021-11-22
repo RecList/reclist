@@ -1,5 +1,5 @@
 """
-    This is a sample script showing how to get started with reclist. In particular, 
+    This is a sample script showing how to get started with reclist. In particular,
     we are targeting a "complementary items" use cases, such as for example a cart recommender:
     if a shopper added item X to the cart, what is she likely to add next?
 
@@ -12,24 +12,19 @@
     your model prediction using the RecModel, and pass it to the CartList.
 """
 from reclist.datasets import CoveoDataset
-from reclist.recommenders.prod2vec import P2VRecModel
-from reclist.utils.train_w2v import train_embeddings
+from reclist.recommenders.prod2vec import CoveoP2VRecModel
 from reclist.reclist import CoveoCartRecList
 
 if __name__ == "__main__":
 
     # get the coveo data challenge dataset as a RecDataset object
-    # force download will make sure you download it when the code is executed
-    coveo_dataset = CoveoDataset(force_download=True)
-    print(len(coveo_dataset.x_train))
+    coveo_dataset = CoveoDataset()
 
-    # get skus from training sessions
-    x_train_skus = [[e['product_sku'] for e in s] for s in coveo_dataset.x_train]
     # re-use a skip-gram model from reclist to train a latent product space, to be used
     # (through knn) to build a recommender
-    embeddings = train_embeddings(sessions=x_train_skus)
-    # instantiate a prod2vec model as a RecModel object
-    model = P2VRecModel(model=embeddings)
+    model = CoveoP2VRecModel()
+    model.train(coveo_dataset.x_train)
+
     # instantiate rec_list object, prepared with standard quantitative tests
     # and sensible behavioral tests (check the paper for details!)
     rec_list = CoveoCartRecList(
