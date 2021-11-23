@@ -22,7 +22,7 @@ class CoveoP2VRecModel(RecModel):
         :return:
         """
         x_train_skus = [[e['product_sku'] for e in s] for s in products]
-        self._model = train_embeddings(x_train_skus).wv
+        self._model = train_embeddings(x_train_skus)
 
     def predict(self, prediction_input: list, *args, **kwargs):
         """
