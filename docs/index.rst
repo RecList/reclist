@@ -7,6 +7,7 @@ Welcome to RecList's documentation!
 
    readme
    abstractions
+   modules
    contributing
    authors
    history
