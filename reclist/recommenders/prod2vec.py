@@ -1,3 +1,4 @@
+import numpy as np
 from reclist.abstractions import RecModel
 from reclist.utils.train_w2v import train_embeddings
 
@@ -39,5 +40,48 @@ class CoveoP2VRecModel(RecModel):
     def get_vector(self, product_sku):
         try:
             return list(self._model.get_vector(product_sku))
+        except Exception as e:
+            return []
+
+
+class SpotifyP2VRecModel(RecModel):
+    """
+    Implement of the prod2vec model through the standard RecModel interface.
+
+    Since init is ok, we just need to overwrite the prediction methods to get predictions
+    out of it.
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    model_name = "prod2vec"
+
+    def train(self, playlists):
+        x_train_uris = [[track['track_uri'] for track in playlist['tracks']] for playlist in playlists]
+        self._model = train_embeddings(x_train_uris)
+
+    def predict(self, prediction_input: list, *args, **kwargs):
+        """
+        Implement the abstract method.
+        NEP following industry best practices mentioned in https://arxiv.org/abs/2007.14906:
+        given a trained prod2vec, take all the seeded (or before-last) tracks to construct a 
+        playlist vector by average pooling, and use kNN to predict the next items (or the last
+        item).
+        """
+        predictions = []
+        for _x in prediction_input:
+            embeddings = [self._model[track['track_uri']] for track in _x['tracks'] if track['track_uri'] in self._model]
+            if embeddings:
+                avg_playlist_vector = np.average(embeddings, axis=0)
+                nn_tracks = self._model.similar_by_vector(avg_playlist_vector, topn=500)
+                predictions.append({'tracks': [{'track_uri':_[0]} for _ in nn_tracks]})
+            else:
+                predictions.append({'tracks': []})
+
+        return predictions
+
+    def get_vector(self, track_uri):
+        try:
+            return list(self._model.get_vector(track_uri))
         except Exception as e:
             return []

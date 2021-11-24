@@ -30,6 +30,6 @@ def train_embeddings(
                                    ns_exponent=ns_exponent)
 
     if is_debug:
-        print("# products in the space: {}".format(len(model.wv.index_to_key)))
+        print("# items in the space: {}".format(len(model.wv.index_to_key)))
 
     return model.wv

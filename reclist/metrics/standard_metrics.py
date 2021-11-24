@@ -100,3 +100,13 @@ def popularity_bias_at_k(y_preds, x_train, k=3):
         average_pop = sum(pop_map.get(_, 0.0) for _ in p[:k]) / len(p) if len(p) > 0 else 0
         all_popularity.append(average_pop)
     return sum(all_popularity) / len(y_preds)
+
+
+def precision_at_k(y_preds, y_test, k=3):
+    precision_ls = [len(set(_y).intersection(set(_p))) / len(_p) if _p else 1 for _p, _y in zip(y_preds, y_test)]
+    return np.average(precision_ls)
+
+
+def recall_at_k(y_preds, y_test, k=3):
+    recall_ls = [len(set(_y).intersection(set(_p))) / len(_y) if _y else 1 for _p, _y in zip(y_preds, y_test)]
+    return np.average(recall_ls)
