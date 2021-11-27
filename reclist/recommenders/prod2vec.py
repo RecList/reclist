@@ -94,3 +94,29 @@ class SpotifyP2VRecModel(RecModel):
             return list(self._model.get_vector(track_uri))
         except Exception as e:
             return []
+class MovieLensP2VRecModel(RecModel):
+
+    model_name = "prod2vec"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def train(self, movies):
+        self._model = train_embeddings(movies)
+
+    def predict(self, prediction_input, *args, **kwargs):
+        all_predictions = []
+        for x in prediction_input:
+            movie_id = x["movieId"]
+            nn_products = self.mode.most_similar(movie_id, topn=10) if movie_id in self.model else None
+            predictions = []
+            if nn_products:
+                predictions.append([{"movie_id": elem} for elem in nn_products])
+            all_predictions.append(predictions)
+        return all_predictions
+
+    def get_vector(self, movie_id):
+        try:
+            return list(self.model.get_vector(movie_id))
+        except Exception as e:
+            return []

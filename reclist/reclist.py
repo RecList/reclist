@@ -215,3 +215,5 @@ class SpotifySessionRecList(RecList):
 
     def uri_only(self, playlists: List[dict]):
         return [[track['track_uri'] for track in playlist] for playlist in playlists]
+class MovieLensSimilarItemRecList(RecList):
+    ...
