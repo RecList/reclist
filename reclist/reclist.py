@@ -63,3 +63,7 @@ class CoveoCartRecList(RecList):
 
     def sku_only(self, l:List[List]):
         return [[e['product_sku'] for e in s] for s in l]
+
+
+class MovieLensSimilarItemRecList(RecList):
+    ...
