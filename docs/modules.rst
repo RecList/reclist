@@ -1,5 +1,5 @@
-reclist
-=======
+RecList Modules
+===============
 
 .. toctree::
    :maxdepth: 4

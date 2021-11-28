@@ -1,7 +1,19 @@
-============
-Abstractions
-============
+Core Components
+===============
 
+
+To understand how to use RecList you need to know the core components of the package.
+After reading this page you should be comfortable enough to play and modify the tutorial and also create your
+reclists for evaluation.
+
+Two Paths
+~~~~~~~~~
+
+
+Say you have a new recommender and you want to validate on behavioural tests. We have different datasets you can play
+with.
+
+Another possible use case is that you might want to create a RecList for a new dataset you have.
 
 RecTest
 -------
@@ -26,12 +38,5 @@ The RecTest is probably the most fundamental abstraction in RecList.
                               self._y_preds)
 
 
-
-.. automodule:: reclist.abstractions
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-
-
+RecDataset
+----------
