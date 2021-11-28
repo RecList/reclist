@@ -17,7 +17,7 @@ run the reclist to evaluate your model.
 Another possible use case is that you might want to create a RecList for a new dataset you have.
 
 RecTest
--------
+~~~~~~~
 
 The RecTest is probably the most fundamental abstraction in RecList. The RecTest is essentially a decorator used to
 evaluate the various datasets.
@@ -41,4 +41,34 @@ evaluate the various datasets.
 
 
 RecDataset
-----------
+~~~~~~~~~~
+
+RecModel
+~~~~~~~~
+
+.. code-block:: python
+
+    class MyRecModel(RecModel):
+        """
+        My Recommender Model
+        """
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+
+        model_name = "mymodel"
+
+        def train(self, products):
+
+            self._model = my_training_function(products)
+
+        def predict(self, prediction_input: list, *args, **kwargs):
+
+            predictions = self.model.predict(prediction_input)
+
+            return predictions
+
+        def get_vector(self, product_sku):
+            try:
+                return list(self._model.get_vector(product_sku))
+            except Exception as e:
+                return []
