@@ -11,14 +11,16 @@ Two Paths
 
 
 Say you have a new recommender and you want to validate on behavioural tests. We have different datasets you can play
-with.
+with. If you want to follow this path, you just need to get the training data from the datastets, train the model and then
+run the reclist to evaluate your model.
 
 Another possible use case is that you might want to create a RecList for a new dataset you have.
 
 RecTest
 -------
 
-The RecTest is probably the most fundamental abstraction in RecList.
+The RecTest is probably the most fundamental abstraction in RecList. The RecTest is essentially a decorator used to
+evaluate the various datasets.
 
 
 .. code-block:: python
