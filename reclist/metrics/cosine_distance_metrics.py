@@ -3,6 +3,8 @@ from reclist.metrics.standard_metrics import sample_misses_at_k
 from scipy.spatial.distance import cosine
 import matplotlib.pyplot as plt
 from statistics import mean
+from reclist.current import current
+import os
 
 def error_by_cosine_distance(model, y_test, y_preds, k=3, bins=25, debug=False):
     if not(hasattr(model.__class__, 'get_vector') and callable(getattr(model.__class__, 'get_vector'))):
@@ -26,7 +28,11 @@ def error_by_cosine_distance(model, y_test, y_preds, k=3, bins=25, debug=False):
     if debug:
         plt.hist(cos_distances, bins=bins)
         plt.title('dist over cosine distance prod space')
-        plt.show()
+        plt.savefig(os.path.join(current.report_path,
+                                 'plots',
+                                 'distance_to_predictions.png'))
+        plt.clf()
+        # plt.show()
 
     return {'mean': np.mean(cos_distances), 'histogram': histogram}
 
@@ -70,7 +76,11 @@ def distance_to_query(model, x_test, y_test, y_preds, k=3, bins=25, debug=False)
         plt.legend(['Distance from Input to Label',
                     'Distance from Input to Label'],
                    loc='upper right')
-        plt.show()
+        # plt.show()
+        plt.savefig(os.path.join(current.report_path,
+                                 'plots',
+                                 'distance_to_query.png'))
+        plt.clf()
 
     return {
         'histogram_x_to_y': h_xy,

@@ -1,3 +1,5 @@
+import os
+from reclist.current import current
 import numpy as np
 from reclist.metrics.standard_metrics import sample_misses_at_k, sample_hits_at_k
 from scipy.spatial.distance import cosine
@@ -29,6 +31,10 @@ def generic_cosine_distance(embeddings: dict,
     if debug:
         plt.hist(cos_distances, bins=bins)
         plt.title('cosine distance misses')
-        plt.show()
+        plt.savefig(os.path.join(current.report_path,
+                                 'plots',
+                                 'cosine_distance_over_type.png'))
+        plt.clf()
+
     return {'mean': np.mean(cos_distances), 'histogram': histogram}
 

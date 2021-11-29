@@ -1,7 +1,5 @@
-from abc import ABC, abstractmethod
-import ast
+
 from datetime import datetime
-import inspect
 import os
 from abc import ABC, abstractmethod
 from functools import wraps
@@ -9,7 +7,7 @@ from pathlib import Path
 import time
 import json
 from reclist.utils.train_w2v import train_embeddings
-
+from reclist.current import current
 
 class RecDataset(ABC):
     """
@@ -164,6 +162,16 @@ class RecList(ABC):
 
     def __call__(self, verbose=True, *args, **kwargs):
         run_epoch_time_ms = round(time.time() * 1000)
+        # create datastore
+        current._report_path = os.path.join(self.META_DATA_FOLDER,
+                                        self.name,
+                                        self.rec_model.__class__.__name__,
+                                        str(run_epoch_time_ms))
+
+        Path(os.path.join(current.report_path, 'artifacts')).mkdir(parents=True, exist_ok=True)
+        Path(os.path.join(current.report_path, 'results')).mkdir(parents=True, exist_ok=True)
+        Path(os.path.join(current.report_path, 'plots')).mkdir(parents=True, exist_ok=True)
+
         # iterate through tests
         for test_func_name, test in self._rec_tests.items():
             test_result = test(*args, **kwargs)
@@ -198,9 +206,7 @@ class RecList(ABC):
         self.store_artifacts(report_path)
 
     def store_artifacts(self, report_path: str):
-        target_path = os.path.join(report_path, 'artifacts')
-        # make sure the folder is there, with all intermediate parents
-        Path(target_path).mkdir(parents=True, exist_ok=True)
+        target_path = os.path.join(current.report_path, 'artifacts')
         # store predictions
         with open(os.path.join(target_path, 'model_predictions.json'), 'w') as f:
             json.dump({
