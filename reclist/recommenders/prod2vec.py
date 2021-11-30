@@ -14,9 +14,9 @@ class CoveoP2VRecModel(RecModel):
 
     model_name = "prod2vec"
 
-    def train(self, products):
+    def train(self, products, iterations=15):
         x_train_skus = [[e['product_sku'] for e in s] for s in products]
-        self._model = train_embeddings(x_train_skus)
+        self._model = train_embeddings(x_train_skus, iterations=iterations)
 
     def predict(self, prediction_input: list, *args, **kwargs):
         """
@@ -31,7 +31,7 @@ class CoveoP2VRecModel(RecModel):
             key_item = _x[0]['product_sku']
             nn_products = self._model.most_similar(key_item, topn=10) if key_item in self._model else None
             if nn_products:
-                predictions.append([{'product_sku':_[0]} for _ in nn_products])
+                predictions.append([{'product_sku': _[0]} for _ in nn_products])
             else:
                 predictions.append([])
 
@@ -56,15 +56,15 @@ class SpotifyP2VRecModel(RecModel):
 
     model_name = "prod2vec"
 
-    def train(self, playlists):
+    def train(self, playlists, iterations=15):
         x_train_uris = [[track['track_uri'] for track in playlist['tracks']] for playlist in playlists]
-        self._model = train_embeddings(x_train_uris)
+        self._model = train_embeddings(x_train_uris, iterations=iterations)
 
     def predict(self, prediction_input: list, *args, **kwargs):
         """
         Implement the abstract method.
         NEP following industry best practices mentioned in https://arxiv.org/abs/2007.14906:
-        given a trained prod2vec, take all the seeded (or before-last) tracks to construct a 
+        given a trained prod2vec, take all the seeded (or before-last) tracks to construct a
         playlist vector by average pooling, and use kNN to predict the next items (or the last
         item).
         """

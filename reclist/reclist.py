@@ -12,11 +12,12 @@ class CoveoCartRecList(RecList):
         Basic statistics on training, test and prediction data
         """
         from reclist.metrics.standard_metrics import statistics
+        y_preds = self.rec_model.predict(self._x_test)
         return statistics(self._x_train,
                           self._y_train,
                           self._x_test,
                           self._y_test,
-                          self._y_preds)
+                          y_preds)
 
     @rec_test(test_type='Coverage@10')
     def coverage_at_k(self):
@@ -25,8 +26,8 @@ class CoveoCartRecList(RecList):
         recommends based on a set of sessions
         """
         from reclist.metrics.standard_metrics import coverage_at_k
-
-        return coverage_at_k(self.sku_only(self._y_preds),
+        y_preds = self.rec_model.predict(self._x_test)
+        return coverage_at_k(self.sku_only(y_preds),
                              self.product_data,
                              k=10)
 
@@ -35,8 +36,9 @@ class CoveoCartRecList(RecList):
         """
         Compute the rate in which the top-k predictions contain the item to be predicted
         """
+        y_preds = self.rec_model.predict(self._x_test)
         from reclist.metrics.standard_metrics import hit_rate_at_k
-        return hit_rate_at_k(self.sku_only(self._y_preds),
+        return hit_rate_at_k(self.sku_only(y_preds),
                              self.sku_only(self._y_test),
                              k=10)
 
@@ -46,10 +48,12 @@ class CoveoCartRecList(RecList):
         Compute the distribution of hit-rate across product frequency in training data
         """
         from reclist.metrics.hits_distribution import hits_distribution
+        y_preds = self.rec_model.predict(self._x_test)
+
         return hits_distribution(self.sku_only(self._x_train),
                                  self.sku_only(self._x_test),
                                  self.sku_only(self._y_test),
-                                 self.sku_only(self._y_preds),
+                                 self.sku_only(y_preds),
                                  k=10,
                                  debug=True)
 
@@ -58,18 +62,19 @@ class CoveoCartRecList(RecList):
         """
         Compute the distribution of distance from query to label and query to prediction
         """
+        y_preds = self.rec_model.predict(self._x_test)
         from reclist.metrics.cosine_distance_metrics import distance_to_query
         return distance_to_query(self.rec_model,
                                  self.sku_only(self._x_test),
                                  self.sku_only(self._y_test),
-                                 self.sku_only(self._y_preds), k=10, bins=25, debug=True)
+                                 self.sku_only(y_preds), k=10, bins=25, debug=True)
 
     def sku_only(self, l:List[List]):
         return [[e['product_sku'] for e in s] for s in l]
 
 
 class SpotifySessionRecList(RecList):
-    
+
     ########### NEXT EVENT PREDICTION #########
     @rec_test(test_type='NEP_stats')
     def nep_stats(self):
@@ -133,7 +138,7 @@ class SpotifySessionRecList(RecList):
                         'album_uri': track['album_uri'],
                         'duration_ms': track['duration_ms']
                     }
-        
+
         def get_item_with_category(product_data: dict, category: set, to_ignore=None):
             to_ignore = [] if to_ignore is None else to_ignore
             uris = [_ for _ in product_data if product_data[_]['artist_uri'] == category and _ not in to_ignore]  # this is a really expensive operation
@@ -178,7 +183,7 @@ class SpotifySessionRecList(RecList):
                     overlap_ratios.append(overlap_ratio)
 
             return np.mean(overlap_ratios)
-        
+
         return session_perturbation_test(self.rec_model,
                                          x_test,
                                          y_preds,
@@ -267,9 +272,9 @@ class SpotifySessionRecList(RecList):
     #         # cast to normal dict
     #         return dict(hit_rate_per_slice)
 
-    #     return hits_distribution_by_slice(slice_fns, 
-    #                                       y_test, 
-    #                                       y_preds, 
+    #     return hits_distribution_by_slice(slice_fns,
+    #                                       y_test,
+    #                                       y_preds,
     #                                       catalog,
     #                                       format_fn=self.uri_only,
     #                                       debug=True)
@@ -295,7 +300,7 @@ class SpotifySessionRecList(RecList):
                         'album_uri': track['album_uri'],
                         'duration_ms': track['duration_ms']
                     }
-        
+
         # import matplotlib.pyplot as plt
         # (n, bins, patches) = plt.hist([t['duration_ms'] for t in catalog.values()], bins=50)
         # print(n)
@@ -353,9 +358,9 @@ class SpotifySessionRecList(RecList):
             # cast to normal dict
             return dict(hit_rate_per_slice)
 
-        return hits_distribution_by_slice(slice_fns, 
-                                          y_test, 
-                                          y_preds, 
+        return hits_distribution_by_slice(slice_fns,
+                                          y_test,
+                                          y_preds,
                                           catalog,
                                           format_fn=self.uri_only,
                                           debug=True)
@@ -372,7 +377,7 @@ class SpotifySessionRecList(RecList):
         return coverage_at_k(self.uri_only(y_preds),
                              self.product_data['uri2track'],  # this contains all the track URIs from train and test sets
                              k=10)
-    
+
     @rec_test(test_type='NEP_Popularity@10')
     def popularity_bias_at_k(self):
         """
@@ -408,10 +413,10 @@ class SpotifySessionRecList(RecList):
         from reclist.metrics.standard_metrics import precision_at_k
         x_test, y_test = self.generate_all_subsequent_test_set()
         y_preds = self.get_y_preds(x_test, y_test)
-        return precision_at_k(self.uri_only(y_preds), 
+        return precision_at_k(self.uri_only(y_preds),
                               self.uri_only(y_test),
                               k=50)
-    
+
     @rec_test(test_type='ALL_R@50')
     def recall_at_k(self):
         """
@@ -423,11 +428,11 @@ class SpotifySessionRecList(RecList):
         return recall_at_k(self.uri_only(y_preds),
                            self.uri_only(y_test),
                            k=50)
-    
+
     @rec_test(test_type='ALL_MRR@10')
     def mrr_at_k(self):
         """
-        MRR calculates the mean reciprocal of the rank at which the first 
+        MRR calculates the mean reciprocal of the rank at which the first
         relevant item was retrieved
         """
         from reclist.metrics.standard_metrics import mrr_at_k

@@ -78,7 +78,7 @@ class SpotifyDataset(RecDataset):
     def load_spotify_playlist_dataset(self):
 
         cache_directory = get_cache_directory()
-        filename = os.path.join(cache_directory, "spotify_playlist.zip")   # TODO: make var somewhere
+        filename = os.path.join(cache_directory, "small_spotify_playlist.zip")   # TODO: make var somewhere
 
         if not os.path.exists(filename) or self.force_download:
             download_with_progress(SPOTIFY_PLAYLIST_DATASET_S3_URL, filename)
