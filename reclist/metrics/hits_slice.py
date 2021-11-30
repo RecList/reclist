@@ -1,6 +1,9 @@
 from collections import defaultdict
 from reclist.metrics.standard_metrics import hit_rate_at_k, sample_hits_at_k, sample_misses_at_k
 import matplotlib.pyplot as plt
+import os
+from reclist.current import current
+
 
 def hits_distribution_by_slice(slice_fns: dict,
                                y_test,
@@ -31,7 +34,10 @@ def hits_distribution_by_slice(slice_fns: dict,
         x_tick_idx = list(range(len(x_tick_names)))
         plt.bar(x_tick_idx, hit_rate_per_slice.values(), align='center')
         plt.xticks(list(range(len(hit_rate_per_slice))), x_tick_names)
-        plt.show()
+        plt.savefig(os.path.join(current.report_path,
+                                 'plots',
+                                 'hit_distribution_slice.png'))
+        plt.clf()
 
     # cast to normal dict
     return dict(hit_rate_per_slice)

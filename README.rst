@@ -54,8 +54,7 @@ Quick Links
 Project updates
 ~~~~~~~~~~~~~~~
 
-*Nov. 2021*: the library is currently in alpha. We welcome contributions and feedback, but please be advised that the package
-may change substantially in the upcoming months.
+*Nov. 2021*: the library is currently in alpha (i.e. enough working code to finish the paper and tinker with it). We welcome early feedback, but please be advised that the package may change substantially in the upcoming months ("If you're not embarrassed by the first version, you've launched too late").
 
 As the project is in active development, come back often for updates.
 

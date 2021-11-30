@@ -6,7 +6,8 @@ Welcome to RecList's documentation!
    :caption: Contents:
 
    readme
-   abstractions
+   core
+   modules
    contributing
    authors
    history

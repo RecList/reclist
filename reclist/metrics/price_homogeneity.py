@@ -1,7 +1,19 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+from reclist.current import current
 
 def price_homogeneity_test(y_test, y_preds, product_data, bins=25, debug=True, key='PRICE'):
+    """
+
+    :param y_test: test data
+    :param y_preds: predicted data
+    :param product_data: catalog data
+    :param bins: bins on which we split the data for the product comparison
+    :param debug: shows plots
+    :param key: key from the product data to find the product price
+    @return:
+    """
     abs_log_price_diff = []
     for idx, (_y, _y_pred) in enumerate(zip(y_test, y_preds)):
         # need >=1 predictions
@@ -21,7 +33,11 @@ def price_homogeneity_test(y_test, y_preds, product_data, bins=25, debug=True, k
     if debug:
         # debug / viz
         plt.hist(abs_log_price_diff, bins=25)
-        plt.show()
+        plt.savefig(os.path.join(current.report_path,
+                                 'plots',
+                                 'price_homogeneity.png'))
+        plt.clf()
+
     return {
         'mean': np.mean(abs_log_price_diff),
         'histogram': histogram

@@ -3,6 +3,8 @@ from reclist.metrics.standard_metrics import hit_rate_at_k
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+import os
+from reclist.current import current
 
 
 def roundup(x: int):
@@ -36,7 +38,9 @@ def hits_distribution(x_train, x_test, y_test, y_preds, k=3, debug=False):
         plt.bar(indices[1:], histogram, width=-np.diff(indices)/1.05, align='edge')
         plt.xscale('log', base=10)
         plt.title('HIT Distribution Across Product Frequency')
-        plt.show()
+        # plt.show()
+        plt.savefig(os.path.join(current.report_path,'plots','hit_distribution.png'))
+        plt.clf()
 
     return {
              'histogram': {int(k): v for k, v in zip(indices[1:], histogram)},
