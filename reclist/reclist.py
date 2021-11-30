@@ -103,21 +103,6 @@ class SpotifySessionRecList(RecList):
                              self.uri_only(y_test),
                              k=10)
 
-    # @rec_test(test_type='NEP_hits_distribution')
-    # def hits_distribution(self):
-    #     """
-    #     Compute the distribution of hit-rate across product frequency in training data
-    #     """
-    #     from reclist.metrics.hits_distribution import hits_distribution
-    #     x_test, y_test = self.generate_nep_test_set()
-    #     y_preds = self.get_y_preds(x_test, y_test)
-    #     return hits_distribution(self.uri_only(self._x_train),
-    #                              self.uri_only(self._x_test),
-    #                              self.uri_only(y_test),
-    #                              self.uri_only(y_preds),
-    #                              k=10,
-    #                              debug=True)
-
     @rec_test(test_type='NEP_perturbation')
     def perturbation_at_k(self):
         """
@@ -191,95 +176,6 @@ class SpotifySessionRecList(RecList):
                                          y_preds,
                                          catalog)
 
-    # @rec_test(test_type='NEP_hits_distribution_by_artist_popularity_slice')
-    # def hits_distribution_by_artist_popularity_slice(self):
-    #     """
-    #     Compute the distribution of hit-rate across various slices of data
-    #     based on artist popularity
-    #     """
-    #     # from reclist.metrics.hits_slice import hits_distribution_by_slice
-    #     x_test, y_test = self.generate_nep_test_set()
-    #     y_preds = self.get_y_preds(x_test, y_test)
-
-    #     # create catalog with metadata that will be used for slicinng
-    #     catalog = collections.defaultdict(dict)
-    #     for dataset in [self._x_train, x_test, y_test]:
-    #         for playlist in dataset:
-    #             for track in playlist['tracks']:
-    #                 if track['track_uri'] in catalog:
-    #                     continue  # could also double check that the existing info lines up
-    #                 catalog[track['track_uri']]= {
-    #                     'artist_uri': track['artist_uri'],
-    #                     'album_uri': track['album_uri'],
-    #                     'duration_ms': track['duration_ms']
-    #                 }
-
-    #     # top 10 and bottom 10 artists by popularity
-    #     artist_popularity = collections.Counter()
-    #     for playlist in self._x_train:
-    #         for track in playlist['tracks']:
-    #             artist_popularity[track['artist_uri']] += 1
-    #     # there are a lot of ties among not-so-popular artists, so we filter
-    #     # out the really uncommon ones
-    #     artist_popularity = collections.Counter({k: v for k, v in artist_popularity.items() if v >= 100})
-    #     top_artists = [a for a, _ in artist_popularity.most_common()[:10]]
-    #     bottom_artists = [a for a, _ in artist_popularity.most_common()[::-1][:50]]
-
-    #     slice_fns = {f'TOP_{i}': lambda _, a=a: _['artist_uri'] == a for i, a \
-    #         in enumerate(top_artists, start=1)}
-    #     slice_fns.update({f'BOTTOM_{i}': lambda _, a=a: _['artist_uri'] == a for i, a \
-    #         in enumerate(bottom_artists, start=1)})
-
-    #     def hits_distribution_by_slice(slice_fns: dict,
-    #                                    y_test,
-    #                                    y_preds,
-    #                                    product_data,
-    #                                    k=3,
-    #                                    sample_size=3,
-    #                                    format_fn=None,
-    #                                    debug=False):
-
-    #         from reclist.metrics.standard_metrics import hit_rate_at_k
-    #         import matplotlib.pyplot as plt
-
-    #         hit_rate_per_slice = collections.defaultdict(dict)
-    #         for slice_name, filter_fn in slice_fns.items():
-    #             # get indices for slice
-    #             slice_idx = [idx for idx, _y in enumerate(y_test) if _y['tracks'][0]['track_uri'] \
-    #                 in product_data and filter_fn(product_data[_y['tracks'][0]['track_uri']])]
-    #             if not slice_idx:
-    #                 continue
-    #             # get predictions for slice
-    #             slice_y_preds = [y_preds[_] for _ in slice_idx]
-    #             # get labels for slice
-    #             slice_y_test = [y_test[_] for _ in slice_idx]
-    #             if format_fn:
-    #                 slice_y_preds, slice_y_test = format_fn(slice_y_preds), format_fn(slice_y_test)
-    #             # TODO: We may want to allow for generic metric to be used here
-    #             slice_hr = hit_rate_at_k(slice_y_preds, slice_y_test, k=k)
-    #             # store results
-    #             hit_rate_per_slice[slice_name]['hit_rate'] = slice_hr
-    #             # TODO: Need to fix sample_hits_at_k and sample_misses_at_k for NEP vs ALL
-    #             # hit_rate_per_slice[slice_name]['hits'] = sample_hits_at_k(slice_y_preds, slice_y_test, k=k, size=sample_size)
-    #             # hit_rate_per_slice[slice_name]['misses'] = sample_misses_at_k(slice_y_preds, slice_y_test, k=k, size=sample_size)
-
-    #         # debug / visualization
-    #         if debug:
-    #             x_tick_names = list(hit_rate_per_slice.keys())
-    #             x_tick_idx = list(range(len(x_tick_names)))
-    #             plt.bar(x_tick_idx, [v['hit_rate'] for v in hit_rate_per_slice.values()], align='center')
-    #             plt.xticks(list(range(len(hit_rate_per_slice))), x_tick_names)
-    #             plt.show()
-
-    #         # cast to normal dict
-    #         return dict(hit_rate_per_slice)
-
-    #     return hits_distribution_by_slice(slice_fns,
-    #                                       y_test,
-    #                                       y_preds,
-    #                                       catalog,
-    #                                       format_fn=self.uri_only,
-    #                                       debug=True)
 
     @rec_test(test_type='NEP_hits_distribution_by_slice')
     def hits_distribution_by_slice(self):
@@ -303,10 +199,6 @@ class SpotifySessionRecList(RecList):
                         'duration_ms': track['duration_ms']
                     }
 
-        # import matplotlib.pyplot as plt
-        # (n, bins, patches) = plt.hist([t['duration_ms'] for t in catalog.values()], bins=50)
-        # print(n)
-        # plt.show()
 
         # genre
         slice_fns = {
