@@ -4,6 +4,7 @@ from reclist.abstractions import RecList, rec_test
 from typing import List
 import random
 
+
 class CoveoCartRecList(RecList):
 
     @rec_test(test_type='stats')
@@ -69,7 +70,7 @@ class CoveoCartRecList(RecList):
                                  self.sku_only(self._y_test),
                                  self.sku_only(y_preds), k=10, bins=25, debug=True)
 
-    def sku_only(self, l:List[List]):
+    def sku_only(self, l: List[List]):
         return [[e['product_sku'] for e in s] for s in l]
 
 
@@ -133,7 +134,7 @@ class SpotifySessionRecList(RecList):
                 for track in playlist['tracks']:
                     if track['track_uri'] in catalog:
                         continue  # could also double check that the existing info lines up
-                    catalog[track['track_uri']]= {
+                    catalog[track['track_uri']] = {
                         'artist_uri': track['artist_uri'],
                         'album_uri': track['album_uri'],
                         'duration_ms': track['duration_ms']
@@ -141,7 +142,8 @@ class SpotifySessionRecList(RecList):
 
         def get_item_with_category(product_data: dict, category: set, to_ignore=None):
             to_ignore = [] if to_ignore is None else to_ignore
-            uris = [_ for _ in product_data if product_data[_]['artist_uri'] == category and _ not in to_ignore]  # this is a really expensive operation
+            uris = [_ for _ in product_data if product_data[_][
+                'artist_uri'] == category and _ not in to_ignore]  # this is a really expensive operation
             if uris:
                 return random.choice(uris)
             return []
@@ -179,7 +181,7 @@ class SpotifySessionRecList(RecList):
                 if _y_p and _y_perturb:
                     # compute prediction intersection
                     intersection = set(_y_perturb[:k]).intersection(_y_p[:k])
-                    overlap_ratio = len(intersection)/len(_y_p[:k])
+                    overlap_ratio = len(intersection) / len(_y_p[:k])
                     overlap_ratios.append(overlap_ratio)
 
             return np.mean(overlap_ratios)
@@ -295,7 +297,7 @@ class SpotifySessionRecList(RecList):
                 for track in playlist['tracks']:
                     if track['track_uri'] in catalog:
                         continue  # could also double check that the existing info lines up
-                    catalog[track['track_uri']]= {
+                    catalog[track['track_uri']] = {
                         'artist_uri': track['artist_uri'],
                         'album_uri': track['album_uri'],
                         'duration_ms': track['duration_ms']
@@ -330,7 +332,7 @@ class SpotifySessionRecList(RecList):
             for slice_name, filter_fn in slice_fns.items():
                 # get indices for slice
                 slice_idx = [idx for idx, _y in enumerate(y_test) if _y['tracks'][0]['track_uri'] \
-                    in product_data and filter_fn(product_data[_y['tracks'][0]['track_uri']])]
+                             in product_data and filter_fn(product_data[_y['tracks'][0]['track_uri']])]
                 if not slice_idx:
                     continue
                 # get predictions for slice
@@ -375,7 +377,8 @@ class SpotifySessionRecList(RecList):
         x_test, y_test = self.generate_nep_test_set()
         y_preds = self.get_y_preds(x_test, y_test)
         return coverage_at_k(self.uri_only(y_preds),
-                             self.product_data['uri2track'],  # this contains all the track URIs from train and test sets
+                             self.product_data['uri2track'],
+                             # this contains all the track URIs from train and test sets
                              k=10)
 
     @rec_test(test_type='NEP_Popularity@10')
@@ -504,7 +507,7 @@ class SpotifySessionRecList(RecList):
                 held_out_tracks = [playlist['tracks'][idx]
                                    for idx in held_out_idx]
                 assert len(seeded_tracks) + \
-                    len(held_out_tracks) == len(playlist['tracks'])
+                       len(held_out_tracks) == len(playlist['tracks'])
             else:
                 seeded_tracks = playlist['tracks'][:k]
                 held_out_tracks = playlist['tracks'][k:]
