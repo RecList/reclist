@@ -30,7 +30,7 @@ class RecDataset(ABC):
     def load(self):
         """
         Abstract method that should implement dataset loading
-        @return:
+        :return:
         """
         return
 

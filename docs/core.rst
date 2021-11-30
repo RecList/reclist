@@ -1,7 +1,6 @@
 Core Components
 ===============
 
-
 To understand how to use RecList you need to know the core components of the package.
 After reading this page you should be comfortable enough to play and modify the tutorial and also create your
 reclists for evaluation.
@@ -44,6 +43,7 @@ RecDataset
 ~~~~~~~~~~
 
 The dataset is a simple abstraction you might want to implement if you are playing with other datasets.
+You will see that we just need to instantiate the main parameters.
 
 
 .. code-block:: python
@@ -76,6 +76,8 @@ The dataset is a simple abstraction you might want to implement if you are playi
 
 RecModel
 ~~~~~~~~
+
+
 
 .. code-block:: python
 
