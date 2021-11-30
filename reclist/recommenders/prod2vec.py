@@ -6,8 +6,8 @@ class CoveoP2VRecModel(RecModel):
     """
     Implement of the prod2vec model through the standard RecModel interface.
 
-    Since init is ok, we just need to overwrite the prediction methods to get predictions
-    out of it.
+    >>> model = CoveoP2VRecModel()
+    >>> model.train(coveo_dataset.x_train)
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

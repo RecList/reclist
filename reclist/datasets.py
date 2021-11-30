@@ -63,7 +63,9 @@ class CoveoDataset(RecDataset):
         self._catalog = data["catalog"]
 
 class SpotifyDataset(RecDataset):
-
+    """
+    Spotify Dataset
+    """
     def __init__(self, k: int = 5, **kwargs):
         self.k = k
         super().__init__(**kwargs)
