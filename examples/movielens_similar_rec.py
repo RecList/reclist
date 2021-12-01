@@ -7,7 +7,7 @@
     We train a simple, yet effective prod2vec baseline model (https://arxiv.org/abs/2007.14906),
     re-using for convenience a "training embedding" function already implemented by recsys. The script
     show how easy it is to run behavioral tests on a target dataset, in this case a wrapper around a large
-    e-commerce dataset (the Coveo Data Challenge dataset: https://github.com/coveooss/SIGIR-ecom-data-challenge).
+    dataset widely used for benchmarking recommendation systems (MovieLens 25M dataset: https://grouplens.org/datasets/movielens/)
 
     If you want to run your own model on the same dataset and the same behavioral test suite, just implement
     your model prediction using the RecModel, and pass it to the RecList.
