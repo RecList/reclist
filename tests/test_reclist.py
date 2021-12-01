@@ -4,9 +4,9 @@
 
 from reclist.datasets import *
 from reclist.metrics.standard_metrics import mrr_at_k
-from reclist.datasets import CoveoDataset
-from reclist.recommenders.prod2vec import CoveoP2VRecModel
-from reclist.reclist import CoveoCartRecList
+from reclist.datasets import CoveoDataset, MovieLensDataset
+from reclist.recommenders.prod2vec import CoveoP2VRecModel, MovieLensP2VRecModel
+from reclist.reclist import CoveoCartRecList, MovieLensSimilarItemRecList
 
 def test_basic_dataset_downloading():
     CoveoDataset()
@@ -28,8 +28,28 @@ def test_examples():
         model=model,
         dataset=coveo_dataset
     )
+
     # invoke rec_list to run tests
     rec_list(verbose=True)
+
+    # get the MovieLens 25M dataset as a RecDataset object
+    movielens_dataset = MovieLensDataset()
+
+    # re-use a skip-gram model from reclist to train a latent product space, to be used
+    # (through knn) to build a recommender
+    model = MovieLensP2VRecModel()
+    model.train(movielens_dataset.x_train)
+
+    # instantiate rec_list object, prepared with standard quantitative tests
+    # and sensible behavioral tests (check the paper for details!)
+    rec_list = MovieLensSimilarItemRecList(
+        model=model,
+        dataset=movielens_dataset
+    )
+
+    # invoke rec_list to run tests
+    rec_list(verbose=True)
+
 
 
 def test_mrr():
