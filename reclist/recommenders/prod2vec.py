@@ -1,3 +1,5 @@
+import numpy as np
+
 from reclist.abstractions import RecModel
 from reclist.utils.train_w2v import train_embeddings
 
@@ -62,20 +64,45 @@ class MovieLensP2VRecModel(RecModel):
         super().__init__(**kwargs)
 
     def train(self, movies):
-        self._model = train_embeddings(movies)
+        # Get the movie ID and rating for each movie for each unique user
+        x_train = [[(x["movieId"], x["rating"]) for x in y] for y in movies]
+        self._model = train_embeddings(x_train)
 
     def predict(self, prediction_input, *args, **kwargs):
+        """
+        Predicts the top 10 similar items recommended for each user according
+        to the movies that they've watched and the ratings that they've given
+
+        :param prediction_input: a list of lists containing a dictionary for
+                                 each movie watched by that user
+        :return:
+        """
         all_predictions = []
-        for x in prediction_input:
-            movie_id = x["movieId"]
-            nn_products = self.mode.most_similar(movie_id, topn=10) if movie_id in self.model else None
+        for movies in prediction_input:
             predictions = []
-            if nn_products:
-                predictions.append([{"movie_id": elem} for elem in nn_products])
+            emb_vecs = []
+            for movie in movies:
+                emb_vec = self.get_vector(movie)
+                if emb_vec:
+                    emb_vecs.append(emb_vec)
+            if emb_vecs:
+                # Calculate the average of all the latent vectors representing
+                # the movies watched by the user
+                avg_emb_vec = np.mean(emb_vecs, axis=0)
+                nn_products = self.model.similar_by_vector(avg_emb_vec, topn=10)
+                for elem in nn_products:
+                    predictions.append({"movie_id": elem})
             all_predictions.append(predictions)
         return all_predictions
 
-    def get_vector(self, movie_id):
+    def get_vector(self, x):
+        """
+        Returns the latent vector that corresponds to the movie ID
+
+        :param x:
+        :return:
+        """
+        movie_id = x["movieId"]
         try:
             return list(self.model.get_vector(movie_id))
         except Exception as e:
