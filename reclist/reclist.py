@@ -205,7 +205,7 @@ class SpotifySessionRecList(RecList):
             'HIP-HOP/RAP': lambda _: _['artist_uri'] == '3TVXtAsR1Inumwj472S9r4',  # Drake
             'POP': lambda _: _['artist_uri'] == '5pKCCKE2ajJHZ9KAiaK11H',  # Rihanna
             'EDM': lambda _: _['artist_uri'] == '69GGBxA162lTqCwzJG5jLp',  # The Chainsmokers
-            'R&B': lambda _: _['artist_uri'] == '1Xyo4u8uXC1ZmMpatF05PJ',  # The Weeknd
+            'R&B': lambda _: _['artist_uri'] == '1Xyo4u8uXC1ZmMpatF05PJ',  # The Weekend
         }
 
         def hits_distribution_by_slice(slice_fns: dict,
@@ -342,30 +342,29 @@ class SpotifySessionRecList(RecList):
 
     def generate_nep_test_set(
         self,
-        n: int = 1,
-        iteratively_increment: bool = True,
         shuffle: bool = True,
         seed: int = 0
     ):
         """
-        Generate test set for Next Event Prediction (NEP), i.e. predict the immediate
-        next item given the first n items.
+        Generate test set for Next Event Prediction (NEP) (i.e. predict the immediate
+        next item given the first n items) by taking last item as target
         """
         x_test = []
         y_test = []
         for playlist in self._x_test:
-            num_items_given = list(range(n, len(playlist['tracks']), 1)) if iteratively_increment else [n]
-            for _n in num_items_given:
-                seeded_tracks = playlist['tracks'][:_n]
-                next_track = playlist['tracks'][_n]
-                x_test.append({
-                    'pid': playlist['pid'],
-                    'tracks': seeded_tracks
-                })
-                y_test.append({
-                    'pid': playlist['pid'],
-                    'tracks': [next_track]
-                })
+            if len(playlist['tracks']) < 2:
+                continue
+            seed_tracks = playlist['tracks'][:-1]
+            target = playlist['tracks'][-1]
+
+            x_test.append({
+                'pid': playlist['pid'],
+                'tracks': seed_tracks
+            })
+            y_test.append({
+                'pid': playlist['pid'],
+                'tracks': [target]
+            })
 
         if shuffle:
             random.seed(seed)
