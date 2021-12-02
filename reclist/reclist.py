@@ -131,15 +131,16 @@ class SpotifySessionRecList(RecList):
         Compute the distribution of hit-rate across various slices of data
         """
         from reclist.metrics.hits_slice import hits_distribution_by_slice
-        # slice by genre
-        slice_fns = {
-            'HIP-HOP/RAP': lambda _: _['artist_uri'] == '3TVXtAsR1Inumwj472S9r4',  # Drake
-            'POP': lambda _: _['artist_uri'] == '5pKCCKE2ajJHZ9KAiaK11H',  # Rihanna
-            'EDM': lambda _: _['artist_uri'] == '69GGBxA162lTqCwzJG5jLp',  # The Chainsmokers
-            'R&B': lambda _: _['artist_uri'] == '1Xyo4u8uXC1ZmMpatF05PJ',  # The Weeknd
-        }
+        
+        def generate_slices(x_test, **kwargs):
+            slices = collections.defaultdict(list)
+            for idx, playlist in enumerate(x_test):
+                slices[len(playlist)].append(idx)
+            slices = collections.OrderedDict(sorted(slices.items()))
+            return slices
 
-        return hits_distribution_by_slice(slice_fns,
+        return hits_distribution_by_slice(generate_slices,
+                                          self.uri_only(self._x_test),
                                           self.uri_only(self._y_test),
                                           self.uri_only(self._y_preds),
                                           self.product_data,
