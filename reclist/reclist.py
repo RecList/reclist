@@ -108,8 +108,9 @@ class SpotifySessionRecList(RecList):
         """
         Compute average consistency in model predictions when inputs are perturbed
         """
-        # from reclist.metrics.perturbation import session_perturbation_test
+        from reclist.metrics.perturbation import session_perturbation_test
         from collections import defaultdict
+        from functools import partial
 
         x_test, y_test = self.generate_nep_test_set()
         y_preds = self.get_y_preds(x_test, y_test)
@@ -131,54 +132,23 @@ class SpotifySessionRecList(RecList):
         for track_uri, row in catalog.items():
             substitute_mapping[row['artist_uri']].append(track_uri)
 
-        def perturb_session(session, substitute_mapping):
+        # define a custom perturbation function
+        def perturb(session, sub_map):
             last_item = session[-1]
             last_item_artist = last_item['artist_uri']
-            if last_item_artist not in substitute_mapping:
-                return []
-            substitutes = set(substitute_mapping[last_item_artist])
-            substitutes.remove(last_item['track_uri'])
+            substitutes = set(sub_map.get(last_item_artist,[])) - {last_item['track_uri']}
             if substitutes:
                 similar_item = random.sample(substitutes, k=1)
                 new_session = session[:-1] + [{"track_uri": similar_item[0]}]
                 return new_session
             return []
 
-        def session_perturbation_test(model, x_test, y_preds, substitute_mapping, k):
-            overlap_ratios = []
-            y_p = []
-            x_perturbs = []
-            # generate a batch of perturbations
-            for _x, _y_p in zip(x_test, y_preds):
-                # perturb last item in session
-                x_perturb = perturb_session(_x['tracks'], substitute_mapping)
-                if not x_perturb:
-                    continue
-                x_perturbs.append({'tracks': x_perturb})
-                y_p.append(_y_p)
-
-            # make predictions over perturbed inputs
-            y_perturbs = model.predict(x_perturbs)
-
-            # extract uri
-            y_p, y_perturbs = self.uri_only(y_p), self.uri_only(y_perturbs)
-
-            # check for overlapping predictions
-            for _y_p, _y_perturb in zip(y_p, y_perturbs):
-                if _y_p and _y_perturb:
-                    # compute prediction intersection
-                    intersection = set(_y_perturb[:k]).intersection(_y_p[:k])
-                    overlap_ratio = len(intersection) / len(_y_p[:k])
-                    overlap_ratios.append(overlap_ratio)
-                else:
-                    overlap_ratios.append(0)
-
-            return np.mean(overlap_ratios)
-
+        # call test
         return session_perturbation_test(self.rec_model,
                                          x_test,
                                          y_preds,
-                                         substitute_mapping,
+                                         partial(perturb, sub_map=substitute_mapping),
+                                         self.uri_only,
                                          k=10)
 
 
@@ -210,7 +180,7 @@ class SpotifySessionRecList(RecList):
             'HIP-HOP/RAP': lambda _: _['artist_uri'] == '3TVXtAsR1Inumwj472S9r4',  # Drake
             'POP': lambda _: _['artist_uri'] == '5pKCCKE2ajJHZ9KAiaK11H',  # Rihanna
             'EDM': lambda _: _['artist_uri'] == '69GGBxA162lTqCwzJG5jLp',  # The Chainsmokers
-            'R&B': lambda _: _['artist_uri'] == '1Xyo4u8uXC1ZmMpatF05PJ',  # The Weekend
+            'R&B': lambda _: _['artist_uri'] == '1Xyo4u8uXC1ZmMpatF05PJ',  # The Weeknd
         }
 
         def hits_distribution_by_slice(slice_fns: dict,
