@@ -103,55 +103,6 @@ class SpotifySessionRecList(RecList):
                              self.uri_only(y_test),
                              k=10)
 
-    @rec_test(test_type='NEP_perturbation')
-    def perturbation_at_k(self):
-        """
-        Compute average consistency in model predictions when inputs are perturbed
-        """
-        from reclist.metrics.perturbation import session_perturbation_test
-        from collections import defaultdict
-        from functools import partial
-
-        x_test, y_test = self.generate_nep_test_set()
-        y_preds = self.get_y_preds(x_test, y_test)
-
-        # should we use the whole catalog or just the ones present in the training set?
-        catalog = collections.defaultdict(dict)
-        for dataset in [self._x_train]:
-            for playlist in dataset:
-                for track in playlist['tracks']:
-                    if track['track_uri'] in catalog:
-                        continue  # could also double check that the existing info lines up
-                    catalog[track['track_uri']] = {
-                        'artist_uri': track['artist_uri'],
-                        'album_uri': track['album_uri'],
-                        'duration_ms': track['duration_ms']
-                    }
-        # map from artist uri to track uri
-        substitute_mapping = defaultdict(list)
-        for track_uri, row in catalog.items():
-            substitute_mapping[row['artist_uri']].append(track_uri)
-
-        # define a custom perturbation function
-        def perturb(session, sub_map):
-            last_item = session[-1]
-            last_item_artist = last_item['artist_uri']
-            substitutes = set(sub_map.get(last_item_artist,[])) - {last_item['track_uri']}
-            if substitutes:
-                similar_item = random.sample(substitutes, k=1)
-                new_session = session[:-1] + [{"track_uri": similar_item[0]}]
-                return new_session
-            return []
-
-        # call test
-        return session_perturbation_test(self.rec_model,
-                                         x_test,
-                                         y_preds,
-                                         partial(perturb, sub_map=substitute_mapping),
-                                         self.uri_only,
-                                         k=10)
-
-
     @rec_test(test_type='NEP_hits_distribution_by_slice')
     def hits_distribution_by_slice(self):
         """
@@ -202,7 +153,7 @@ class SpotifySessionRecList(RecList):
                              # this contains all the track URIs from train and test sets
                              k=10)
 
-    @rec_test(test_type='NEP_Popularity@10')
+    @rec_test(test_type='Popularity@10')
     def popularity_bias_at_k(self):
         """
         Compute average frequency of occurrence across recommended items in training data
@@ -213,6 +164,68 @@ class SpotifySessionRecList(RecList):
         return popularity_bias_at_k(self.uri_only(y_preds),
                                     [[t['track_uri'] for t in p['tracks']] for p in self._x_train],
                                     k=10)
+
+    @rec_test(test_type='MRR@10')
+    def mrr_at_k(self):
+        """
+        MRR calculates the mean reciprocal of the rank at which the first
+        relevant item was retrieved
+        """
+        from reclist.metrics.standard_metrics import mrr_at_k
+        x_test, y_test = self.generate_nep_test_set()
+        y_preds = self.get_y_preds(x_test, y_test)
+        return mrr_at_k(self.uri_only(y_preds),
+                        self.uri_only(y_test),
+                        k=10)
+
+
+    @rec_test(test_type='NEP_perturbation')
+    def perturbation_at_k(self):
+        """
+        Compute average consistency in model predictions when inputs are perturbed
+        """
+        from reclist.metrics.perturbation import session_perturbation_test
+        from collections import defaultdict
+        from functools import partial
+
+        x_test, y_test = self.generate_nep_test_set()
+        y_preds = self.get_y_preds(x_test, y_test)
+
+        # should we use the whole catalog or just the ones present in the training set?
+        catalog = collections.defaultdict(dict)
+        for dataset in [self._x_train]:
+            for playlist in dataset:
+                for track in playlist['tracks']:
+                    if track['track_uri'] in catalog:
+                        continue  # could also double check that the existing info lines up
+                    catalog[track['track_uri']] = {
+                        'artist_uri': track['artist_uri'],
+                        'album_uri': track['album_uri'],
+                        'duration_ms': track['duration_ms']
+                    }
+        # map from artist uri to track uri
+        substitute_mapping = defaultdict(list)
+        for track_uri, row in catalog.items():
+            substitute_mapping[row['artist_uri']].append(track_uri)
+
+        # define a custom perturbation function
+        def perturb(session, sub_map):
+            last_item = session[-1]
+            last_item_artist = last_item['artist_uri']
+            substitutes = set(sub_map.get(last_item_artist,[])) - {last_item['track_uri']}
+            if substitutes:
+                similar_item = random.sample(substitutes, k=1)
+                new_session = session[:-1] + [{"track_uri": similar_item[0]}]
+                return new_session
+            return []
+
+        # call test
+        return session_perturbation_test(self.rec_model,
+                                         x_test,
+                                         y_preds,
+                                         partial(perturb, sub_map=substitute_mapping),
+                                         self.uri_only,
+                                         k=10)
 
     # ########### ALL SUBSEQUENT PREDICTION #########
     # @rec_test(test_type='ALL_stats')
