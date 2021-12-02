@@ -1,6 +1,4 @@
-import random
 import numpy as np
-from tqdm import tqdm
 
 
 def session_perturbation_test(model,
@@ -9,29 +7,22 @@ def session_perturbation_test(model,
                               perturbation_fn,
                               id_fn,
                               k):
-    overlap_ratios = []
-    y_p = []
-    x_perturbs = []
-    # generate a batch of perturbations
-    for _x, _y_p in zip(x_test, y_preds):
-        # perturb last item in session
-        x_perturb = perturbation_fn(_x)
-        if not x_perturb:
-            continue
-        x_perturbs.append(x_perturb)
-        y_p.append(_y_p)
-    # make predictions over perturbed inputs
-    y_perturbs = model.predict(x_perturbs)
-    # extract uri
-    y_p, y_perturbs = id_fn(y_p), id_fn(y_perturbs)
+    # generate perturbations
+    perturbed_pairs = [(perturbation_fn(_x), _y_p) for _x, _y_p in zip(x_test, y_preds) if perturbation_fn(_x)]
+    # extract perturbed x and original y
+    x_test_p, y_preds_o = zip(*perturbed_pairs)
+    # make new predictions over perturbed inputs
+    y_preds_n = model.predict(x_test_p)
+    # extract atomic unit for comparison
+    y_preds_o, y_preds_n = id_fn(y_preds_o), id_fn(y_preds_n)
     # check for overlapping predictions
-    for _y_p, _y_perturb in zip(y_p, y_perturbs):
-        if _y_p and _y_perturb:
+    overlap_ratios = []
+    for _y_p_n, _y_p_o in zip(y_preds_o, y_preds_n):
+        if _y_p_n and _y_p_o:
             # compute prediction intersection
-            intersection = set(_y_perturb[:k]).intersection(_y_p[:k])
-            overlap_ratio = len(intersection) / len(_y_p[:k])
+            intersection = set(_y_p_o[:k]).intersection(_y_p_n[:k])
+            overlap_ratio = len(intersection) / len(_y_p_n[:k])
             overlap_ratios.append(overlap_ratio)
         else:
             overlap_ratios.append(0)
-
     return np.mean(overlap_ratios)

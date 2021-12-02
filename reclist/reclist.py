@@ -70,7 +70,6 @@ class CoveoCartRecList(RecList):
 
 class SpotifySessionRecList(RecList):
 
-    ########### NEXT EVENT PREDICTION #########
     @rec_test(test_type='basic_stats')
     def nep_stats(self):
         """
