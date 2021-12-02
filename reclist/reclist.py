@@ -132,9 +132,6 @@ class SpotifySessionRecList(RecList):
         Compute the distribution of hit-rate across various slices of data
         """
         from reclist.metrics.hits_slice import hits_distribution_by_slice
-        x_test, y_test = self.generate_nep_test_set()
-        y_preds = self.get_y_preds(x_test, y_test)
-
         # slice by genre
         slice_fns = {
             'HIP-HOP/RAP': lambda _: _['artist_uri'] == '3TVXtAsR1Inumwj472S9r4',  # Drake
@@ -144,8 +141,8 @@ class SpotifySessionRecList(RecList):
         }
 
         return hits_distribution_by_slice(slice_fns,
-                                          self.uri_only(y_test),
-                                          self.uri_only(y_preds),
+                                          self.uri_only(self._y_test),
+                                          self.uri_only(self._y_preds),
                                           self.product_data,
                                           debug=True)
 
@@ -156,9 +153,7 @@ class SpotifySessionRecList(RecList):
         recommends based on a set of sessions
         """
         from reclist.metrics.standard_metrics import coverage_at_k
-        x_test, y_test = self.generate_nep_test_set()
-        y_preds = self.get_y_preds(x_test, y_test)
-        return coverage_at_k(self.uri_only(y_preds),
+        return coverage_at_k(self.uri_only(self._y_preds),
                              self.product_data,
                              # this contains all the track URIs from train and test sets
                              k=10)
@@ -169,9 +164,7 @@ class SpotifySessionRecList(RecList):
         Compute average frequency of occurrence across recommended items in training data
         """
         from reclist.metrics.standard_metrics import popularity_bias_at_k
-        x_test, y_test = self.generate_nep_test_set()
-        y_preds = self.get_y_preds(x_test, y_test)
-        return popularity_bias_at_k(self.uri_only(y_preds),
+        return popularity_bias_at_k(self.uri_only(self._y_preds),
                                     self.uri_only(self._x_train),
                                     k=10)
 
