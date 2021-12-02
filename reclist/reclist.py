@@ -125,25 +125,27 @@ class SpotifySessionRecList(RecList):
                                          self.uri_only,
                                          k=10)
 
-    @rec_test(test_type='hits_distribution_by_playlist_length')
+    @rec_test(test_type='hits_distribution_by_slice')
     def hits_distribution_by_slice(self):
         """
         Compute the distribution of hit-rate across various slices of data
         """
         from reclist.metrics.hits_slice import hits_distribution_by_slice
 
-        def generate_slices(x_test, **kwargs):
-            slices = collections.defaultdict(list)
-            for idx, playlist in enumerate(x_test):
-                slices[len(playlist)].append(idx)
-            slices = collections.OrderedDict(sorted(slices.items()))
-            return slices
+        len_map = collections.defaultdict(list)
+        for idx, playlist in enumerate(self._x_test):
+            len_map[len(playlist)].append(idx)
+        slices = collections.defaultdict(list)
+        bins = [(x * 5, (x + 1) * 5) for x in range(max(len_map) // 5 + 1)]
+        for bin_min, bin_max in bins:
+            for i in range(bin_min + 1, bin_max + 1, 1):
+                slices[f'({bin_min}, {bin_max}]'].extend(len_map[i])
+                del len_map[i]
+        assert len(len_map) == 0
 
-        return hits_distribution_by_slice(generate_slices,
-                                          self.uri_only(self._x_test),
+        return hits_distribution_by_slice(slices,
                                           self.uri_only(self._y_test),
                                           self.uri_only(self._y_preds),
-                                          self.product_data,
                                           debug=True)
 
     @rec_test(test_type='Coverage@10')
