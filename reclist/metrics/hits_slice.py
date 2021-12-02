@@ -5,7 +5,8 @@ import os
 from reclist.current import current
 
 
-def hits_distribution_by_slice(slice_fns: dict,
+def hits_distribution_by_slice(generate_slices,
+                               x_test,
                                y_test,
                                y_preds,
                                product_data,
@@ -14,9 +15,8 @@ def hits_distribution_by_slice(slice_fns: dict,
                                debug=False):
 
     hit_rate_per_slice = defaultdict(dict)
-    for slice_name, filter_fn in slice_fns.items():
-        # get indices for slice
-        slice_idx = [idx for idx, _y in enumerate(y_test) if _y[0] in product_data and filter_fn(product_data[_y[0]])]
+    slices = generate_slices(x_test=x_test, y_test=y_test, y_preds=y_preds, product_data=product_data)
+    for slice_name, slice_idx in slices.items():
         # get predictions for slice
         slice_y_preds = [y_preds[_] for _ in slice_idx]
         # get labels for slice
@@ -25,8 +25,8 @@ def hits_distribution_by_slice(slice_fns: dict,
         slice_hr = hit_rate_at_k(slice_y_preds, slice_y_test, k=k)
         # store results
         hit_rate_per_slice[slice_name]['hit_rate'] = slice_hr
-        hit_rate_per_slice[slice_name]['hits'] = sample_hits_at_k(slice_y_preds, slice_y_test, k=k, size=sample_size)
-        hit_rate_per_slice[slice_name]['misses'] = sample_misses_at_k(slice_y_preds, slice_y_test, k=k, size=sample_size)
+        # hit_rate_per_slice[slice_name]['hits'] = sample_hits_at_k(slice_y_preds, slice_y_test, k=k, size=sample_size)
+        # hit_rate_per_slice[slice_name]['misses'] = sample_misses_at_k(slice_y_preds, slice_y_test, k=k, size=sample_size)
 
     # debug / visualization
     if debug:
