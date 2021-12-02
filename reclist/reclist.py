@@ -59,8 +59,7 @@ class CoveoCartRecList(RecList):
         Compute the distribution of distance from query to label and query to prediction
         """
         from reclist.metrics.cosine_distance_metrics import distance_to_query
-        return distance_to_query(self.rec_model,]8
-        u
+        return distance_to_query(self.rec_model,
                                  self.sku_only(self._x_test),
                                  self.sku_only(self._y_test),
                                  self.sku_only(self._y_preds), k=10, bins=25, debug=True)
