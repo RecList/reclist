@@ -131,14 +131,6 @@ class SpotifySessionRecList(RecList):
         for track_uri, row in catalog.items():
             substitute_mapping[row['artist_uri']].append(track_uri)
 
-        def get_item_with_category(product_data: dict, category: set, to_ignore=None):
-            to_ignore = [] if to_ignore is None else to_ignore
-            uris = [_ for _ in product_data if product_data[_][
-                'artist_uri'] == category and _ not in to_ignore]  # this is a really expensive operation
-            if uris:
-                return random.choice(uris)
-            return []
-
         def perturb_session(session, substitute_mapping):
             last_item = session[-1]
             last_item_artist = last_item['artist_uri']
