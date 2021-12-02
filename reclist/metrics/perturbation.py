@@ -15,10 +15,10 @@ def session_perturbation_test(model,
     # generate a batch of perturbations
     for _x, _y_p in zip(x_test, y_preds):
         # perturb last item in session
-        x_perturb = perturbation_fn(_x['tracks'])
+        x_perturb = perturbation_fn(_x)
         if not x_perturb:
             continue
-        x_perturbs.append({'tracks': x_perturb})
+        x_perturbs.append(x_perturb)
         y_p.append(_y_p)
     # make predictions over perturbed inputs
     y_perturbs = model.predict(x_perturbs)

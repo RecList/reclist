@@ -81,13 +81,13 @@ class SpotifyP2VRecModel(RecModel):
         """
         predictions = []
         for _x in prediction_input:
-            embeddings = [self._model[track['track_uri']] for track in _x['tracks'] if track['track_uri'] in self._model]
+            embeddings = [self._model[track['track_uri']] for track in _x if track['track_uri'] in self._model]
             if embeddings:
                 avg_playlist_vector = np.average(embeddings, axis=0)
                 nn_tracks = self._model.similar_by_vector(avg_playlist_vector, topn=100)
-                predictions.append({'tracks': [{'track_uri':_[0]} for _ in nn_tracks]})
+                predictions.append([{'track_uri':_[0]} for _ in nn_tracks])
             else:
-                predictions.append({'tracks': []})
+                predictions.append([])
 
         return predictions
 

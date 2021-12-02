@@ -32,7 +32,7 @@ def hits_distribution_by_slice(slice_fns: dict,
     if debug:
         x_tick_names = list(hit_rate_per_slice.keys())
         x_tick_idx = list(range(len(x_tick_names)))
-        plt.bar(x_tick_idx, hit_rate_per_slice.values(), align='center')
+        plt.bar(x_tick_idx,[_['hit_rate'] for _ in hit_rate_per_slice.values()], align='center')
         plt.xticks(list(range(len(hit_rate_per_slice))), x_tick_names)
         plt.savefig(os.path.join(current.report_path,
                                  'plots',
