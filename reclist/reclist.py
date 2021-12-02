@@ -125,13 +125,13 @@ class SpotifySessionRecList(RecList):
                                          self.uri_only,
                                          k=10)
 
-    @rec_test(test_type='hits_distribution_by_genre')
+    @rec_test(test_type='hits_distribution_by_playlist_length')
     def hits_distribution_by_slice(self):
         """
         Compute the distribution of hit-rate across various slices of data
         """
         from reclist.metrics.hits_slice import hits_distribution_by_slice
-        
+
         def generate_slices(x_test, **kwargs):
             slices = collections.defaultdict(list)
             for idx, playlist in enumerate(x_test):
@@ -146,7 +146,7 @@ class SpotifySessionRecList(RecList):
                                           self.product_data,
                                           debug=True)
 
-    @rec_test(test_type='NEP_Coverage@10')
+    @rec_test(test_type='Coverage@10')
     def coverage_at_k(self):
         """
         Coverage is the proportion of all possible products which the RS
