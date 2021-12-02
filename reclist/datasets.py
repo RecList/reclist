@@ -73,7 +73,7 @@ class SpotifyDataset(RecDataset):
         self._y_train = None
         self._x_test = data['test']
         self._y_test = None
-        self._catalog = data["metadata"]
+        self._catalog = data["catalog"]
 
     def load_spotify_playlist_dataset(self):
 

@@ -68,7 +68,7 @@ class SpotifyP2VRecModel(RecModel):
     model_name = "prod2vec"
 
     def train(self, playlists, iterations=15):
-        x_train_uris = [[track['track_uri'] for track in playlist['tracks']] for playlist in playlists]
+        x_train_uris = [[track['track_uri'] for track in playlist] for playlist in playlists]
         self._model = train_embeddings(x_train_uris, iterations=iterations)
 
     def predict(self, prediction_input: list, *args, **kwargs):
