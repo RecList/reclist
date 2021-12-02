@@ -13,12 +13,11 @@ class CoveoCartRecList(RecList):
         Basic statistics on training, test and prediction data
         """
         from reclist.metrics.standard_metrics import statistics
-        y_preds = self.rec_model.predict(self._x_test)
         return statistics(self._x_train,
                           self._y_train,
                           self._x_test,
                           self._y_test,
-                          y_preds)
+                          self._y_preds)
 
     @rec_test(test_type='Coverage@10')
     def coverage_at_k(self):
@@ -27,8 +26,7 @@ class CoveoCartRecList(RecList):
         recommends based on a set of sessions
         """
         from reclist.metrics.standard_metrics import coverage_at_k
-        y_preds = self.rec_model.predict(self._x_test)
-        return coverage_at_k(self.sku_only(y_preds),
+        return coverage_at_k(self.sku_only(self._y_preds),
                              self.product_data,
                              k=10)
 
@@ -37,9 +35,8 @@ class CoveoCartRecList(RecList):
         """
         Compute the rate in which the top-k predictions contain the item to be predicted
         """
-        y_preds = self.rec_model.predict(self._x_test)
         from reclist.metrics.standard_metrics import hit_rate_at_k
-        return hit_rate_at_k(self.sku_only(y_preds),
+        return hit_rate_at_k(self.sku_only(self._y_preds),
                              self.sku_only(self._y_test),
                              k=10)
 
@@ -49,12 +46,10 @@ class CoveoCartRecList(RecList):
         Compute the distribution of hit-rate across product frequency in training data
         """
         from reclist.metrics.hits_distribution import hits_distribution
-        y_preds = self.rec_model.predict(self._x_test)
-
         return hits_distribution(self.sku_only(self._x_train),
                                  self.sku_only(self._x_test),
                                  self.sku_only(self._y_test),
-                                 self.sku_only(y_preds),
+                                 self.sku_only(self._y_preds),
                                  k=10,
                                  debug=True)
 
@@ -63,12 +58,12 @@ class CoveoCartRecList(RecList):
         """
         Compute the distribution of distance from query to label and query to prediction
         """
-        y_preds = self.rec_model.predict(self._x_test)
         from reclist.metrics.cosine_distance_metrics import distance_to_query
-        return distance_to_query(self.rec_model,
+        return distance_to_query(self.rec_model,]8
+        u
                                  self.sku_only(self._x_test),
                                  self.sku_only(self._y_test),
-                                 self.sku_only(y_preds), k=10, bins=25, debug=True)
+                                 self.sku_only(self._y_preds), k=10, bins=25, debug=True)
 
     def sku_only(self, l: List[List]):
         return [[e['product_sku'] for e in s] for s in l]
