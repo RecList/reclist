@@ -120,27 +120,21 @@ class RecList(ABC):
         :param dataset:
         :param y_preds:
         """
+
         self.name = self.__class__.__name__
         self._rec_tests = self.get_tests()
         self._x_train = dataset.x_train
         self._y_train = dataset.y_train
         self._x_test = dataset.x_test
         self._y_test = dataset.y_test
-        self._y_preds = y_preds
+        self._y_preds = y_preds if y_preds else model.predict(dataset.x_test)
         self.rec_model = model
         self.product_data = dataset.catalog
         self._test_results = []
         self._test_data = {}
         self._dense_repr = {}
 
-        if self._y_preds is not None:
-            assert len(self._y_test) == len(self._y_preds)
-
-    def get_y_preds(self, x_test, y_test, overwrite=False):
-        if self._y_preds is None or overwrite:
-            self._y_preds = self.rec_model.predict(x_test)
-            assert len(y_test) == len(self._y_preds)
-        return self._y_preds
+        assert len(self._y_test) == len(self._y_preds)
 
     def train_dense_repr(self, type_name: str, type_fn):
         """

@@ -5,7 +5,7 @@
     We train a simple, yet effective prod2vec baseline model (https://arxiv.org/abs/2007.14906),
     re-using for convenience a "training embedding" function already implemented by recsys. The script
     shows how easy it is to run behavioral tests on a target dataset, in this case a wrapper around a large
-    music dataset (the Spotify Million Playlist dataset: 
+    music dataset (the Spotify Million Playlist dataset:
     https://www.aicrowd.com/challenges/spotify-million-playlist-dataset-challenge).
 
     If you want to run your own model on the same dataset and the same behavioral test suite, just implement

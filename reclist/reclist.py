@@ -83,13 +83,11 @@ class SpotifySessionRecList(RecList):
         Basic statistics on training, test and prediction data for Next Event Prediction
         """
         from reclist.metrics.standard_metrics import statistics
-        x_test, y_test = self.generate_nep_test_set()
-        y_preds = self.get_y_preds(x_test, y_test, overwrite=True)
         return statistics(self._x_train,
                           self._y_train,
-                          x_test,
-                          y_test,
-                          y_preds,)
+                          self._x_test,
+                          self._y_test,
+                          self._y_preds)
 
     @rec_test(test_type='NEP_HR@10')
     def hit_rate_at_k(self):
@@ -97,135 +95,157 @@ class SpotifySessionRecList(RecList):
         Compute the rate at which the top-k predictions contain the item to be predicted
         """
         from reclist.metrics.standard_metrics import hit_rate_at_k
-        x_test, y_test = self.generate_nep_test_set()
-        y_preds = self.get_y_preds(x_test, y_test)
-        return hit_rate_at_k(self.uri_only(y_preds),
-                             self.uri_only(y_test),
+        return hit_rate_at_k(self.uri_only(self._y_preds),
+                             self.uri_only(self._y_test),
                              k=10)
 
-    @rec_test(test_type='NEP_hits_distribution_by_slice')
-    def hits_distribution_by_slice(self):
-        """
-        Compute the distribution of hit-rate across various slices of data
-        """
-        from reclist.metrics.hits_slice import hits_distribution_by_slice
-        x_test, y_test = self.generate_nep_test_set()
-        y_preds = self.get_y_preds(x_test, y_test)
-
-        # create catalog with metadata that will be used for slicing
-        catalog = collections.defaultdict(dict)
-        for dataset in [self._x_train]:
-            for playlist in dataset:
-                for track in playlist['tracks']:
-                    if track['track_uri'] in catalog:
-                        continue  # could also double check that the existing info lines up
-                    catalog[track['track_uri']] = {
-                        'artist_uri': track['artist_uri'],
-                        'album_uri': track['album_uri'],
-                        'duration_ms': track['duration_ms']
-                    }
-
-        # slice by artist
-        slice_fns = {
-            'HIP-HOP/RAP': lambda _: _['artist_uri'] == '3TVXtAsR1Inumwj472S9r4',  # Drake
-            'POP': lambda _: _['artist_uri'] == '5pKCCKE2ajJHZ9KAiaK11H',  # Rihanna
-            'EDM': lambda _: _['artist_uri'] == '69GGBxA162lTqCwzJG5jLp',  # The Chainsmokers
-            'R&B': lambda _: _['artist_uri'] == '1Xyo4u8uXC1ZmMpatF05PJ',  # The Weeknd
-        }
-
-        return hits_distribution_by_slice(slice_fns,
-                                          self.uri_only(y_test),
-                                          self.uri_only(y_preds),
-                                          catalog,
-                                          debug=True)
-
-    @rec_test(test_type='NEP_Coverage@10')
-    def coverage_at_k(self):
-        """
-        Coverage is the proportion of all possible products which the RS
-        recommends based on a set of sessions
-        """
-        from reclist.metrics.standard_metrics import coverage_at_k
-        x_test, y_test = self.generate_nep_test_set()
-        y_preds = self.get_y_preds(x_test, y_test)
-        return coverage_at_k(self.uri_only(y_preds),
-                             self.product_data['uri2track'],
-                             # this contains all the track URIs from train and test sets
-                             k=10)
-
-    @rec_test(test_type='Popularity@10')
-    def popularity_bias_at_k(self):
-        """
-        Compute average frequency of occurrence across recommended items in training data
-        """
-        from reclist.metrics.standard_metrics import popularity_bias_at_k
-        x_test, y_test = self.generate_nep_test_set()
-        y_preds = self.get_y_preds(x_test, y_test)
-        return popularity_bias_at_k(self.uri_only(y_preds),
-                                    [[t['track_uri'] for t in p['tracks']] for p in self._x_train],
-                                    k=10)
-
-    @rec_test(test_type='MRR@10')
-    def mrr_at_k(self):
-        """
-        MRR calculates the mean reciprocal of the rank at which the first
-        relevant item was retrieved
-        """
-        from reclist.metrics.standard_metrics import mrr_at_k
-        x_test, y_test = self.generate_nep_test_set()
-        y_preds = self.get_y_preds(x_test, y_test)
-        return mrr_at_k(self.uri_only(y_preds),
-                        self.uri_only(y_test),
-                        k=10)
-
-
-    @rec_test(test_type='NEP_perturbation')
-    def perturbation_at_k(self):
-        """
-        Compute average consistency in model predictions when inputs are perturbed
-        """
-        from reclist.metrics.perturbation import session_perturbation_test
-        from collections import defaultdict
-        from functools import partial
-
-        x_test, y_test = self.generate_nep_test_set()
-        y_preds = self.get_y_preds(x_test, y_test)
-
-        # should we use the whole catalog or just the ones present in the training set?
-        catalog = collections.defaultdict(dict)
-        for dataset in [self._x_train]:
-            for playlist in dataset:
-                for track in playlist['tracks']:
-                    if track['track_uri'] in catalog:
-                        continue  # could also double check that the existing info lines up
-                    catalog[track['track_uri']] = {
-                        'artist_uri': track['artist_uri'],
-                        'album_uri': track['album_uri'],
-                        'duration_ms': track['duration_ms']
-                    }
-        # map from artist uri to track uri
-        substitute_mapping = defaultdict(list)
-        for track_uri, row in catalog.items():
-            substitute_mapping[row['artist_uri']].append(track_uri)
-
-        # define a custom perturbation function
-        def perturb(session, sub_map):
-            last_item = session[-1]
-            last_item_artist = last_item['artist_uri']
-            substitutes = set(sub_map.get(last_item_artist,[])) - {last_item['track_uri']}
-            if substitutes:
-                similar_item = random.sample(substitutes, k=1)
-                new_session = session[:-1] + [{"track_uri": similar_item[0]}]
-                return new_session
-            return []
-
-        # call test
-        return session_perturbation_test(self.rec_model,
-                                         x_test,
-                                         y_preds,
-                                         partial(perturb, sub_map=substitute_mapping),
-                                         self.uri_only,
-                                         k=10)
+    # @rec_test(test_type='NEP_perturbation')
+    # def perturbation_at_k(self):
+    #     """
+    #     Compute average consistency in model predictions when inputs are perturbed
+    #     """
+    #     from reclist.metrics.perturbation import session_perturbation_test
+    #     from collections import defaultdict
+    #     from functools import partial
+    #
+    #     x_test, y_test = self.generate_nep_test_set()
+    #     y_preds = self.get_y_preds(x_test, y_test)
+    #
+    #     # map from artist uri to track uri
+    #     substitute_mapping = defaultdict(list)
+    #     for track_uri, row in self.product_data.items():
+    #         substitute_mapping[row['artist_uri']].append(track_uri)
+    #
+    #     # define a custom perturbation function
+    #     def perturb(session, sub_map):
+    #         last_item = session[-1]
+    #         last_item_artist = self.product_data[last_item['track_uri']]['artist_uri']
+    #         substitutes = set(sub_map.get(last_item_artist,[])) - {last_item['track_uri']}
+    #         if substitutes:
+    #             similar_item = random.sample(substitutes, k=1)
+    #             new_session = session[:-1] + [{"track_uri": similar_item[0]}]
+    #             return new_session
+    #         return []
+    #
+    #     # call test
+    #     return session_perturbation_test(self.rec_model,
+    #                                      x_test,
+    #                                      y_preds,
+    #                                      partial(perturb, sub_map=substitute_mapping),
+    #                                      self.uri_only,
+    #                                      k=10)
+    #
+    #
+    # @rec_test(test_type='NEP_hits_distribution_by_slice')
+    # def hits_distribution_by_slice(self):
+    #     """
+    #     Compute the distribution of hit-rate across various slices of data
+    #     """
+    #     from reclist.metrics.hits_slice import hits_distribution_by_slice
+    #     x_test, y_test = self.generate_nep_test_set()
+    #     y_preds = self.get_y_preds(x_test, y_test)
+    #
+    #     # slice by artist
+    #     slice_fns = {
+    #         'HIP-HOP/RAP': lambda _: _['artist_uri'] == '3TVXtAsR1Inumwj472S9r4',  # Drake
+    #         'POP': lambda _: _['artist_uri'] == '5pKCCKE2ajJHZ9KAiaK11H',  # Rihanna
+    #         'EDM': lambda _: _['artist_uri'] == '69GGBxA162lTqCwzJG5jLp',  # The Chainsmokers
+    #         'R&B': lambda _: _['artist_uri'] == '1Xyo4u8uXC1ZmMpatF05PJ',  # The Weeknd
+    #     }
+    #
+    #     return hits_distribution_by_slice(slice_fns,
+    #                                       self.uri_only(y_test),
+    #                                       self.uri_only(y_preds),
+    #                                       self.product_data,
+    #                                       debug=True)
+    #
+    # @rec_test(test_type='NEP_Coverage@10')
+    # def coverage_at_k(self):
+    #     """
+    #     Coverage is the proportion of all possible products which the RS
+    #     recommends based on a set of sessions
+    #     """
+    #     from reclist.metrics.standard_metrics import coverage_at_k
+    #     x_test, y_test = self.generate_nep_test_set()
+    #     y_preds = self.get_y_preds(x_test, y_test)
+    #     return coverage_at_k(self.uri_only(y_preds),
+    #                          self.product_data,
+    #                          # this contains all the track URIs from train and test sets
+    #                          k=10)
+    #
+    # @rec_test(test_type='Popularity@10')
+    # def popularity_bias_at_k(self):
+    #     """
+    #     Compute average frequency of occurrence across recommended items in training data
+    #     """
+    #     from reclist.metrics.standard_metrics import popularity_bias_at_k
+    #     x_test, y_test = self.generate_nep_test_set()
+    #     y_preds = self.get_y_preds(x_test, y_test)
+    #     return popularity_bias_at_k(self.uri_only(y_preds),
+    #                                 self.uri_only(self._x_train),
+    #                                 k=10)
+    #
+    # @rec_test(test_type='MRR@10')
+    # def mrr_at_k(self):
+    #     """
+    #     MRR calculates the mean reciprocal of the rank at which the first
+    #     relevant item was retrieved
+    #     """
+    #     from reclist.metrics.standard_metrics import mrr_at_k
+    #     x_test, y_test = self.generate_nep_test_set()
+    #     y_preds = self.get_y_preds(x_test, y_test)
+    #     return mrr_at_k(self.uri_only(y_preds),
+    #                     self.uri_only(y_test),
+    #                     k=10)
+    #
+    #
+    # @rec_test(test_type='NEP_perturbation')
+    # def perturbation_at_k(self):
+    #     """
+    #     Compute average consistency in model predictions when inputs are perturbed
+    #     """
+    #     from reclist.metrics.perturbation import session_perturbation_test
+    #     from collections import defaultdict
+    #     from functools import partial
+    #
+    #     x_test, y_test = self.generate_nep_test_set()
+    #     y_preds = self.get_y_preds(x_test, y_test)
+    #
+    #     # should we use the whole catalog or just the ones present in the training set?
+    #     catalog = collections.defaultdict(dict)
+    #     for dataset in [self._x_train]:
+    #         for playlist in dataset:
+    #             for track in playlist['tracks']:
+    #                 if track['track_uri'] in catalog:
+    #                     continue  # could also double check that the existing info lines up
+    #                 catalog[track['track_uri']] = {
+    #                     'artist_uri': track['artist_uri'],
+    #                     'album_uri': track['album_uri'],
+    #                     'duration_ms': track['duration_ms']
+    #                 }
+    #     # map from artist uri to track uri
+    #     substitute_mapping = defaultdict(list)
+    #     for track_uri, row in catalog.items():
+    #         substitute_mapping[row['artist_uri']].append(track_uri)
+    #
+    #     # define a custom perturbation function
+    #     def perturb(session, sub_map):
+    #         last_item = session[-1]
+    #         last_item_artist = last_item['artist_uri']
+    #         substitutes = set(sub_map.get(last_item_artist,[])) - {last_item['track_uri']}
+    #         if substitutes:
+    #             similar_item = random.sample(substitutes, k=1)
+    #             new_session = session[:-1] + [{"track_uri": similar_item[0]}]
+    #             return new_session
+    #         return []
+    #
+    #     # call test
+    #     return session_perturbation_test(self.rec_model,
+    #                                      x_test,
+    #                                      y_preds,
+    #                                      partial(perturb, sub_map=substitute_mapping),
+    #                                      self.uri_only,
+    #                                      k=10)
 
     # ########### ALL SUBSEQUENT PREDICTION #########
     # @rec_test(test_type='ALL_stats')
@@ -240,7 +260,7 @@ class SpotifySessionRecList(RecList):
     #                       self._y_train,
     #                       x_test,
     #                       y_test,
-    #                       [playlist['tracks'] for playlist in y_preds])
+    #                       y_preds)
     #
     # @rec_test(test_type='ALL_P@50')
     # def precision_at_k(self):
@@ -294,12 +314,10 @@ class SpotifySessionRecList(RecList):
         x_test = []
         y_test = []
         for playlist in self._x_test:
-            if len(playlist['tracks']) < 2:
+            if len(playlist) < 2:
                 continue
-            seed_tracks = playlist['tracks'][:-1]
-            target = playlist['tracks'][-1]
-            x_test.append(seed_tracks)
-            y_test.append([target])
+            x_test.append(playlist[:-1])
+            y_test.append([playlist[-1]])
 
         if shuffle:
             random.seed(seed)
@@ -322,28 +340,21 @@ class SpotifySessionRecList(RecList):
         x_test = []
         y_test = []
         for playlist in self._x_test:
-            if len(playlist['tracks']) <= k:
+            if len(playlist) <= k:
                 continue
             if shuffle:
                 random.seed(seed)
-                all_idx = list(range(len(playlist['tracks'])))
+                all_idx = list(range(len(playlist)))
                 seeded_idx = random.sample(all_idx, k=k)
                 held_out_idx = set(all_idx) - set(seeded_idx)
-                seeded_tracks = [playlist['tracks'][idx] for idx in seeded_idx]
-                held_out_tracks = [playlist['tracks'][idx]
-                                   for idx in held_out_idx]
+                seeded_tracks = [playlist[idx] for idx in seeded_idx]
+                held_out_tracks = [playlist[idx] for idx in held_out_idx]
                 assert len(seeded_tracks) + \
-                       len(held_out_tracks) == len(playlist['tracks'])
+                       len(held_out_tracks) == len(playlist)
             else:
-                seeded_tracks = playlist['tracks'][:k]
-                held_out_tracks = playlist['tracks'][k:]
-            x_test.append({
-                'pid': playlist['pid'],
-                'tracks': seeded_tracks
-            })
-            y_test.append({
-                'pid': playlist['pid'],
-                'tracks': held_out_tracks
-            })
+                seeded_tracks = playlist[:k]
+                held_out_tracks = playlist[k:]
+            x_test.append(seeded_tracks)
+            y_test.append(held_out_tracks)
 
         return x_test, y_test

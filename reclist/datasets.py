@@ -73,7 +73,11 @@ class SpotifyDataset(RecDataset):
         self._y_train = None
         self._x_test = data['test']
         self._y_test = None
-        self._catalog = data["metadata"]
+        self._catalog = data["catalog"]
+
+        # generate NEP dataset here for now
+        test_pairs = [(playlist[:-1], [playlist[-1]])  for playlist in self._x_test if len(playlist) > 1]
+        self._x_test, self._y_test = zip(*test_pairs)
 
     def load_spotify_playlist_dataset(self):
 

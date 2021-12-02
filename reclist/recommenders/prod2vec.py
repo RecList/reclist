@@ -7,8 +7,6 @@ class CoveoP2VRecModel(RecModel):
     """
     Implement of the prod2vec model through the standard RecModel interface.
 
-    >>> model = CoveoP2VRecModel()
-    >>> model.train(coveo_dataset.x_train)
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -68,7 +66,7 @@ class SpotifyP2VRecModel(RecModel):
     model_name = "prod2vec"
 
     def train(self, playlists, iterations=15):
-        x_train_uris = [[track['track_uri'] for track in playlist['tracks']] for playlist in playlists]
+        x_train_uris = [[track['track_uri'] for track in playlist] for playlist in playlists]
         self._model = train_embeddings(x_train_uris, iterations=iterations)
 
     def predict(self, prediction_input: list, *args, **kwargs):
