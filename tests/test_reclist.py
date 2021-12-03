@@ -34,29 +34,29 @@ def test_coveo_example():
     # invoke rec_list to run tests
     rec_list(verbose=True)
 
-def test_spotify_example():
-
-    # get the Spotify million playlist dataset as a RecDataset object
-    spotify_dataset = SpotifyDataset()
-
-    # re-use a skip-gram model from reclist to train a latent product space, to be used
-    # (through knn) to build a recommender
-    model = SpotifyP2VRecModel()
-    spotify_dataset._x_train = spotify_dataset._x_train[0:1000]
-
-    spotify_dataset._x_test = spotify_dataset._x_test[0:20]
-
-
-    model.train(spotify_dataset._x_train, iterations=1)
-
-    # instantiate rec_list object, prepared with standard quantitative tests
-    # and sensible behavioral tests (check the paper for details!)
-    rec_list = SpotifySessionRecList(
-        model=model,
-        dataset=spotify_dataset
-    )
-    # invoke rec_list to run tests
-    rec_list(verbose=True)
+# def test_spotify_example():
+#
+#     # get the Spotify million playlist dataset as a RecDataset object
+#     spotify_dataset = SpotifyDataset()
+#
+#     # re-use a skip-gram model from reclist to train a latent product space, to be used
+#     # (through knn) to build a recommender
+#     model = SpotifyP2VRecModel()
+#     spotify_dataset._x_train = spotify_dataset._x_train[0:1000]
+#
+#     spotify_dataset._x_test = spotify_dataset._x_test[0:20]
+#
+#
+#     model.train(spotify_dataset._x_train, iterations=1)
+#
+#     # instantiate rec_list object, prepared with standard quantitative tests
+#     # and sensible behavioral tests (check the paper for details!)
+#     rec_list = SpotifySessionRecList(
+#         model=model,
+#         dataset=spotify_dataset
+#     )
+#     # invoke rec_list to run tests
+#     rec_list(verbose=True)
 
 
 def test_mrr():

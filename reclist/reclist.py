@@ -71,7 +71,7 @@ class CoveoCartRecList(RecList):
 class SpotifySessionRecList(RecList):
 
     @rec_test(test_type='basic_stats')
-    def nep_stats(self):
+    def basic_stats(self):
         """
         Basic statistics on training, test and prediction data for Next Event Prediction
         """
