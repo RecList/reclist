@@ -19,6 +19,20 @@ class CoveoCartRecList(RecList):
                           self._y_test,
                           self._y_preds)
 
+    @rec_test(test_type='price_homogeneity')
+    def price_test(self):
+        """
+        Measures the absolute log ratio of ground truth and prediction price
+        """
+        from reclist.metrics.price_homogeneity import price_homogeneity_test
+        return price_homogeneity_test(y_test=self.sku_only(self._y_test),
+                                      y_preds=self.sku_only(self._y_preds),
+                                      product_data=self.product_data,
+                                      price_sel_fn=lambda x: float(x['price_bucket'])
+                                                             if x['price_bucket']
+                                                             else None
+                                      )
+
     @rec_test(test_type='Coverage@10')
     def coverage_at_k(self):
         """
