@@ -35,9 +35,9 @@ def test_coveo_example():
     rec_list(verbose=True)
 
 def test_spotify_example():
-
+    pass
     # get the Spotify million playlist dataset as a RecDataset object
-    spotify_dataset = SpotifyDataset()
+    # spotify_dataset = SpotifyDataset()
 
     # re-use a skip-gram model from reclist to train a latent product space, to be used
     # (through knn) to build a recommender
