@@ -1,3 +1,4 @@
+import numpy as np
 from reclist.abstractions import RecModel
 from reclist.utils.train_w2v import train_embeddings
 
@@ -6,15 +7,13 @@ class CoveoP2VRecModel(RecModel):
     """
     Implement of the prod2vec model through the standard RecModel interface.
 
-    >>> model = CoveoP2VRecModel()
-    >>> model.train(coveo_dataset.x_train)
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     model_name = "prod2vec"
 
-    def train(self, products):
+    def train(self, products, iterations=15):
         """
         Takes a list of products in the COVEO dataset (with coveo dataset format) and trains a model
 
@@ -22,7 +21,7 @@ class CoveoP2VRecModel(RecModel):
         :return:
         """
         x_train_skus = [[e['product_sku'] for e in s] for s in products]
-        self._model = train_embeddings(x_train_skus)
+        self._model = train_embeddings(x_train_skus, iterations=iterations)
 
     def predict(self, prediction_input: list, *args, **kwargs):
         """
@@ -41,7 +40,7 @@ class CoveoP2VRecModel(RecModel):
             key_item = _x[0]['product_sku']
             nn_products = self._model.most_similar(key_item, topn=10) if key_item in self._model else None
             if nn_products:
-                predictions.append([{'product_sku':_[0]} for _ in nn_products])
+                predictions.append([{'product_sku': _[0]} for _ in nn_products])
             else:
                 predictions.append([])
 
@@ -50,5 +49,48 @@ class CoveoP2VRecModel(RecModel):
     def get_vector(self, product_sku):
         try:
             return list(self._model.get_vector(product_sku))
+        except Exception as e:
+            return []
+
+
+class SpotifyP2VRecModel(RecModel):
+    """
+    Implement of the prod2vec model through the standard RecModel interface.
+
+    Since init is ok, we just need to overwrite the prediction methods to get predictions
+    out of it.
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    model_name = "prod2vec"
+
+    def train(self, playlists, iterations=15):
+        x_train_uris = [[track['track_uri'] for track in playlist] for playlist in playlists]
+        self._model = train_embeddings(x_train_uris, iterations=iterations)
+
+    def predict(self, prediction_input: list, *args, **kwargs):
+        """
+        Implement the abstract method.
+        NEP following industry best practices mentioned in https://arxiv.org/abs/2007.14906:
+        given a trained prod2vec, take all the seeded (or before-last) tracks to construct a
+        playlist vector by average pooling, and use kNN to predict the next items (or the last
+        item).
+        """
+        predictions = []
+        for _x in prediction_input:
+            embeddings = [self._model[track['track_uri']] for track in _x if track['track_uri'] in self._model]
+            if embeddings:
+                avg_playlist_vector = np.average(embeddings, axis=0)
+                nn_tracks = self._model.similar_by_vector(avg_playlist_vector, topn=100)
+                predictions.append([{'track_uri':_[0]} for _ in nn_tracks])
+            else:
+                predictions.append([])
+
+        return predictions
+
+    def get_vector(self, track_uri):
+        try:
+            return list(self._model.get_vector(track_uri))
         except Exception as e:
             return []

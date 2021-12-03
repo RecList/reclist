@@ -1,7 +1,7 @@
 import json
 import tempfile
 import zipfile
-import random
+import os
 from reclist.abstractions import RecDataset
 from reclist.utils.config import *
 
@@ -63,26 +63,26 @@ class CoveoDataset(RecDataset):
         self._catalog = data["catalog"]
 
 class SpotifyDataset(RecDataset):
-    """
-    Spotify Dataset
-    """
-    def __init__(self, k: int = 5, **kwargs):
-        self.k = k
+
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     def load(self):
         data = self.load_spotify_playlist_dataset()
-        x_test, y_test = self.preprocess_spotify_playlist_data()
-        self._x_train = data["x_train"]
+        self._x_train = data["train"]
         self._y_train = None
-        self._x_test = x_test
-        self._y_test = y_test
-        self._catalog = data["metadata"]
+        self._x_test = data['test']
+        self._y_test = None
+        self._catalog = data["catalog"]
+
+        # generate NEP dataset here for now
+        test_pairs = [(playlist[:-1], [playlist[-1]])  for playlist in self._x_test if len(playlist) > 1]
+        self._x_test, self._y_test = zip(*test_pairs)
 
     def load_spotify_playlist_dataset(self):
 
         cache_directory = get_cache_directory()
-        filename = os.path.join(cache_directory, "spotify_playlist.zip")   # TODO: make var somewhere
+        filename = os.path.join(cache_directory, "small_spotify_playlist.zip")   # TODO: make var somewhere
 
         if not os.path.exists(filename) or self.force_download:
             download_with_progress(SPOTIFY_PLAYLIST_DATASET_S3_URL, filename)
@@ -93,31 +93,3 @@ class SpotifyDataset(RecDataset):
             with open(os.path.join(temp_dir, 'dataset.json')) as f:
                 data = json.load(f)
         return data
-
-    def preprocess_spotify_playlist_data(
-        self,
-        shuffle: bool = False,
-        seed: int = 0
-    ):
-        x_test = []
-        y_test = []
-        for playlist in self.data['test']:
-            if len(playlist['tracks']) <= self.k:
-                continue
-            if shuffle:
-                random.seed(seed)
-                all_idx = list(range(len(playlist['tracks'])))
-                seeded_idx = random.sample(all_idx, k=self.k)
-                held_out_idx = set(all_idx) - set(seeded_idx)
-                seeded_tracks = [playlist['tracks'][idx] for idx in seeded_idx]
-                held_out_tracks = [playlist['tracks'][idx]
-                                   for idx in held_out_idx]
-                assert len(seeded_tracks) + \
-                    len(held_out_tracks) == len(playlist['tracks'])
-            else:
-                seeded_tracks = playlist['tracks'][:self.k]
-                held_out_tracks = playlist['tracks'][self.k:]
-            x_test.append(seeded_tracks)
-            y_test.append(held_out_tracks)
-
-        return x_test, y_test

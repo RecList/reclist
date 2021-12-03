@@ -120,6 +120,7 @@ class RecList(ABC):
         :param dataset:
         :param y_preds:
         """
+
         self.name = self.__class__.__name__
         self._rec_tests = self.get_tests()
         self._x_train = dataset.x_train
