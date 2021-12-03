@@ -23,6 +23,6 @@ def session_perturbation_test(model,
             intersection = set(_y_p_o[:k]).intersection(_y_p_n[:k])
             overlap_ratio = len(intersection) / len(_y_p_n[:k])
             overlap_ratios.append(overlap_ratio)
-        else:
+        elif _y_p_n or _y_p_o:
             overlap_ratios.append(0)
     return np.mean(overlap_ratios)

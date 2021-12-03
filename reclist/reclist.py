@@ -139,6 +139,25 @@ class SpotifySessionRecList(RecList):
                                          self.uri_only,
                                          k=10)
 
+    @rec_test(test_type='shuffle_session')
+    def perturbation_shuffle_at_k(self):
+        """
+        Compute average consistency in model predictions when inputs are re-ordered
+        """
+        from reclist.metrics.perturbation import session_perturbation_test
+
+        # Step 1: define a custom perturbation function
+        def perturb(session):
+            return random.sample(session, len(session))
+
+        # Step 2: call test
+        return session_perturbation_test(self.rec_model,
+                                         self._x_test,
+                                         self._y_preds,
+                                         perturb,
+                                         self.uri_only,
+                                         k=10)
+
     @rec_test(test_type='hits_distribution_by_slice')
     def hits_distribution_by_slice(self):
         """
