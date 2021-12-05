@@ -1,4 +1,8 @@
 import numpy as np
+<<<<<<< HEAD
+=======
+
+>>>>>>> f826fcdad107d38909e4b48dd3a14d680c46f853
 from reclist.abstractions import RecModel
 from reclist.utils.train_w2v import train_embeddings
 
@@ -94,6 +98,7 @@ class SpotifyP2VRecModel(RecModel):
             return list(self._model.get_vector(track_uri))
         except Exception as e:
             return []
+
 class MovieLensP2VRecModel(RecModel):
 
     model_name = "prod2vec"
@@ -144,4 +149,8 @@ class MovieLensP2VRecModel(RecModel):
         try:
             return list(self.model.get_vector(movie_id))
         except Exception as e:
+<<<<<<< HEAD
             return []
+=======
+            return []
+>>>>>>> f826fcdad107d38909e4b48dd3a14d680c46f853

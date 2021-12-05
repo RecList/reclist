@@ -79,6 +79,7 @@ def test_spotify_example():
 
 
 
+
 def test_mrr():
     """
     Testing MRR works as intended
