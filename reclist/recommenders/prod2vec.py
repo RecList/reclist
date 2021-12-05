@@ -104,10 +104,10 @@ class MovieLensP2VRecModel(RecModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def train(self, movies):
+    def train(self, movies, iterations=15):
         # Get the movie ID and rating for each movie for each unique user
         x_train = [[(x["movieId"], x["rating"]) for x in y] for y in movies]
-        self._model = train_embeddings(x_train)
+        self._model = train_embeddings(x_train, iterations=15)
 
     def predict(self, prediction_input, *args, **kwargs):
         """
