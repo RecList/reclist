@@ -41,8 +41,7 @@ with an easy-to-extend interface for custom use cases.
 *RecList* ships with some popular datasets and ready-made behavioral tests: check the `paper <https://arxiv.org/abs/2111.09963>`__
 for more details on the relevant literature and the philosophical motivations behind the project.
 
-If you are not familiar with the library, we suggest first taking our small tour to get acquainted with the main
-abstractions through ready-made models and public datasets.
+If you are not familiar with the library, we suggest first taking our small tour to get acquainted with the main abstractions through ready-made models and public datasets.
 
 Quick Links
 ~~~~~~~~~~~
@@ -54,7 +53,7 @@ Quick Links
 Project updates
 ~~~~~~~~~~~~~~~
 
-*Nov. 2021*: the library is currently in alpha (i.e. enough working code to finish the paper and tinker with it). We welcome early feedback, but please be advised that the package may change substantially in the upcoming months ("If you're not embarrassed by the first version, you've launched too late").
+*Dec. 2021*: the library is currently in alpha (i.e. enough working code to finish the paper and tinker with it). We welcome early feedback, but please be advised that the package may change substantially in the upcoming months ("If you're not embarrassed by the first version, you've launched too late").
 
 As the project is in active development, come back often for updates.
 
@@ -73,14 +72,9 @@ This doc is structured as follows:
 Quick Start
 -----------
 
-If you want to see *RecList* in action, clone the repository, create and activate a virtual env, and install
-the required packages from root. If you prefer to experiment in an interactive, no-installation-required fashion,
-try out our `colab notebook <https://colab.research.google.com/drive/1Wn5mm0csEkyWqmBBDxNBkfGR6CNfWeH-?usp=sharing>`__.
+If you want to see *RecList* in action, clone the repository, create and activate a virtual env, and install the required packages from root. If you prefer to experiment in an interactive, no-installation-required fashion, try out our `colab notebook <https://colab.research.google.com/drive/1Wn5mm0csEkyWqmBBDxNBkfGR6CNfWeH-?usp=sharing>`__.
 
-Sample scripts are divided by use-cases: similar items, complementary items or
-session-based recommendations. When executing one, a suitable public dataset will be downloaded,
-and a baseline ML model trained: finally, the script will run a pre-made suite of behavioral tests
-to show typical results.
+Sample scripts are divided by use-cases: similar items, complementary items or session-based recommendations. When executing one, a suitable public dataset will be downloaded, and a baseline ML model trained: finally, the script will run a pre-made suite of behavioral tests to show typical results.
 
 .. code-block:: bash
 
@@ -91,22 +85,18 @@ to show typical results.
     pip install -e .
     python examples/coveo_complementary_rec.py
 
-Running *your* model on one of the supported dataset, leveraging the pre-made tests, is as easy as implementing
-a simple interface, *RecModel*.
+Running *your* model on one of the supported dataset, leveraging the pre-made tests, is as easy as implementing a simple interface, *RecModel*.
 
-Once you've run successfully the sample script, take the guided tour below to learn more about
-the abstractions and the out-of-the-box capabilities of *RecList*.
+Once you've run successfully the sample script, take the guided tour below to learn more about the abstractions and the out-of-the-box capabilities of *RecList*.
 
 A Guided Tour
 -------------
 
 An instance of `RecList <https://github.com/jacopotagliabue/reclist/blob/main/reclist/reclist.py>`__ represents a suite of tests for recommender systems: given
 a dataset (more appropriately, an instance of `RecDataset <https://github.com/jacopotagliabue/reclist/blob/main/reclist/abstractions.py>`__)
-and a model (an instance of `RecModel <https://github.com/jacopotagliabue/reclist/blob/main/reclist/abstractions.py>`__), it will
-run the specified tests on the target dataset, using the supplied model. 
+and a model (an instance of `RecModel <https://github.com/jacopotagliabue/reclist/blob/main/reclist/abstractions.py>`__), it will run the specified tests on the target dataset, using the supplied model. 
 
-For example, the following code instantiates a pre-made suite of tests that contains sensible defaults 
-for a `cart recommendation use case <https://github.com/jacopotagliabue/reclist/blob/main/reclist/reclist.py>`__:
+For example, the following code instantiates a pre-made suite of tests that contains sensible defaults for a `cart recommendation use case <https://github.com/jacopotagliabue/reclist/blob/main/reclist/reclist.py>`__:
 
 .. code-block:: python
    
@@ -117,11 +107,9 @@ for a `cart recommendation use case <https://github.com/jacopotagliabue/reclist/
     # invoke rec_list to run tests
     rec_list(verbose=True)
 
-Our library pre-packages standard recSys KPIs and important behavioral tests, divided by use cases, but it is built with 
-extensibility in mind: you can re-use tests in new suites, or you can write new domain-specific suites and tests. 
+Our library pre-packages standard recSys KPIs and important behavioral tests, divided by use cases, but it is built with extensibility in mind: you can re-use tests in new suites, or you can write new domain-specific suites and tests. 
 
-Any suite must inherit the *RecList* interface, and then declare with Pytonic decorators its tests: 
-in this case, the test re-uses a standard function:
+Any suite must inherit the *RecList* interface, and then declare with Pytonic decorators its tests. In this case, the test re-uses a standard function:
 
 .. code-block:: python
    
@@ -221,8 +209,8 @@ RecList features convenient wrappers around popular datasets, to help test model
 in a standardized way.
 
 * `Coveo Data Challenge <https://github.com/coveooss/SIGIR-ecom-data-challenge>`__
-* `The Million Playlist Dataset <https://engineering.atspotify.com/2018/05/30/introducing-the-million-playlist-dataset-and-recsys-challenge-2018/>`__ (*coming soon*)
-* `MovieLens <https://grouplens.org/datasets/movielens/>`__ (*coming soon*)
+* (a smaller version of) `The Million Playlist Dataset <https://engineering.atspotify.com/2018/05/30/introducing-the-million-playlist-dataset-and-recsys-challenge-2018/>`__ 
+* (a smaller version of) `MovieLens <https://grouplens.org/datasets/movielens/>`__
 
 Behavioral Tests
 ~~~~~~~~~~~~~~~~
@@ -247,8 +235,7 @@ We maintain a small Trello board on the project which we plan on sharing with th
 Contributing
 ~~~~~~~~~~~~
 
-We will update this repo with some guidelines for contributions as soon as the codebase becomes more stable.
-Check back often for updates!
+We will update this repo with some guidelines for contributions as soon as the codebase becomes more stable. Check back often for updates!
 
 Acknowledgments
 ---------------
