@@ -100,7 +100,9 @@ class SpotifyP2VRecModel(RecModel):
             return []
 
 class MovieLensP2VRecModel(RecModel):
-
+    """
+    Prod2Vec implementation for MovieLens 25M dataset
+    """
     model_name = "prod2vec"
 
     def __init__(self, **kwargs):
@@ -130,11 +132,11 @@ class MovieLensP2VRecModel(RecModel):
                     emb_vecs.append(emb_vec)
             if emb_vecs:
                 # Calculate the average of all the latent vectors representing
-                # the movies watched by the user
+                # the movies watched by the user as is done in https://arxiv.org/abs/2007.14906
                 avg_emb_vec = np.mean(emb_vecs, axis=0)
                 nn_products = self.model.similar_by_vector(avg_emb_vec, topn=10)
                 for elem in nn_products:
-                    predictions.append({"movie_id": elem})
+                    predictions.append({"movieId": elem})
             all_predictions.append(predictions)
         return all_predictions
 
@@ -149,8 +151,4 @@ class MovieLensP2VRecModel(RecModel):
         try:
             return list(self.model.get_vector(movie_id))
         except Exception as e:
-<<<<<<< HEAD
             return []
-=======
-            return []
->>>>>>> f826fcdad107d38909e4b48dd3a14d680c46f853
