@@ -1,8 +1,4 @@
 import numpy as np
-<<<<<<< HEAD
-=======
-
->>>>>>> f826fcdad107d38909e4b48dd3a14d680c46f853
 from reclist.abstractions import RecModel
 from reclist.utils.train_w2v import train_embeddings
 
