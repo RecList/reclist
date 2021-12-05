@@ -1,5 +1,4 @@
 import collections
-import numpy as np
 from reclist.abstractions import RecList, rec_test
 from typing import List
 import random
@@ -59,7 +58,7 @@ class CoveoCartRecList(RecList):
         """
         Compute the distribution of hit-rate across product frequency in training data
         """
-        from reclist.metrics.hits_distribution import hits_distribution
+        from reclist.metrics.hits import hits_distribution
         return hits_distribution(self.sku_only(self._x_train),
                                  self.sku_only(self._x_test),
                                  self.sku_only(self._y_test),
@@ -72,7 +71,7 @@ class CoveoCartRecList(RecList):
         """
         Compute the distribution of distance from query to label and query to prediction
         """
-        from reclist.metrics.cosine_distance_metrics import distance_to_query
+        from reclist.metrics.distance_metrics import distance_to_query
         return distance_to_query(self.rec_model,
                                  self.sku_only(self._x_test),
                                  self.sku_only(self._y_test),
@@ -163,7 +162,7 @@ class SpotifySessionRecList(RecList):
         """
         Compute the distribution of hit-rate across various slices of data
         """
-        from reclist.metrics.hits_slice import hits_distribution_by_slice
+        from reclist.metrics.hits import hits_distribution_by_slice
 
         len_map = collections.defaultdict(list)
         for idx, playlist in enumerate(self._x_test):
@@ -262,7 +261,7 @@ class MovieLensSimilarItemRecList(RecList):
         """
         Compute the distribution of hit-rate across product frequency in training data
         """
-        from reclist.metrics.hits_distribution import hits_distribution
+        from reclist.metrics.hits import hits_distribution
         return hits_distribution(
             self.movie_only(self._x_train),
             self.movie_only(self._x_test),
