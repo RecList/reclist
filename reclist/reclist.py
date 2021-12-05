@@ -247,7 +247,7 @@ class MovieLensSimilarItemRecList(RecList):
     def coverage_at_k(self):
         """
         Coverage is the proportion of all possible products which the RS
-        recommends based on a set of sessions
+        recommends based on a set of movies and their respective ratings
         """
         from reclist.metrics.standard_metrics import coverage_at_k
         return coverage_at_k(
@@ -268,6 +268,15 @@ class MovieLensSimilarItemRecList(RecList):
             self.movie_only(self._y_test),
             self.movie_only(self._y_preds),
             k=10,
+            debug=True
+        )
+
+    @rec_test(test_type="hits_distribution_by_rating")
+    def hits_distribution_by_rating(self):
+        from reclist.metrics.hits_rating import hits_distribution_by_rating
+        return hits_distribution_by_rating(
+            self._y_test,
+            self._y_preds,
             debug=True
         )
 
