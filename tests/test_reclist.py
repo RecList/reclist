@@ -4,15 +4,15 @@
 
 from reclist.datasets import *
 from reclist.metrics.standard_metrics import mrr_at_k
-from reclist.datasets import CoveoDataset, SpotifyDataset
-from reclist.recommenders.prod2vec import CoveoP2VRecModel, SpotifyP2VRecModel
-from reclist.reclist import CoveoCartRecList, SpotifySessionRecList
+from reclist.datasets import CoveoDataset, SpotifyDataset, MovieLensDataset
+from reclist.recommenders.prod2vec import CoveoP2VRecModel, SpotifyP2VRecModel, MovieLensP2VRecModel
+from reclist.reclist import CoveoCartRecList, SpotifySessionRecList, MovieLensSimilarItemRecList
 import random
 
 def test_basic_dataset_downloading():
-    pass
-    #CoveoDataset()
-    #MovieLensDataset()
+    CoveoDataset()
+    MovieLensDataset()
+    MovieLensDataset()
 
 
 def test_coveo_example():
@@ -31,32 +31,9 @@ def test_coveo_example():
         model=model,
         dataset=coveo_dataset
     )
+
     # invoke rec_list to run tests
     rec_list(verbose=True)
-
-def test_spotify_example():
-    pass
-    # get the Spotify million playlist dataset as a RecDataset object
-    # spotify_dataset = SpotifyDataset()
-
-    # re-use a skip-gram model from reclist to train a latent product space, to be used
-    # (through knn) to build a recommender
-    # model = SpotifyP2VRecModel()
-    # spotify_dataset._x_train = spotify_dataset._x_train[0:1000]
-    #
-    # spotify_dataset._x_test = spotify_dataset._x_test[0:20]
-    #
-    #
-    # model.train(spotify_dataset._x_train, iterations=1)
-    #
-    # # instantiate rec_list object, prepared with standard quantitative tests
-    # # and sensible behavioral tests (check the paper for details!)
-    # rec_list = SpotifySessionRecList(
-    #     model=model,
-    #     dataset=spotify_dataset
-    # )
-    # # invoke rec_list to run tests
-    # rec_list(verbose=True)
 
 
 def test_mrr():

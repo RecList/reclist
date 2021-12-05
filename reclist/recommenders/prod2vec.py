@@ -94,3 +94,57 @@ class SpotifyP2VRecModel(RecModel):
             return list(self._model.get_vector(track_uri))
         except Exception as e:
             return []
+
+class MovieLensP2VRecModel(RecModel):
+    """
+    Prod2Vec implementation for MovieLens 25M dataset
+    """
+    model_name = "prod2vec"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def train(self, movies, iterations=15):
+        # Get the movie ID and rating for each movie for each unique user
+        x_train = [[(x["movieId"], x["rating"]) for x in y] for y in movies]
+        self._model = train_embeddings(x_train, iterations=15)
+
+    def predict(self, prediction_input, *args, **kwargs):
+        """
+        Predicts the top 10 similar items recommended for each user according
+        to the movies that they've watched and the ratings that they've given
+
+        :param prediction_input: a list of lists containing a dictionary for
+                                 each movie watched by that user
+        :return:
+        """
+        all_predictions = []
+        for movies in prediction_input:
+            predictions = []
+            emb_vecs = []
+            for movie in movies:
+                emb_vec = self.get_vector(movie)
+                if emb_vec:
+                    emb_vecs.append(emb_vec)
+            if emb_vecs:
+                # Calculate the average of all the latent vectors representing
+                # the movies watched by the user as is done in https://arxiv.org/abs/2007.14906
+                avg_emb_vec = np.mean(emb_vecs, axis=0)
+                nn_products = self.model.similar_by_vector(avg_emb_vec, topn=10)
+                for elem in nn_products:
+                    predictions.append({"movieId": elem})
+            all_predictions.append(predictions)
+        return all_predictions
+
+    def get_vector(self, x):
+        """
+        Returns the latent vector that corresponds to the movie ID
+
+        :param x:
+        :return:
+        """
+        movie_id = x["movieId"]
+        try:
+            return list(self.model.get_vector(movie_id))
+        except Exception as e:
+            return []
