@@ -234,7 +234,7 @@ class MovieLensSimilarItemRecList(RecList):
     @rec_test(test_type='HR@10')
     def hit_rate_at_k(self):
         """
-        Compute the rate at which the top-k predictions contain the item to be predicted
+        Compute the rate at which the top-k predictions contain the movie to be predicted
         """
         from reclist.metrics.standard_metrics import hit_rate_at_k
         return hit_rate_at_k(
@@ -246,7 +246,7 @@ class MovieLensSimilarItemRecList(RecList):
     @rec_test(test_type='Coverage@10')
     def coverage_at_k(self):
         """
-        Coverage is the proportion of all possible products which the RS
+        Coverage is the proportion of all possible movies which the RS
         recommends based on a set of movies and their respective ratings
         """
         from reclist.metrics.standard_metrics import coverage_at_k
@@ -259,7 +259,7 @@ class MovieLensSimilarItemRecList(RecList):
     @rec_test(test_type='hits_distribution')
     def hits_distribution(self):
         """
-        Compute the distribution of hit-rate across product frequency in training data
+        Compute the distribution of hit-rate across movie frequency in training data
         """
         from reclist.metrics.hits import hits_distribution
         return hits_distribution(
@@ -273,7 +273,10 @@ class MovieLensSimilarItemRecList(RecList):
 
     @rec_test(test_type="hits_distribution_by_rating")
     def hits_distribution_by_rating(self):
-        from reclist.metrics.hits_rating import hits_distribution_by_rating
+        """
+        Compute the distribution of hit-rate across movie ratings in testing data
+        """
+        from reclist.metrics.hits import hits_distribution_by_rating
         return hits_distribution_by_rating(
             self._y_test,
             self._y_preds,

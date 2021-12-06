@@ -107,7 +107,7 @@ class MovieLensP2VRecModel(RecModel):
     def train(self, movies, iterations=15):
         # Get the movie ID and rating for each movie for each unique user
         x_train = [[(x["movieId"], x["rating"]) for x in y] for y in movies]
-        self._model = train_embeddings(x_train, iterations=15)
+        self._model = train_embeddings(x_train, iterations=iterations)
 
     def predict(self, prediction_input, *args, **kwargs):
         """
@@ -132,19 +132,19 @@ class MovieLensP2VRecModel(RecModel):
                 avg_emb_vec = np.mean(emb_vecs, axis=0)
                 nn_products = self.model.similar_by_vector(avg_emb_vec, topn=10)
                 for elem in nn_products:
-                    predictions.append({"movieId": elem})
+                    predictions.append({"movieId": elem[0][0], "rating": elem[0][1]})
             all_predictions.append(predictions)
         return all_predictions
 
     def get_vector(self, x):
         """
-        Returns the latent vector that corresponds to the movie ID
+        Returns the latent vector that corresponds to the movie ID and the rating
 
         :param x:
         :return:
         """
-        movie_id = x["movieId"]
+        movie = (x["movieId"], x["rating"])
         try:
-            return list(self.model.get_vector(movie_id))
+            return list(self.model.get_vector(movie))
         except Exception as e:
             return []

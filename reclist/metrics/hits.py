@@ -10,7 +10,7 @@ from reclist.current import current
 
 def hits_distribution_by_rating(y_test, y_preds, debug=False):
     """
-    Calculates the distribution of hit-rate across the movie ratings in testing data
+    Calculates the distribution of hit-rate across movie ratings in testing data
     """
     hits = defaultdict(int)
     total = defaultdict(int)
