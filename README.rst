@@ -36,10 +36,14 @@ Overview
 
 *RecList* is an open source library providing behavioral, "black-box" testing for recommender systems. Inspired by the pioneering work of
 `Ribeiro et al. 2020 <https://aclanthology.org/2020.acl-main.442.pdf>`__ in NLP, we introduce a general plug-and-play procedure to scale up behavioral testing,
-with an easy-to-extend interface for custom use cases.
+with an easy-to-extend interface for custom use cases. While quantitative metrics over held-out data points are important, a lot more tests are needed for recommenders
+to properly function in the wild and not erode our confidence in them: for example, a model may boast an accuracy improvement over the entire dataset, but actually be
+significantly worse than another on rare items or new users; or again, a model that correctly recommends HDMI cables as add-on for shoppers buying a TV, may also wrongly 
+recommend TVs to shoppers just buying a cable. 
 
-*RecList* ships with some popular datasets and ready-made behavioral tests: check the `paper <https://arxiv.org/abs/2111.09963>`__
-for more details on the relevant literature and the philosophical motivations behind the project.
+*RecList* goal is operationalize these important behavioral intuitions into a practical packages for testing research and production model, in a more nuanced way, but without
+requiring custom code and boilerplate when not necessary. To streamline comparisons between existing models, *RecList* ships with popular datasets and ready-made behavioral tests: 
+check the `paper <https://arxiv.org/abs/2111.09963>`__ for more details on the relevant literature and the philosophical motivations behind the project.
 
 If you are not familiar with the library, we suggest first taking our small tour to get acquainted with the main abstractions through ready-made models and public datasets.
 
@@ -215,7 +219,36 @@ in a standardized way.
 Behavioral Tests
 ~~~~~~~~~~~~~~~~
 
-*Coming soon!*
+RecList helps report standard quantitative metrics over popular (or custom) datasets, such as the ones collected in 
+*standard_metrics*: hit rate, mrr, coverage, popularity bias, etc. However, RecList raison d'etre is providing plug-and-play
+behavioral tests, as agnostic as possible to the underlying models and datasets, while leaving open the possibility of writing
+fully custom tests when domain knowledge and custom logic are necessary.
+
+Tests descriptions are available in our (WIP) `docs <https://reclist.readthedocs.io>`__, but we share here some examples 
+(taken from our `paper <https://arxiv.org/abs/2111.09963>`__).
+
+First, RecList allows to compare the performance of models which may have similar aggregate KPIs (e.g. hit rate on the entire
+test set) in different slices. When plotting HR by product popularity, it is easy to spot that
+prod2vec works much better with rarer items:
+
+.. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/hit_rate_dist.png
+   :height: 150
+
+When slicing by important meta-data (in this simulated example, brands), RecList uncovers significant differences
+in performance for different groups; since the specific item features we care about varie across datasets and use cases
+the package allows for a generic way to partition the test set and automatically compute per-slice metrics:
+
+.. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/slice_dist.png
+   :height: 150
+
+Finally, RecList can take advantage of the latent item space to compute the cosine distances <query item, ground truth> and 
+<query item, prediction> for missed predictions in the test set. In a cart recommender use case we should expect suggested items to
+reflect the complementary nature of the suggestions: if a TV is in the cart, a model should recommend a HDMI cable,
+not another TV. As we can see in the comparison below, Google's predictions better match the label distribution,
+suggesting that the model better capture the nature of the task.
+
+.. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/distance_to_query.png
+   :height: 150
 
 Roadmap
 -------
