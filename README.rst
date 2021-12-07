@@ -43,9 +43,9 @@ to properly function in the wild and not erode our confidence in them: for examp
 significantly worse than another on rare items or new users; or again, a model that correctly recommends HDMI cables as add-on for shoppers buying a TV, may also wrongly 
 recommend TVs to shoppers just buying a cable. 
 
-*RecList* goal is operationalize these important intuitions into a practical package for testing research and production models in a more nuanced way, but without
+*RecList* goal is to operationalize these important intuitions into a practical package for testing research and production models in a more nuanced way, without
 requiring unnecessary custom code and ad hoc procedures. To streamline comparisons among existing models, *RecList* ships with popular datasets and ready-made behavioral tests: 
-check the `paper <https://arxiv.org/abs/2111.09963>`__ for more details on the relevant literature and the philosophical motivations behind the project.
+check the `paper <https://arxiv.org/abs/2111.09963>`__ for more details on the relevant literature and the motivations behind the project.
 
 If you are not familiar with the library, we suggest first taking our small tour to get acquainted with the main abstractions through ready-made models and public datasets.
 
