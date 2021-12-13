@@ -39,9 +39,7 @@ Overview
 with an easy-to-extend interface for custom use cases. 
 
 While quantitative metrics over held-out data points are important, a lot more tests are needed for recommenders
-to properly function in the wild and not erode our confidence in them: for example, a model may boast an accuracy improvement over the entire dataset, but actually be
-significantly worse than another on rare items or new users; or again, a model that correctly recommends HDMI cables as add-on for shoppers buying a TV, may also wrongly 
-recommend TVs to shoppers just buying a cable. 
+to properly function in the wild and not erode our confidence in them: for example, a model may boast an accuracy improvement over the entire dataset, but actually be significantly worse than another on rare items or new users; or again, a model that correctly recommends HDMI cables as add-on for shoppers buying a TV, may also wrongly  recommend TVs to shoppers just buying a cable. 
 
 *RecList* goal is to operationalize these important intuitions into a practical package for testing research and production models in a more nuanced way, without
 requiring unnecessary custom code and ad hoc procedures. To streamline comparisons among existing models, *RecList* ships with popular datasets and ready-made behavioral tests: 
@@ -78,9 +76,9 @@ This doc is structured as follows:
 Quick Start
 -----------
 
-If you want to see *RecList* in action, clone the repository, create and activate a virtual env, and install the required packages from root. If you prefer to experiment in an interactive, no-installation-required fashion, try out our `colab notebook <https://colab.research.google.com/drive/1Wn5mm0csEkyWqmBBDxNBkfGR6CNfWeH-?usp=sharing>`__.
+If you want to see *RecList* in action, clone the repository, create and activate a virtual env, and install the required packages from pip (you can install from root of course). If you prefer to experiment in an interactive, no-installation-required fashion, try out our `colab notebook <https://colab.research.google.com/drive/1Wn5mm0csEkyWqmBBDxNBkfGR6CNfWeH-?usp=sharing>`__.
 
-Sample scripts are divided by use-cases: similar items, complementary items or session-based recommendations. When executing one, a suitable public dataset will be downloaded, and a baseline ML model trained: finally, the script will run a pre-made suite of behavioral tests to show typical results.
+Sample scripts are divided by use-cases: similar items, complementary items or session-based recommendations. When executing one, a suitable public dataset will be downloaded, and a baseline model trained: finally, the script will run a pre-made suite of behavioral tests to show typical results.
 
 .. code-block:: bash
 
@@ -88,7 +86,7 @@ Sample scripts are divided by use-cases: similar items, complementary items or s
     cd reclist
     python3 -m venv venv
     source venv/bin/activate
-    pip install -e .
+    pip install reclist
     python examples/coveo_complementary_rec.py
 
 Running *your* model on one of the supported dataset, leveraging the pre-made tests, is as easy as implementing a simple interface, *RecModel*.
