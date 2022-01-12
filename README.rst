@@ -42,8 +42,7 @@ While quantitative metrics over held-out data points are important, a lot more t
 to properly function in the wild and not erode our confidence in them: for example, a model may boast an accuracy improvement over the entire dataset, but actually be significantly worse than another on rare items or new users; or again, a model that correctly recommends HDMI cables as add-on for shoppers buying a TV, may also wrongly  recommend TVs to shoppers just buying a cable. 
 
 *RecList* goal is to operationalize these important intuitions into a practical package for testing research and production models in a more nuanced way, without
-requiring unnecessary custom code and ad hoc procedures. To streamline comparisons among existing models, *RecList* ships with popular datasets and ready-made behavioral tests: 
-check the `paper <https://arxiv.org/abs/2111.09963>`__ for more details on the relevant literature and the motivations behind the project.
+requiring unnecessary custom code and ad hoc procedures. To streamline comparisons among existing models, *RecList* ships with popular datasets and ready-made behavioral tests: read the `TDS blog post <https://towardsdatascience.com/ndcg-is-not-all-you-need-24eb6d2f1227>`__ as a gentle introduction to the main use cases, check the `paper <https://arxiv.org/abs/2111.09963>`__ for more details on the relevant literature.
 
 If you are not familiar with the library, we suggest first taking our small tour to get acquainted with the main abstractions through ready-made models and public datasets.
 
@@ -51,8 +50,8 @@ Quick Links
 ~~~~~~~~~~~
 
 * Our `paper <https://arxiv.org/abs/2111.09963>`__, with in-depth analysis, detailed use cases and scholarly references.
-* A `colab notebook <https://colab.research.google.com/drive/1Wn5mm0csEkyWqmBBDxNBkfGR6CNfWeH-?usp=sharing>`__ (WIP), showing how to train a cart recommender model from scratch and use the library to test it.
-* Our blog post (forthcoming), with examples and practical tips. 
+* A `colab notebook <https://colab.research.google.com/drive/1Wn5mm0csEkyWqmBBDxNBkfGR6CNfWeH-?usp=sharing>`__, showing how to train a cart recommender model from scratch and use the library to test it.
+* Our `blog post <https://towardsdatascience.com/ndcg-is-not-all-you-need-24eb6d2f1227>`__, with examples and practical tips.
 
 Project updates
 ~~~~~~~~~~~~~~~
@@ -260,7 +259,7 @@ To do:
 
 * improving our test suites and refactor some abstractions;
 
-* adding Colab tutorials, extensive documentation and a blog-like write-up to explain the basic usage.
+* adding Colab tutorials and extensive documentation to explain the basic usage (a first `blog post <https://towardsdatascience.com/ndcg-is-not-all-you-need-24eb6d2f1227>`__ is out!).
 
 We maintain a small Trello board on the project which we plan on sharing with the community: *more details coming soon*!
 
