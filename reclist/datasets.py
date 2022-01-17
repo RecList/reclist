@@ -6,6 +6,48 @@ from reclist.abstractions import RecDataset
 from reclist.utils.config import *
 
 
+class BBCSoundsDataset(RecDataset):
+    """
+    BBC Sounds September 2021 Dataset
+
+    Reference: https://...
+    """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def load(self):
+        cache_dir = get_cache_directory()
+        filepath = os.path.join(cache_dir, "movielens_25m.zip")
+
+        if not os.path.exists(filepath) or self.force_download:
+            download_with_progress(MOVIELENS_DATASET_S3_URL, filepath)
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with zipfile.ZipFile(filepath, "r") as zip_file:
+                zip_file.extractall(temp_dir)
+            with open(os.path.join(temp_dir, "dataset.json")) as f:
+                data = json.load(f)
+
+        self._x_train = data["x_train"]
+        self._y_train = None
+        self._x_test = data["x_test"]
+        self._y_test = data["y_test"]
+        self._catalog = self._convert_catalog_keys(data["catalog"])
+
+    def _convert_catalog_keys(self, catalog):
+        """
+        Convert catalog keys from string to integer type
+
+        JSON encodes all keys to strings, so the catalog dictionary
+        will be loaded up string representation of movie IDs.
+        """
+        converted_catalog = {}
+        for k, v in catalog.items():
+            converted_catalog[int(k)] = v
+        return converted_catalog
+
+
 class MovieLensDataset(RecDataset):
     """
     MovieLens 25M Dataset
@@ -34,7 +76,7 @@ class MovieLensDataset(RecDataset):
         self._x_test = data["x_test"]
         self._y_test = data["y_test"]
         self._catalog = self._convert_catalog_keys(data["catalog"])
-        
+
     def _convert_catalog_keys(self, catalog):
         """
         Convert catalog keys from string to integer type
