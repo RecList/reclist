@@ -47,17 +47,107 @@ def hits_distribution_by_rating(y_test, y_preds, debug=False):
 
     return hits_distribution_by_rating
 
+
+def hits_distribution_by_agerange(y_test, y_preds, debug=True):
+    """
+    Calculates the distribution of hit-rate across movie ratings in testing data
+    """
+    hits = defaultdict(int)
+    total = defaultdict(int)
+
+    for target, pred in zip(y_test, y_preds):
+        target_movie_id, target_rating = target[0]["resourceId"], target[0]["age_range"]
+        for movie in pred:
+            pred_movie_id = movie["resourceId"]
+            if target_movie_id == pred_movie_id:
+                hits[target_rating] += 1
+                break
+        total[target_rating] += 1
+
+    hits_distribution_by_agerange = {}
+    for target_rating in sorted(hits.keys()):
+        hit_rate = hits[target_rating] / total[target_rating]
+        hits_distribution_by_agerange[target_rating] = hit_rate
+
+    if debug:
+        x_tick_names = list(hits_distribution_by_agerange.keys())
+        x_tick_idx = list(range(len(x_tick_names)))
+        plt.figure(dpi=250)
+        plt.bar(
+            x_tick_idx,
+            [hit_rate for hit_rate in hits_distribution_by_agerange.values()],
+            align='center'
+        )
+        plt.xticks(
+            list(range(len(hits_distribution_by_agerange))), x_tick_names, fontsize=8
+        )
+        plt.savefig(os.path.join(current.report_path,
+                                'plots',
+                                'hit_distribution_agerange.png'))
+        plt.clf()
+
+    return hits_distribution_by_agerange
+
+
+def hits_distribution_by_gender(y_test, y_preds, debug=True):
+    """
+    Calculates the distribution of hit-rate across movie ratings in testing data
+    """
+    hits = defaultdict(int)
+    total = defaultdict(int)
+
+    for target, pred in zip(y_test, y_preds):
+        target_resource_id, target_gender = target[0]["resourceId"], target[0]["gender"]
+        if not target_gender:
+            target_gender = 'unknown'
+        for resource_obj in pred:
+            pred_resource_id = resource_obj["resourceId"]
+            if target_resource_id == pred_resource_id:
+                hits[target_gender] += 1
+                break
+        total[target_gender] += 1
+
+    hits_distribution_by_agerange = {}
+    for target_gender in sorted(hits.keys()):
+        hit_rate = hits[target_gender] / total[target_gender]
+        hits_distribution_by_agerange[target_gender] = hit_rate
+
+    if debug:
+        x_tick_names = list(hits_distribution_by_agerange.keys())
+        x_tick_idx = list(range(len(x_tick_names)))
+        plt.figure(dpi=150)
+        plt.bar(
+            x_tick_idx,
+            [hit_rate for hit_rate in hits_distribution_by_agerange.values()],
+            align='center'
+        )
+        plt.xticks(
+            list(range(len(hits_distribution_by_agerange))), x_tick_names, fontsize=10
+        )
+        plt.savefig(os.path.join(current.report_path,
+                                 'plots',
+                                 'hit_distribution_gender.png'))
+        plt.clf()
+
+    return hits_distribution_by_agerange
+
+
 def roundup(x: int):
     div = 10.0 ** (len(str(x)))
     return int(math.ceil(x / div)) * div
 
 
-def hits_distribution(x_train, x_test, y_test, y_preds, k=3, debug=False):
+def hits_distribution(x_train, x_test, y_test, y_preds, k=3, debug=True):
     # get product interaction frequency
     prod_interaction_cnt = Counter([_ for x in x_train for _ in x])
     hit_per_interaction_cnt = defaultdict(list)
     for _x, _y_test, _y_pred in zip(x_test, y_test, y_preds):
         _x_cnt = prod_interaction_cnt[_x[0]]
+        print(_x)
+        print(_x[0])
+        print(_y_test)
+        print(_y_test[0])
+        print('this is the _x_cnt coming from the x_test: ', _x_cnt)
         # TODO: allow for generic metric
         hit_per_interaction_cnt[_x_cnt].append(hit_rate_at_k([_y_pred], [_y_test], k=k))
     # get max product frequency
@@ -77,7 +167,43 @@ def hits_distribution(x_train, x_test, y_test, y_preds, k=3, debug=False):
         # debug / visualization
         plt.bar(indices[1:], histogram, width=-np.diff(indices) / 1.05, align='edge')
         plt.xscale('log', base=10)
-        plt.title('HIT Distribution Across Product Frequency')
+        plt.title('HIT Distribution Across Item Frequency')
+        # plt.show()
+        plt.savefig(os.path.join(current.report_path, 'plots', 'hit_distribution.png'))
+        plt.clf()
+
+    return {
+        'histogram': {int(k): v for k, v in zip(indices[1:], histogram)},
+        'counts': {int(k): v for k, v in zip(indices[1:], count)}
+    }
+
+
+def hits_distribution_custom(x_train, y_test, y_preds, k=3, debug=True):
+    # get product interaction frequency
+    prod_interaction_cnt = Counter([_ for x in x_train for _ in x])
+    hit_per_interaction_cnt = defaultdict(list)
+    for _y_test, _y_pred in zip(y_test, y_preds):
+        _x_cnt = prod_interaction_cnt[_y_test[0]]
+        # TODO: allow for generic metric
+        hit_per_interaction_cnt[_x_cnt].append(hit_rate_at_k([_y_pred], [_y_test], k=k))
+    # get max product frequency
+    max_cnt = prod_interaction_cnt.most_common(1)[0][1]
+    # round up to nearest place
+    max_cnt = int(roundup(max_cnt))
+    # generate log-bins
+    indices = np.logspace(1, np.log10(max_cnt), num=int(np.log10(max_cnt))).astype(np.int64)
+    indices = np.concatenate(([0], indices))
+    counts_per_bin = [[_ for i in range(low, high) for _ in hit_per_interaction_cnt[i]]
+                      for low, high in zip(indices[:-1], indices[1:])]
+
+    histogram = [np.mean(counts) if counts else 0 for counts in counts_per_bin]
+    count = [len(counts) for counts in counts_per_bin]
+
+    if debug:
+        # debug / visualization
+        plt.bar(indices[1:], histogram, width=-np.diff(indices) / 1.05, align='edge')
+        plt.xscale('log', base=10)
+        plt.title('HIT Distribution Across Item Frequency')
         # plt.show()
         plt.savefig(os.path.join(current.report_path, 'plots', 'hit_distribution.png'))
         plt.clf()

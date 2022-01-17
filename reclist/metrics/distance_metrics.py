@@ -9,8 +9,9 @@ from statistics import mean
 from reclist.metrics.standard_metrics import sample_misses_at_k, sample_hits_at_k
 import numpy as np
 
+
 def error_by_cosine_distance(model, y_test, y_preds, k=3, bins=25, debug=False):
-    if not(hasattr(model.__class__, 'get_vector') and callable(getattr(model.__class__, 'get_vector'))):
+    if not (hasattr(model.__class__, 'get_vector') and callable(getattr(model.__class__, 'get_vector'))):
         error_msg = "Error : Model {} does not support retrieval of vector embeddings".format(model.__class__)
         print(error_msg)
         return error_msg
@@ -39,8 +40,9 @@ def error_by_cosine_distance(model, y_test, y_preds, k=3, bins=25, debug=False):
 
     return {'mean': np.mean(cos_distances), 'histogram': histogram}
 
+
 def distance_to_query(model, x_test, y_test, y_preds, k=3, bins=25, debug=False):
-    if not(hasattr(model.__class__, 'get_vector') and callable(getattr(model.__class__, 'get_vector'))):
+    if not (hasattr(model.__class__, 'get_vector') and callable(getattr(model.__class__, 'get_vector'))):
         error_msg = "Error : Model {} does not support retrieval of vector embeddings".format(model.__class__)
         print(error_msg)
         return error_msg
@@ -52,7 +54,7 @@ def distance_to_query(model, x_test, y_test, y_preds, k=3, bins=25, debug=False)
             vector_x = model.get_vector(m['X_TEST'][0])
             vector_y = model.get_vector(m['Y_TEST'][0])
             vectors_p = [model.get_vector(_) for _ in m['Y_PRED']]
-            c_dists =[]
+            c_dists = []
             if not vector_x or not vector_y:
                 continue
             x_to_y_cos.append(cosine(vector_x, vector_y))
@@ -91,7 +93,6 @@ def distance_to_query(model, x_test, y_test, y_preds, k=3, bins=25, debug=False)
         'raw_distances_x_to_y': x_to_y_cos,
         'raw_distances_x_to_p': x_to_p_cos,
     }
-
 
 
 def shortest_path_length():
@@ -144,7 +145,6 @@ def graph_distance_test(y_test, y_preds, product_data, k=3):
     return {'mean': mean(path_lengths), 'hist': histogram}
 
 
-
 def generic_cosine_distance(embeddings: dict,
                             type_fn,
                             y_test,
@@ -152,7 +152,6 @@ def generic_cosine_distance(embeddings: dict,
                             k=10,
                             bins=25,
                             debug=False):
-
     misses = sample_misses_at_k(y_preds, y_test, k=k, size=-1)
     cos_distances = []
     for m in misses:

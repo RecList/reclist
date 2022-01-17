@@ -148,3 +148,58 @@ class MovieLensP2VRecModel(RecModel):
             return list(self.model.get_vector(movie))
         except Exception as e:
             return []
+
+
+class BBCSoundsP2VRecModel(RecModel):
+    """
+    Prod2Vec implementation for MovieLens 25M dataset
+    """
+    model_name = "prod2vec"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def train(self, resource_ids, iterations=15):
+        # Get the resource ID and label for each resource ID for each unique user
+        x_train = [[(x["resourceId"], x["label"]) for x in y] for y in resource_ids]
+        self._model = train_embeddings(x_train, iterations=iterations)
+
+    def predict(self, prediction_input, *args, **kwargs):
+        """
+        Predicts the top 10 similar resource IDs recommended for each user according
+        to the resource IDs that they've watched
+
+        :param prediction_input: a list of lists containing a dictionary for
+                                 each resource ID watched by that user
+        :return:
+        """
+        all_predictions = []
+        for movies in prediction_input:
+            predictions = []
+            emb_vecs = []
+            for movie in movies:
+                emb_vec = self.get_vector(movie)
+                if emb_vec:
+                    emb_vecs.append(emb_vec)
+            if emb_vecs:
+                # Calculate the average of all the latent vectors representing
+                # the movies watched by the user as is done in https://arxiv.org/abs/2007.14906
+                avg_emb_vec = np.mean(emb_vecs, axis=0)
+                nn_products = self.model.similar_by_vector(avg_emb_vec, topn=10)
+                for elem in nn_products:
+                    predictions.append({"resourceId": elem[0][0], "label": elem[0][1]})
+            all_predictions.append(predictions)
+        return all_predictions
+
+    def get_vector(self, x):
+        """
+        Returns the latent vector that corresponds to the movie ID and the rating
+
+        :param x:
+        :return:
+        """
+        movie = (x["resourceId"], x["label"])
+        try:
+            return list(self.model.get_vector(movie))
+        except Exception as e:
+            return []

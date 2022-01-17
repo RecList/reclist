@@ -6,9 +6,9 @@ wget==3.2
 pytest==6.2.5
 requests==2.22.0
 tqdm==4.62.3
-matplotlib==3.4.3
-numpy==1.21.2
+matplotlib==3.3.4
+numpy==1.19.5
 pathos==0.2.8
 flask==2.0.2
-networkx==2.6.3
+networkx==2.5.1
 python-Levenshtein==0.12.2
