@@ -56,9 +56,11 @@ Quick Links
 Project updates
 ~~~~~~~~~~~~~~~
 
-*Dec. 2021*: the library is currently in alpha (i.e. enough working code to finish the paper and tinker with it). We welcome early feedback, but please be advised that the package may change substantially in the upcoming months ("If you're not embarrassed by the first version, you've launched too late").
+*Jan. 2022*: RecList paper has been accepted in a top-tier conference, TheWebConf 2022! A final camera-ready version of the original draft will soon be ready (pre-print `here<https://arxiv.org/abs/2111.09963>`__).
 
-As the project is in active development, come back often for updates.
+In the last month, we presented this library to practioners at Tubi, eBay, NVIDIA, BBC and other RecSys companies: we are in the process of collecting our thoughts after all the feedback we received, as we plan a beta release for this package in the next few months - come back often for updates, as we will also open a call for collaboration!
+
+Please remember that the library is in alpha (i.e. enough working code to finish the paper and tinker with it). We welcome early feedback, but please be advised that the package may change substantially in the near future ("If you're not embarrassed by the first version, you've launched too late"). 
 
 Summary
 ~~~~~~~
@@ -284,7 +286,7 @@ If you have questions or feedback, please reach out to: :code:`jacopo dot taglia
 License and Citation
 --------------------
 
-All the code is released under an open MIT license. If you found *RecList* useful, or you are using it to benchmark/debug your model, please cite our pre-print (forhtcoming):
+All the code is released under an open MIT license. If you found *RecList* useful, please cite our pre-print: RecList will be a WWW paper soon, so the citation below will be updated soon.
 
 .. code-block:: bash
 
