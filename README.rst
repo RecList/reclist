@@ -56,7 +56,7 @@ Quick Links
 Project updates
 ~~~~~~~~~~~~~~~
 
-*Jan. 2022*: RecList paper has been accepted in a top-tier conference, TheWebConf 2022! A final camera-ready version of the original draft will soon be ready (pre-print `here<https://arxiv.org/abs/2111.09963>`__).
+*Jan. 2022*: RecList paper has been accepted in a top-tier conference, TheWebConf 2022! A final camera-ready version of the original draft will soon be ready (pre-print `here <https://arxiv.org/abs/2111.09963>`__).
 
 In the last month, we presented this library to practioners at Tubi, eBay, NVIDIA, BBC and other RecSys companies: we are in the process of collecting our thoughts after all the feedback we received, as we plan a beta release for this package in the next few months - come back often for updates, as we will also open a call for collaboration!
 
