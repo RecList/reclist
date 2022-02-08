@@ -152,6 +152,11 @@ a SaaS provider can be tested just by wrapping the proper API call in the method
 
             return
 
+More generally, the logical workflow of a typical RecList implementation is as follows (see our `blog post <https://towardsdatascience.com/ndcg-is-not-all-you-need-24eb6d2f1227>`__ for a longer explanation):
+
+.. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/workflow.gif
+   :height: 400
+
 While many standard KPIs are available in the package, the philosophy behind *RecList* is that metrics like Hit Rate provide only a partial picture
 of the expected behavior of recommenders in the wild: two models with very similar accuracy can have very different behavior on, say, the long-tail, or
 model A can be better than model B overall, but at the expense of providing disastrous performance on a set of inputs that are particularly important in production. 
