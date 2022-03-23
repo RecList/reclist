@@ -121,7 +121,7 @@ def popularity_bias_at_k(y_preds, x_train, k=3):
 
 
 def precision_at_k(y_preds, y_test, k=3):
-    precision_ls = [len(set(_y).intersection(set(_p[:k]))) / len(_p) if _p else 1 for _p, _y in zip(y_preds, y_test)]
+    precision_ls = [len(set(_y).intersection(set(_p[:k]))) / len(_p[:k]) if _p else 1 for _p, _y in zip(y_preds, y_test)]
     return np.average(precision_ls)
 
 
