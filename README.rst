@@ -49,6 +49,7 @@ If you are not familiar with the library, we suggest first taking our small tour
 Quick Links
 ~~~~~~~~~~~
 
+* Our `talk <https://www.youtube.com/watch?v=cAlJYxFYA04>`__ at Stitch Fix Algo Hour, for a general presentation.
 * Our `paper <https://arxiv.org/abs/2111.09963>`__, with in-depth analysis, detailed use cases and scholarly references.
 * A `colab notebook <https://colab.research.google.com/drive/1Wn5mm0csEkyWqmBBDxNBkfGR6CNfWeH-?usp=sharing>`__, showing how to train a cart recommender model from scratch and use the library to test it.
 * Our `blog post <https://towardsdatascience.com/ndcg-is-not-all-you-need-24eb6d2f1227>`__, with examples and practical tips.
@@ -56,9 +57,9 @@ Quick Links
 Project updates
 ~~~~~~~~~~~~~~~
 
-*Jan. 2022*: RecList paper has been accepted in a top-tier conference, TheWebConf 2022! A final camera-ready version of the original draft will soon be ready (pre-print `here <https://arxiv.org/abs/2111.09963>`__).
+*Mar. 2022*: RecList paper will be presented in April at TheWebConf 2022 (pre-print `here <https://arxiv.org/abs/2111.09963>`__).
 
-In the last month, we presented this library to practioners at Tubi, eBay, NVIDIA, BBC and other RecSys companies: we are in the process of collecting our thoughts after all the feedback we received, as we plan a beta release for this package in the next few months - come back often for updates, as we will also open a call for collaboration!
+In the last few months, we presented this library to practioners at Tubi, eBay, NVIDIA, BBC and other RecSys companies: we are in the process of collecting our thoughts after all the feedback we received, as we plan a beta release for this package in the next few months - come back often for updates, as we will also open a call for collaboration!
 
 Please remember that the library is in alpha (i.e. enough working code to finish the paper and tinker with it). We welcome early feedback, but please be advised that the package may change substantially in the near future ("If you're not embarrassed by the first version, you've launched too late"). 
 
@@ -175,27 +176,11 @@ Once you run a suite of tests, results are dumped automatically and versioned in
         myModel/
           1637357392/
           1637357404/
-
-We provide a simple (and *very* WIP) UI to easily compare runs and models. After you run two times one of the example scripts,
-you can do:
-
-.. code-block:: bash
-
-    cd app
-    python app.py
-
-to start a local web app that lets you explore test results:    
-
-.. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/explorer.png
-   :height: 200
-
-If you select more than model, the app will automatically build comparison tables:
-
-.. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/comparison.png
-   :height: 200
-
+          
 If you start using *RecList* as part of your standard testings - either for research or production purposes - you can use the JSON report
 for machine-to-machine communication with downstream system (e.g. you may want to automatically fail the model pipeline if certain behavioral tests are not passed).
+          
+Note: our app is deprecated, as RecList Beta will have connectors with existing apps (experiment trackers, model cards, etc.).
 
 Capabilities
 ------------
@@ -291,7 +276,7 @@ If you have questions or feedback, please reach out to: :code:`jacopo dot taglia
 License and Citation
 --------------------
 
-All the code is released under an open MIT license. If you found *RecList* useful, please cite our pre-print: RecList will be a WWW paper soon, so the citation below will be updated soon.
+All the code is released under an open MIT license. If you found *RecList* useful, please cite our pre-print: RecList is a WWW, so the citation below will be updated soon.
 
 .. code-block:: bash
 
