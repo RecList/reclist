@@ -24,7 +24,12 @@ RecList
 .. image:: https://pepy.tech/badge/reclist
         :target: https://pepy.tech/project/reclist
         :alt: Downloads
-
+        
+.. image:: https://img.shields.io/badge/youtube-video-red
+        :target: https://www.youtube.com/watch?v=cAlJYxFYA04
+        :alt: YouTube
+        
+  
 RecList
 
 
