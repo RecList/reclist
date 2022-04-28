@@ -62,7 +62,8 @@ Quick Links
 Project updates
 ~~~~~~~~~~~~~~~
 
-*Mar. 2022*: RecList paper will be presented in April at TheWebConf 2022 (pre-print `here <https://arxiv.org/abs/2111.09963>`__).
+*May 2022*: RecList has been presented at `TheWebConf 2022 <https://arxiv.org/abs/2111.09963>`__; a list of recent talks and presentations
+can be found below. RecList will be featured in the Data Challenge of a top-tier ML conference: *an official announcement will follow*.
 
 In the last few months, we presented this library to practioners at Tubi, eBay, NVIDIA, BBC and other RecSys companies: we are in the process of collecting our thoughts after all the feedback we received, as we plan a beta release for this package in the next few months - come back often for updates, as we will also open a call for collaboration!
 
@@ -78,6 +79,7 @@ This doc is structured as follows:
 * `Capabilities`_
 * `Roadmap`_
 * `Acknowledgments`_
+* `Talks and Presentations`_
 * `License and Citation`_
 
 Quick Start
@@ -248,17 +250,7 @@ suggesting that the model better capture the nature of the task:
 Roadmap
 -------
 
-To do:
-
-* the app is just a stub: improve the report "contract" and extend the app capabilities, possibly including it in the library itself;
-
-* continue adding default *RecTests* by use cases, and test them on public datasets;
-
-* improving our test suites and refactor some abstractions;
-
-* adding Colab tutorials and extensive documentation to explain the basic usage (a first `blog post <https://towardsdatascience.com/ndcg-is-not-all-you-need-24eb6d2f1227>`__ is out!).
-
-We maintain a small Trello board on the project which we plan on sharing with the community: *more details coming soon*!
+We have exciting news about our Beta, including the usage of RecList as main library for a popular Data Challenge: *more details coming soon*!
 
 Contributing
 ~~~~~~~~~~~~
@@ -268,7 +260,7 @@ We will update this repo with some guidelines for contributions as soon as the c
 Acknowledgments
 ---------------
 
-The main contributors are:
+The original authors are:
 
 * Patrick John Chia - `LinkedIn <https://www.linkedin.com/in/patrick-john-chia-b0a34019b/>`__, `GitHub <https://github.com/patrickjohncyh>`__
 * Jacopo Tagliabue - `LinkedIn <https://www.linkedin.com/in/jacopotagliabue/>`__, `GitHub <https://github.com/jacopotagliabue>`__
@@ -277,6 +269,17 @@ The main contributors are:
 * Brian Ko - `LinkedIn <https://www.linkedin.com/in/briankosw/>`__, `GitHub <https://github.com/briankosw>`__
 
 If you have questions or feedback, please reach out to: :code:`jacopo dot tagliabue at tooso dot ai`.
+
+Talks and Presentations
+--------------------
+
+Past and upcoming talks and presentations, for additional background information:
+
+* neptune.ai Podcast, *forthcoming*
+* apply(conf) 2022, *forthcoming*
+* TheWebConf2022, *forthcoming*
+* `NVIDIA GTC <https://www.nvidia.com/en-us/on-demand/session/gtcspring22-s41531/>`__ 
+* `Stitch Fix Algo Hour <https://www.youtube.com/watch?v=cAlJYxFYA04>`__ 
 
 License and Citation
 --------------------
