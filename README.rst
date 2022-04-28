@@ -284,7 +284,7 @@ Past and upcoming talks and presentations, for additional background information
 License and Citation
 --------------------
 
-All the code is released under an open MIT license. If you found *RecList* useful, please cite our pre-print: RecList is a WWW, so the citation below will be updated soon.
+All the code is released under an open MIT license. If you found *RecList* useful, please cite our pre-print: RecList is a WWW paper, so the citation below will be updated soon.
 
 .. code-block:: bash
 
