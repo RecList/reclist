@@ -61,12 +61,14 @@ Quick Links
 
 Sponsors
 ~~~~~~~~
-
+Reclist is an open source project generously supported by these awesome folks:
 
 .. image:: https://github.com/jacopotagliabue/reclist/raw/main/images/comet.png
+   :target: https://comet.ml
    :width: 175
 
 .. image:: https://github.com/jacopotagliabue/reclist/raw/main/images/neptune.png
+   :target: https://neptune.ai
    :width: 175
 
 Project updates
