@@ -62,10 +62,10 @@ Quick Links
 Project updates
 ~~~~~~~~~~~~~~~
 
-*Community Support*: RecList is an open source community project made possible by the support of the awesome folks at `Comet <https://www.comet.ml/site/>` and `Neptune <https://neptune.ai/>`. 
+*Community Support*: RecList is an open source community project made possible by the support of the awesome folks at `Comet <https://www.comet.ml/site/>`__ and `Neptune <https://neptune.ai/>`__. 
 Soon RecList tests will be natively integrated with the MLOps tools you already know and love!
 
-*June 2022*: We launched a `website <https://reclist.io/>` to collect RecList materials, such as talks and presentations. 
+*June 2022*: We launched a `website <https://reclist.io/>`__ to collect RecList materials, such as talks and presentations. 
 RecList will be featured in the Data Challenge of a top-tier ML conference: *an official announcement will follow*.
 
 In the last few months, we presented this library to practioners at Tubi, eBay, NVIDIA, BBC and other RecSys companies: we are in the process of collecting our thoughts after all the feedback we received, as we plan a beta release for this package in the next few months - come back often for updates, as we will also open a call for collaboration!
@@ -266,7 +266,11 @@ Supporters
 
 RecList is a community project made possible by the generous support of these awesome folks. Make sure to check them out!
 
+.. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/comet.png
+   :height: 80
 
+.. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/neptune.png
+   :height: 80
 
 Acknowledgments
 ---------------
