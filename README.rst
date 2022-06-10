@@ -62,8 +62,11 @@ Quick Links
 Project updates
 ~~~~~~~~~~~~~~~
 
-*May 2022*: RecList has been presented at `TheWebConf 2022 <https://arxiv.org/abs/2111.09963>`__; a list of recent talks and presentations
-can be found below. RecList will be featured in the Data Challenge of a top-tier ML conference: *an official announcement will follow*.
+*Community Support*: RecList is an open source community project made possible by the support of the awesome folks at `Comet <https://www.comet.ml/site/>` and `Neptune <https://neptune.ai/>`. 
+Soon RecList tests will be natively integrated with the MLOps tools you already know and love!
+
+*June 2022*: We launched a `website <https://reclist.io/>` to collect RecList materials, such as talks and presentations. 
+RecList will be featured in the Data Challenge of a top-tier ML conference: *an official announcement will follow*.
 
 In the last few months, we presented this library to practioners at Tubi, eBay, NVIDIA, BBC and other RecSys companies: we are in the process of collecting our thoughts after all the feedback we received, as we plan a beta release for this package in the next few months - come back often for updates, as we will also open a call for collaboration!
 
@@ -78,9 +81,10 @@ This doc is structured as follows:
 * `A Guided Tour`_
 * `Capabilities`_
 * `Roadmap`_
-* `Acknowledgments`_
 * `Talks and Presentations`_
+* `Supporters`_
 * `License and Citation`_
+* `Acknowledgments`_
 
 Quick Start
 -----------
@@ -257,6 +261,13 @@ Contributing
 
 We will update this repo with some guidelines for contributions as soon as the codebase becomes more stable. Check back often for updates!
 
+Supporters
+-------
+
+RecList is a community project made possible by the generous support of these awesome folks. Make sure to check them out!
+
+
+
 Acknowledgments
 ---------------
 
@@ -273,13 +284,7 @@ If you have questions or feedback, please reach out to: :code:`jacopo dot taglia
 Talks and Presentations
 --------------------
 
-Past and upcoming talks and presentations, for additional background information:
-
-* neptune.ai Podcast, *forthcoming*
-* apply(conf) 2022, *forthcoming*
-* TheWebConf2022, *forthcoming*
-* `NVIDIA GTC <https://www.nvidia.com/en-us/on-demand/session/gtcspring22-s41531/>`__ 
-* `Stitch Fix Algo Hour <https://www.youtube.com/watch?v=cAlJYxFYA04>`__ 
+Past and upcoming talks and presentations can be found at our new `website <https://reclist.io/>` (WIP). 
 
 License and Citation
 --------------------
