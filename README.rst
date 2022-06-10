@@ -59,9 +59,9 @@ Quick Links
 * A `colab notebook <https://colab.research.google.com/drive/1Wn5mm0csEkyWqmBBDxNBkfGR6CNfWeH-?usp=sharing>`__, showing how to train a cart recommender model from scratch and use the library to test it.
 * Our `blog post <https://towardsdatascience.com/ndcg-is-not-all-you-need-24eb6d2f1227>`__, with examples and practical tips.
 
-Sponsors
+Supporters
 ~~~~~~~~
-Reclist is an open source project generously supported by these awesome folks:
+RecList is a community project made possible by the generous support of these awesome folks. Make sure to check them out!
 
 Comet
 =====
@@ -76,6 +76,7 @@ Neptune
 .. image:: https://github.com/jacopotagliabue/reclist/raw/main/images/neptune.png
    :target: https://neptune.ai
    :width: 175
+
 
 Project updates
 ~~~~~~~~~~~~~~~
@@ -100,7 +101,6 @@ This doc is structured as follows:
 * `Capabilities`_
 * `Roadmap`_
 * `Talks and Presentations`_
-* `Supporters`_
 * `License and Citation`_
 * `Acknowledgments`_
 
@@ -278,17 +278,6 @@ Contributing
 ~~~~~~~~~~~~
 
 We will update this repo with some guidelines for contributions as soon as the codebase becomes more stable. Check back often for updates!
-
-Supporters
--------
-
-RecList is a community project made possible by the generous support of these awesome folks. Make sure to check them out!
-
-.. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/comet.png
-   :height: 80
-
-.. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/neptune.png
-   :height: 80
 
 Acknowledgments
 ---------------
