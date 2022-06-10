@@ -295,7 +295,7 @@ If you have questions or feedback, please reach out to: :code:`jacopo dot taglia
 Talks and Presentations
 --------------------
 
-Past and upcoming talks and presentations can be found at our new `website <https://reclist.io/>` (WIP).
+Past and upcoming talks and presentations can be found at our new `website <https://reclist.io/>`__.
 
 License and Citation
 --------------------
