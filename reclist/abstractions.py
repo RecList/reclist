@@ -13,7 +13,7 @@ class RecDataset(ABC):
     """
     Implements an abstract class for the dataset
     """
-    def __init__(self, force_download=False):
+    def __init__(self, force_download=False, **kwargs):
         """
         :param force_download: allows to force the download of the dataset in case it is needed.
         :type: force_download: bool, optional
@@ -24,10 +24,10 @@ class RecDataset(ABC):
         self._y_test = None
         self._catalog = None
         self.force_download = force_download
-        self.load()
+        self.load(**kwargs)
 
     @abstractmethod
-    def load(self):
+    def load(self, **kwargs):
         """
         Abstract method that should implement dataset loading
         :return:

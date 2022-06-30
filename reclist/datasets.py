@@ -2,8 +2,27 @@ import json
 import tempfile
 import zipfile
 import os
+import pandas as pd
 from reclist.abstractions import RecDataset
 from reclist.utils.config import *
+
+class MovieLensDatasetDF(RecDataset):
+    """
+        MovieLens 25M Dataset
+
+        Reference: https://files.grouplens.org/datasets/movielens/ml-25m-README.html
+        """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def load(self, **kwargs):
+
+        self._x_train = pd.read_parquet(kwargs.get("path_to_x_train"))
+        self._y_train = pd.read_parquet(kwargs.get("path_to_y_train"))
+        self._x_test = pd.read_parquet(kwargs.get("path_to_x_test"))
+        self._y_test = pd.read_parquet(kwargs.get("path_to_y_test"))
+        self._catalog = pd.read_parquet(kwargs.get("path_to_catalog"))
 
 
 class MovieLensDataset(RecDataset):
@@ -34,7 +53,7 @@ class MovieLensDataset(RecDataset):
         self._x_test = data["x_test"]
         self._y_test = data["y_test"]
         self._catalog = self._convert_catalog_keys(data["catalog"])
-        
+
     def _convert_catalog_keys(self, catalog):
         """
         Convert catalog keys from string to integer type
