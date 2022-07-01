@@ -201,10 +201,12 @@ class RecList(ABC):
             self.rec_model.__class__.__name__,
             str(epoch_time_ms)
         )
-        # now, dump results
-        self.dump_results_to_json(self._test_results, report_path, epoch_time_ms)
-        # now, store artifacts
-        self.store_artifacts(report_path)
+
+        # TODO: Refactor reporting to accomodate dataframe
+        # # now, dump results
+        # self.dump_results_to_json(self._test_results, report_path, epoch_time_ms)
+        # # now, store artifacts
+        # self.store_artifacts(report_path)
 
     def store_artifacts(self, report_path: str):
         target_path = os.path.join(current.report_path, 'artifacts')
