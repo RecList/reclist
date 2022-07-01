@@ -33,11 +33,14 @@ class MovieLensKernelMFModel(RecModel):
                 user_movie_pairs: pd.DataFrame,
                 user_column_name: str = 'user_id',
                 movie_column_name: str = 'movie_id',
-                *args, **kwargs):
+                *args, **kwargs) -> pd.DataFrame:
         """
         Predicts the user rating for a given movie
 
         """
         x_test = user_movie_pairs[[user_column_name, movie_column_name]]
         x_test.columns = ['user_id', 'item_id']
-        return self.model.predict(x_test)
+
+        return pd.DataFrame(self.model.predict(x_test),
+                            columns=['rating'],
+                            index=x_test.index)
