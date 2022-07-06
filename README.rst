@@ -77,15 +77,22 @@ Neptune
    :target: https://neptune.ai
    :width: 175
 
+Gantry
+=======
+
+.. image:: https://github.com/jacopotagliabue/reclist/raw/main/images/gantry.png
+   :target: https://gantry.io/
+   :width: 175
+
 
 Project updates
 ~~~~~~~~~~~~~~~
 
-*Community Support*: RecList is an open source community project made possible by the support of the awesome folks at `Comet <https://www.comet.ml/site/>`__ and `Neptune <https://neptune.ai/>`__.
+*Community Support*: RecList is an open source community project made possible by the support of the awesome folks at `Comet <https://www.comet.ml/site/>`__, `Neptune <https://neptune.ai/>`__ and `Gantry <https://gantry.io/>`__.
 Soon RecList tests will be natively integrated with the MLOps tools you already know and love!
 
 *June 2022*: We launched a `website <https://reclist.io/>`__ to collect RecList materials, such as talks and presentations.
-RecList will be featured in the Data Challenge of a top-tier ML conference: *an official announcement will follow*.
+RecList is powering the `Data Challenge <https://reclist.io/cikm2022-cup/>`__ at CIKM 2022: fill `the form <https://docs.google.com/forms/d/e/1FAIpQLSfAypzM1mvd79JfRGRbb9QMfXGMoVYosdjU9C4NFEWNSNUZXQ/viewform>`__ for updates.
 
 In the last few months, we presented this library to practioners at Tubi, eBay, NVIDIA, BBC and other RecSys companies: we are in the process of collecting our thoughts after all the feedback we received, as we plan a beta release for this package in the next few months - come back often for updates, as we will also open a call for collaboration!
 
@@ -272,7 +279,7 @@ suggesting that the model better capture the nature of the task:
 Roadmap
 -------
 
-We have exciting news about our Beta, including the usage of RecList as main library for a popular Data Challenge: *more details coming soon*!
+We have exciting news about our Beta, including the usage of RecList as main library for the `CIKM Data Challenge <https://reclist.io/cikm2022-cup/>`__!
 
 Contributing
 ~~~~~~~~~~~~
