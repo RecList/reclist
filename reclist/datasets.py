@@ -17,12 +17,20 @@ class MovieLensDatasetDF(RecDataset):
         super().__init__(**kwargs)
 
     def load(self, **kwargs):
+        cache_dir = get_cache_directory()
+        filepath = os.path.join(cache_dir, "movielens_25m_useritem.zip")
 
-        self._x_train = pd.read_parquet(kwargs.get("path_to_x_train"))
-        self._y_train = pd.read_parquet(kwargs.get("path_to_y_train"))
-        self._x_test = pd.read_parquet(kwargs.get("path_to_x_test"))
-        self._y_test = pd.read_parquet(kwargs.get("path_to_y_test"))
-        self._catalog = pd.read_parquet(kwargs.get("path_to_catalog"))
+        if not os.path.exists(filepath) or self.force_download:
+            download_with_progress(MOVIELENS_UI_DATASET_S3_URL, filepath)
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with zipfile.ZipFile(filepath, "r") as zip_file:
+                zip_file.extractall(temp_dir)
+            self._x_train = pd.read_parquet(os.path.join(temp_dir,"movielens_reclist","movielens_x_train.pk"))
+            self._y_train = pd.read_parquet(os.path.join(temp_dir,"movielens_reclist","movielens_y_train.pk"))
+            self._x_test = pd.read_parquet(os.path.join(temp_dir,"movielens_reclist","movielens_x_test.pk"))
+            self._y_test = pd.read_parquet(os.path.join(temp_dir,"movielens_reclist","movielens_y_test.pk"))
+            self._catalog = pd.read_parquet(os.path.join(temp_dir,"movielens_reclist","movielens_catalog.pk"))
 
 
 class MovieLensDataset(RecDataset):
