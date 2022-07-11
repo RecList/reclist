@@ -10,6 +10,11 @@ class MovieLensRecList(RecList):
     def squared_error(self, y_true, y_pred):
         return (y_true-y_pred)**2
 
+    def rmse_by_slice(self, slice: str):
+        sq_error = self.squared_error(self._y_preds[['rating']], self._y_test[['rating']])
+        sq_error[slice] = self.product_data.loc[self._x_test['movie_id']][slice].values
+        return sq_error.explode(slice).groupby(slice)['rating'].agg("mean")
+
     @rec_test(test_type='stats')
     def basic_stats(self):
         return self._y_preds.describe()
@@ -21,9 +26,7 @@ class MovieLensRecList(RecList):
 
     @rec_test(test_type='rmse_by_genre')
     def rmse_by_genre(self):
-        sq_error = self.squared_error(self._y_preds[['rating']], self._y_test[['rating']])
-        sq_error['genres'] = self.product_data.loc[self._x_test['movie_id']]['genres'].values
-        return sq_error.explode('genres').groupby('genres')['rating'].agg("mean")
+        return self.rmse_by_slice('genres')
 
 
 
