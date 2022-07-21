@@ -2,6 +2,7 @@ import random
 import itertools
 import numpy as np
 import collections
+import pandas as pd
 
 
 def statistics(x_train, y_train, x_test, y_test, y_pred):
@@ -52,10 +53,35 @@ def sample_misses_at_k(y_preds, y_test, x_test=None, k=3, size=3):
 
 def hit_rate_at_k_nep(y_preds, y_test, k=3):
     y_test = [[k] for k in y_test]
-    return hit_rate_at_k(y_preds, y_test, k=k)
+    return hit_rate_at_k_list(y_preds, y_test, k=k)
 
 
-def hit_rate_at_k(y_preds, y_test, k=3):
+def hits_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int = 3) -> (np.array, pd.DataFrame):
+    y_test_mask = y_test != -1
+    y_pred_mask = y_pred != -1
+
+    y_test = y_test.values[:, :, None]
+    y_pred = y_pred.values[:, None, :k]
+    # TODO: maybe shift masking logic here
+    hits = (y_test == y_pred)
+
+    return hits, y_test_mask, y_pred_mask
+
+
+def ranks_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int = 3) -> (np.array, pd.DataFrame):
+    hits, valid_hits_mask, valid_pred_mask = hits_at_k(y_pred, y_test, k)
+    ranks = hits * np.arange(1,k+1,1)[None, None, :]
+    ranks = ranks.max(2)
+    return ranks, valid_hits_mask, valid_pred_mask
+
+
+def hit_rate_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int = 3):
+    hits, valid_hits_mask, valid_pred_mask = hits_at_k(y_pred, y_test, k)
+    hits = hits.max(1) * valid_pred_mask.values[:, :k]
+    return hits.max(axis=1).mean()
+
+
+def hit_rate_at_k_list(y_preds, y_test, k=3) -> float:
     hits = 0
     for _p, _y in zip(y_preds, y_test):
         if len(set(_p[:k]).intersection(set(_y))) > 0:
@@ -63,7 +89,14 @@ def hit_rate_at_k(y_preds, y_test, k=3):
     return hits / len(y_test)
 
 
-def mrr_at_k_nep(y_preds, y_test, k=3):
+def mrr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int = 3) -> float:
+    ranks, valid_hits_mask, valid_preds_mask = ranks_at_k(y_pred, y_test, k)
+    reciprocal_ranks = np.reciprocal(ranks.astype(np.float64), where=ranks>0)
+    reciprocal_ranks = reciprocal_ranks.max(axis=1)
+    return reciprocal_ranks.mean()
+
+
+def mrr_at_k_nep_list(y_preds, y_test, k=3):
     """
     Computes MRR
 
@@ -72,10 +105,10 @@ def mrr_at_k_nep(y_preds, y_test, k=3):
     :param k: top-k
     """
     y_test = [[k] for k in y_test]
-    return mrr_at_k(y_preds, y_test, k=k)
+    return mrr_at_k_list(y_preds, y_test, k=k)
 
 
-def mrr_at_k(y_preds, y_test, k=3):
+def mrr_at_k_list(y_preds, y_test, k=3):
     """
     Computes MRR
 
