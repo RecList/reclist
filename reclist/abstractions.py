@@ -8,6 +8,7 @@ import time
 import json
 from reclist.utils.train_w2v import train_embeddings
 from reclist.current import current
+import pandas as pd
 
 class RecDataset(ABC):
     """
@@ -68,7 +69,7 @@ class RecModel(ABC):
         self._model = model
 
     @abstractmethod
-    def predict(self, prediction_input: list, *args, **kwargs):
+    def predict(self, prediction_input: list, *args, **kwargs) -> pd.DataFrame:
         """
         The predict function should implement the behaviour of the model at inference time.
 
@@ -114,7 +115,7 @@ def rec_test(test_type: str):
 class RecList(ABC):
     META_DATA_FOLDER = '.reclist'
 
-    def __init__(self, model: RecModel, dataset: RecDataset, y_preds: list = None):
+    def __init__(self, model: RecModel, dataset: RecDataset, y_preds: pd.DataFrame = None):
         """
         :param model:
         :param dataset:
@@ -123,13 +124,13 @@ class RecList(ABC):
 
         self.name = self.__class__.__name__
         self._rec_tests = self.get_tests()
-        self._x_train = dataset.x_train
-        self._y_train = dataset.y_train
-        self._x_test = dataset.x_test
-        self._y_test = dataset.y_test
-        self._y_preds = y_preds if y_preds else model.predict(dataset.x_test)
+        self._x_train: pd.DataFrame = dataset.x_train
+        self._y_train: pd.DataFrame = dataset.y_train
+        self._x_test: pd.DataFrame = dataset.x_test
+        self._y_test: pd.DataFrame = dataset.y_test
+        self._y_preds =  model.predict(dataset.x_test) if isinstance(y_preds, type(None)) else y_preds
         self.rec_model = model
-        self.product_data = dataset.catalog
+        self.product_data: pd.DataFrame = dataset.catalog
         self._test_results = []
         self._test_data = {}
         self._dense_repr = {}
