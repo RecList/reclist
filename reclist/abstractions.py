@@ -69,7 +69,7 @@ class RecModel(ABC):
         self._model = model
 
     @abstractmethod
-    def predict(self, prediction_input: list, *args, **kwargs) -> pd.DataFrame:
+    def predict(self, *args, **kwargs) -> pd.DataFrame:
         """
         The predict function should implement the behaviour of the model at inference time.
 
