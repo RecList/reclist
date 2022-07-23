@@ -192,7 +192,7 @@ class RecList(ABC):
         # at the end, we dump it locally
         if verbose:
             print("Generating reports at {}".format(datetime.utcnow()))
-        self.generate_report(run_epoch_time_ms)
+        return self.generate_report(run_epoch_time_ms)
 
     def generate_report(self, epoch_time_ms: int):
         # create path first: META_DATA_FOLDER / RecList / Model / Run Time
@@ -203,21 +203,20 @@ class RecList(ABC):
             str(epoch_time_ms)
         )
 
-        # TODO: Refactor reporting to accomodate dataframe
-        # # now, dump results
-        # self.dump_results_to_json(self._test_results, report_path, epoch_time_ms)
-        # # now, store artifacts
-        # self.store_artifacts(report_path)
+        # now, dump results
+        self.dump_results_to_json(self._test_results, report_path, epoch_time_ms)
+        # now, store artifacts
+        self.store_artifacts(report_path)
+        return report_path
 
     def store_artifacts(self, report_path: str):
         target_path = os.path.join(current.report_path, 'artifacts')
         # store predictions
-        with open(os.path.join(target_path, 'model_predictions.json'), 'w') as f:
-            json.dump({
-                'x_test': self._x_test,
-                'y_test': self._y_test,
-                'y_preds': self._y_preds
-            }, f)
+
+        self._x_test.to_parquet(os.path.join(target_path,'x_test.pk'))
+        self._y_test.to_parquet(os.path.join(target_path,'y_test.pk'))
+        self._y_preds.to_parquet(os.path.join(target_path,'y_preds.pk'))
+
 
     def dump_results_to_json(self, test_results: list, report_path: str, epoch_time_ms: int):
         target_path = os.path.join(report_path, 'results')
@@ -233,7 +232,7 @@ class RecList(ABC):
             'data': test_results
         }
         with open(os.path.join(target_path, 'report.json'), 'w') as f:
-            json.dump(report, f)
+            json.dump(report, f, indent=2)
 
     @property
     def test_results(self):
