@@ -67,7 +67,7 @@ Comet
 =====
 
 .. image:: https://github.com/jacopotagliabue/reclist/raw/main/images/comet.png
-   :target: https://www.comet.com/?utm_source=jacopot&utm_medium=referral&utm_campaign=online_jacopot_2022&utm_content=jacopot_site
+   :target: https://www.comet.com/?utm_source=jacopot&utm_medium=referral&utm_campaign=online_jacopot_2022&utm_content=github_reclist
    :width: 175
 
 Neptune
