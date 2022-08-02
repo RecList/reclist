@@ -91,7 +91,8 @@ def hit_rate_at_k_list(y_preds, y_test, k=3) -> float:
 
 def mrr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int = 3) -> float:
     ranks, valid_hits_mask, valid_preds_mask = ranks_at_k(y_pred, y_test, k)
-    reciprocal_ranks = np.reciprocal(ranks.astype(np.float64), where=ranks>0)
+    ranks = ranks.astype(np.float64)
+    reciprocal_ranks = np.reciprocal(ranks, out=ranks, where=ranks>0)
     reciprocal_ranks = reciprocal_ranks.max(axis=1)
     return reciprocal_ranks.mean()
 
