@@ -56,7 +56,7 @@ def hit_rate_at_k_nep(y_preds, y_test, k=3):
     return hit_rate_at_k_list(y_preds, y_test, k=k)
 
 
-def hits_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int = 3) -> (np.array, pd.DataFrame):
+def hits_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int) -> (np.array, pd.DataFrame):
     """
     N = number test cases
     M = number ground truth per test case
@@ -75,7 +75,7 @@ def hits_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int = 3) -> (np.arr
     return hits
 
 
-def ranks_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int = 3) -> (np.array, pd.DataFrame):
+def ranks_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int) -> (np.array, pd.DataFrame):
     """
     N = number test cases
     M = number ground truth per test case
@@ -86,7 +86,7 @@ def ranks_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int = 3) -> (np.ar
     return ranks
 
 
-def hit_rate_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int = 3):
+def hit_rate_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int):
     """
     N = number test cases
     M = number ground truth per test case
@@ -96,13 +96,13 @@ def hit_rate_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int = 3):
     return hits.max(axis=1).mean()           # 1
 
 
-def rr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int = 3):
+def rr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int):
     ranks = ranks_at_k(y_pred, y_test, k).astype(np.float64)             # N x M
     reciprocal_ranks = np.reciprocal(ranks, out=ranks, where=ranks > 0)  # N x M
     return reciprocal_ranks.max(axis=1)                                  # N
 
 
-def mrr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int = 3) -> float:
+def mrr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int) -> float:
     return rr_at_k(y_pred, y_test, k=k).mean()
 
 
