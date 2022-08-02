@@ -57,28 +57,57 @@ def hit_rate_at_k_nep(y_preds, y_test, k=3):
 
 
 def hits_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int = 3) -> (np.array, pd.DataFrame):
-    y_test_mask = y_test != -1
-    y_pred_mask = y_pred != -1
+    """
+    N = number test cases
+    M = number ground truth per test case
+    """
+    y_test_mask = y_test.values != -1           # N x M
 
-    y_test = y_test.values[:, :, None]
-    y_pred = y_pred.values[:, None, :k]
-    # TODO: maybe shift masking logic here
-    hits = (y_test == y_pred)
+    y_pred_mask = y_pred.values[:, :k] != -1    # N x k
 
-    return hits, y_test_mask, y_pred_mask
+    y_test = y_test.values[:, :, None]          # N x M x 1
+    y_pred = y_pred.values[:, None, :k]         # N x 1 x k
+
+    hits = (y_test == y_pred)                   # N x M x k
+    hits = hits * y_test_mask[:, :, None]       # N x M x k
+    hits = hits * y_pred_mask[:, None, :]       # N x M x k
+
+    return hits
 
 
 def ranks_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int = 3) -> (np.array, pd.DataFrame):
-    hits, valid_hits_mask, valid_pred_mask = hits_at_k(y_pred, y_test, k)
-    ranks = hits * np.arange(1,k+1,1)[None, None, :]
-    ranks = ranks.max(2)
-    return ranks, valid_hits_mask, valid_pred_mask
+    """
+    N = number test cases
+    M = number ground truth per test case
+    """
+    hits = hits_at_k(y_pred, y_test, k)                 # N x M x k
+    ranks = hits * np.arange(1,k+1,1)[None, None, :]    # N x M x k
+    ranks = ranks.max(axis=2)                           # N x M
+    return ranks
 
 
 def hit_rate_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int = 3):
-    hits, valid_hits_mask, valid_pred_mask = hits_at_k(y_pred, y_test, k)
-    hits = hits.max(1) * valid_pred_mask.values[:, :k]
-    return hits.max(axis=1).mean()
+    """
+    N = number test cases
+    M = number ground truth per test case
+    """
+    hits = hits_at_k(y_pred, y_test, k)      # N x M x k
+    hits = hits.max(axis=1)                  # N x k
+    return hits.max(axis=1).mean()           # 1
+
+
+def rr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int = 3):
+    ranks = ranks_at_k(y_pred, y_test, k).astype(np.float64)             # N x M
+    reciprocal_ranks = np.reciprocal(ranks, out=ranks, where=ranks > 0)  # N x M
+    return reciprocal_ranks.max(axis=1)                                  # N
+
+
+def mrr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int = 3) -> float:
+    return rr_at_k(y_pred, y_test, k=k).mean()
+
+
+
+####################### LIST-WISE CODE #####################################
 
 
 def hit_rate_at_k_list(y_preds, y_test, k=3) -> float:
@@ -88,13 +117,6 @@ def hit_rate_at_k_list(y_preds, y_test, k=3) -> float:
             hits += 1
     return hits / len(y_test)
 
-
-def mrr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int = 3) -> float:
-    ranks, valid_hits_mask, valid_preds_mask = ranks_at_k(y_pred, y_test, k)
-    ranks = ranks.astype(np.float64)
-    reciprocal_ranks = np.reciprocal(ranks, out=ranks, where=ranks>0)
-    reciprocal_ranks = reciprocal_ranks.max(axis=1)
-    return reciprocal_ranks.mean()
 
 
 def mrr_at_k_nep_list(y_preds, y_test, k=3):
