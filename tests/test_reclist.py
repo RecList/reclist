@@ -46,5 +46,5 @@ def test_mrr():
     df_c = pd.DataFrame([[2, 3], [0, 1]])
 
     assert mrr_at_k(df_b, df_a, 1) == 1
-    assert mrr_at_k(df_c, df_a, 21) == 0.25
+    assert mrr_at_k(df_c, df_a, 2) == 0.25
     assert mrr_at_k(df_c, df_a, 1) == 0
