@@ -15,7 +15,7 @@ with open('requirements.txt') as f:
 
 setup_requirements = ['pytest-runner', ]
 
-test_requirements = ['pytest>=3', 'pandas==1.4.2' ]
+test_requirements = ['pytest>=3', ]
 
 setup(
     author="Federico Bianchi",
