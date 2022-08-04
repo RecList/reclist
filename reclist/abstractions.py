@@ -9,6 +9,7 @@ import json
 from reclist.utils.train_w2v import train_embeddings
 from reclist.current import current
 import pandas as pd
+from typing import Dict
 
 class RecDataset(ABC):
     """
@@ -128,9 +129,9 @@ class RecList(ABC):
         self._y_train: pd.DataFrame = dataset.y_train
         self._x_test: pd.DataFrame = dataset.x_test
         self._y_test: pd.DataFrame = dataset.y_test
-        self._y_preds =  model.predict(dataset.x_test) if isinstance(y_preds, type(None)) else y_preds
+        self._y_preds: pd.DataFrame = model.predict(dataset.x_test) if isinstance(y_preds, type(None)) else y_preds
         self.rec_model = model
-        self.product_data: pd.DataFrame = dataset.catalog
+        self.product_data: Dict[pd.DataFrame] = dataset.catalog
         self._test_results = []
         self._test_data = {}
         self._dense_repr = {}
