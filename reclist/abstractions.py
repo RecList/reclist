@@ -10,6 +10,7 @@ from reclist.utils.train_w2v import train_embeddings
 from reclist.current import current
 import pandas as pd
 from typing import Dict
+from gensim.models import KeyedVectors
 
 class RecDataset(ABC):
     """
@@ -134,9 +135,15 @@ class RecList(ABC):
         self.product_data: Dict[pd.DataFrame] = dataset.catalog
         self._test_results = []
         self._test_data = {}
-        self._dense_repr = {}
+        self._dense_repr: [KeyedVectors, None] = None
 
         assert len(self._y_test) == len(self._y_preds)
+
+    def load_dense_repr(self, path_to_word_vectors: str):
+        try:
+            self._dense_repr = KeyedVectors.load(path_to_word_vectors)
+        except Exception as e:
+            print('WARNING: Dense representation not loaded \n Reason : {}'.format(e))
 
     def train_dense_repr(self, type_name: str, type_fn):
         """
