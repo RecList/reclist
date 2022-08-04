@@ -5,6 +5,64 @@ import collections
 import pandas as pd
 
 
+def hits_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int) -> (np.array, pd.DataFrame):
+    """
+    N = number test cases
+    M = number ground truth per test case
+    """
+    y_test_mask = y_test.values != -1           # N x M
+
+    y_pred_mask = y_pred.values[:, :k] != -1    # N x k
+
+    y_test = y_test.values[:, :, None]          # N x M x 1
+    y_pred = y_pred.values[:, None, :k]         # N x 1 x k
+
+    hits = (y_test == y_pred)                   # N x M x k
+    hits = hits * y_test_mask[:, :, None]       # N x M x k
+    hits = hits * y_pred_mask[:, None, :]       # N x M x k
+
+    return hits
+
+
+def ranks_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int) -> (np.array, pd.DataFrame):
+    """
+    N = number test cases
+    M = number ground truth per test case
+    """
+    hits = hits_at_k(y_pred, y_test, k)                   # N x M x k
+    ranks = hits * np.arange(1, k+1, 1)[None, None, :]    # N x M x k
+    ranks = ranks.max(axis=2)                              # N x M
+    return ranks
+
+
+def false_positives_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int) -> (np.array, pd.DataFrame):
+    hits = hits_at_k(y_pred, y_test, k)                 # N x M x k
+    return 1-hits
+
+
+def hit_rate_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int):
+    """
+    N = number test cases
+    M = number ground truth per test case
+    """
+    hits = hits_at_k(y_pred, y_test, k)      # N x M x k
+    hits = hits.max(axis=1)                  # N x k
+    return hits.max(axis=1).mean()           # 1
+
+
+def rr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int):
+    ranks = ranks_at_k(y_pred, y_test, k).astype(np.float64)             # N x M
+    reciprocal_ranks = np.reciprocal(ranks, out=ranks, where=ranks > 0)  # N x M
+    return reciprocal_ranks.max(axis=1)                                  # N
+
+
+def mrr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int) -> float:
+    return rr_at_k(y_pred, y_test, k=k).mean()
+
+
+
+####################### LIST-WISE CODE #####################################
+
 def statistics(x_train, y_train, x_test, y_test, y_pred):
     train_size = len(x_train)
     test_size = len(x_test)
@@ -54,60 +112,6 @@ def sample_misses_at_k(y_preds, y_test, x_test=None, k=3, size=3):
 def hit_rate_at_k_nep(y_preds, y_test, k=3):
     y_test = [[k] for k in y_test]
     return hit_rate_at_k_list(y_preds, y_test, k=k)
-
-
-def hits_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int) -> (np.array, pd.DataFrame):
-    """
-    N = number test cases
-    M = number ground truth per test case
-    """
-    y_test_mask = y_test.values != -1           # N x M
-
-    y_pred_mask = y_pred.values[:, :k] != -1    # N x k
-
-    y_test = y_test.values[:, :, None]          # N x M x 1
-    y_pred = y_pred.values[:, None, :k]         # N x 1 x k
-
-    hits = (y_test == y_pred)                   # N x M x k
-    hits = hits * y_test_mask[:, :, None]       # N x M x k
-    hits = hits * y_pred_mask[:, None, :]       # N x M x k
-
-    return hits
-
-
-def ranks_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int) -> (np.array, pd.DataFrame):
-    """
-    N = number test cases
-    M = number ground truth per test case
-    """
-    hits = hits_at_k(y_pred, y_test, k)                 # N x M x k
-    ranks = hits * np.arange(1,k+1,1)[None, None, :]    # N x M x k
-    ranks = ranks.max(axis=2)                           # N x M
-    return ranks
-
-
-def hit_rate_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int):
-    """
-    N = number test cases
-    M = number ground truth per test case
-    """
-    hits = hits_at_k(y_pred, y_test, k)      # N x M x k
-    hits = hits.max(axis=1)                  # N x k
-    return hits.max(axis=1).mean()           # 1
-
-
-def rr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int):
-    ranks = ranks_at_k(y_pred, y_test, k).astype(np.float64)             # N x M
-    reciprocal_ranks = np.reciprocal(ranks, out=ranks, where=ranks > 0)  # N x M
-    return reciprocal_ranks.max(axis=1)                                  # N
-
-
-def mrr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int) -> float:
-    return rr_at_k(y_pred, y_test, k=k).mean()
-
-
-
-####################### LIST-WISE CODE #####################################
 
 
 def hit_rate_at_k_list(y_preds, y_test, k=3) -> float:
