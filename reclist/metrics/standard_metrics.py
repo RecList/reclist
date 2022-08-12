@@ -35,7 +35,7 @@ def ranks_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int) -> (np.array,
     return ranks
 
 
-def false_positives_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int) -> (np.array, pd.DataFrame):
+def misses_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int) -> (np.array, pd.DataFrame):
     hits = hits_at_k(y_pred, y_test, k)                 # N x M x k
     return 1-hits
 
