@@ -311,21 +311,21 @@ All the code is released under an open MIT license. If you found *RecList* usefu
 
 .. code-block:: bash
 
-@inproceedings{10.1145/3487553.3524215,
-    author = {Chia, Patrick John and Tagliabue, Jacopo and Bianchi, Federico and He, Chloe and Ko, Brian},
-    title = {Beyond NDCG: Behavioral Testing of Recommender Systems with RecList},
-    year = {2022},
-    isbn = {9781450391306},
-    publisher = {Association for Computing Machinery},
-    address = {New York, NY, USA},
-    url = {https://doi.org/10.1145/3487553.3524215},
-    doi = {10.1145/3487553.3524215},
-    pages = {99–104},
-    numpages = {6},
-    keywords = {recommender systems, open source, behavioral testing},
-    location = {Virtual Event, Lyon, France},
-    series = {WWW '22 Companion}
-}
+    @inproceedings{10.1145/3487553.3524215,
+        author = {Chia, Patrick John and Tagliabue, Jacopo and Bianchi, Federico and He, Chloe and Ko, Brian},
+        title = {Beyond NDCG: Behavioral Testing of Recommender Systems with RecList},
+        year = {2022},
+        isbn = {9781450391306},
+        publisher = {Association for Computing Machinery},
+        address = {New York, NY, USA},
+        url = {https://doi.org/10.1145/3487553.3524215},
+        doi = {10.1145/3487553.3524215},
+        pages = {99–104},
+        numpages = {6},
+        keywords = {recommender systems, open source, behavioral testing},
+        location = {Virtual Event, Lyon, France},
+        series = {WWW '22 Companion}
+    }
 
 Credits
 -------
