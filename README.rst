@@ -307,15 +307,25 @@ Past and upcoming talks and presentations can be found at our new `website <http
 License and Citation
 --------------------
 
-All the code is released under an open MIT license. If you found *RecList* useful, please cite our pre-print: RecList is a WWW paper, so the citation below will be updated soon.
+All the code is released under an open MIT license. If you found *RecList* useful, please cite our WWW paper:
 
 .. code-block:: bash
 
- @inproceedings{Chia2021BeyondNB,
-   title={Beyond NDCG: behavioral testing of recommender systems with RecList},
-   author={Patrick John Chia and Jacopo Tagliabue and Federico Bianchi and Chloe He and Brian Ko},
-   year={2021}
- }
+@inproceedings{10.1145/3487553.3524215,
+    author = {Chia, Patrick John and Tagliabue, Jacopo and Bianchi, Federico and He, Chloe and Ko, Brian},
+    title = {Beyond NDCG: Behavioral Testing of Recommender Systems with RecList},
+    year = {2022},
+    isbn = {9781450391306},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/3487553.3524215},
+    doi = {10.1145/3487553.3524215},
+    pages = {99–104},
+    numpages = {6},
+    keywords = {recommender systems, open source, behavioral testing},
+    location = {Virtual Event, Lyon, France},
+    series = {WWW '22 Companion}
+}
 
 Credits
 -------
