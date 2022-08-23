@@ -47,7 +47,7 @@ While quantitative metrics over held-out data points are important, a lot more t
 to properly function in the wild and not erode our confidence in them: for example, a model may boast an accuracy improvement over the entire dataset, but actually be significantly worse than another on rare items or new users; or again, a model that correctly recommends HDMI cables as add-on for shoppers buying a TV, may also wrongly  recommend TVs to shoppers just buying a cable.
 
 *RecList* goal is to operationalize these important intuitions into a practical package for testing research and production models in a more nuanced way, without
-requiring unnecessary custom code and ad hoc procedures. To streamline comparisons among existing models, *RecList* ships with popular datasets and ready-made behavioral tests: read the `TDS blog post <https://towardsdatascience.com/ndcg-is-not-all-you-need-24eb6d2f1227>`__ as a gentle introduction to the main use cases, check the `paper <https://arxiv.org/abs/2111.09963>`__ for more details on the relevant literature.
+requiring unnecessary custom code and ad hoc procedures. To streamline comparisons among existing models, *RecList* ships with popular datasets and ready-made behavioral tests: read the `TDS blog post <https://towardsdatascience.com/ndcg-is-not-all-you-need-24eb6d2f1227>`__ as a gentle introduction to the main use cases, check the `paper <https://dl.acm.org/doi/abs/10.1145/3487553.3524215>`__ for more details on the relevant literature.
 
 If you are not familiar with the library, we suggest first taking our small tour to get acquainted with the main abstractions through ready-made models and public datasets.
 
@@ -55,9 +55,10 @@ Quick Links
 ~~~~~~~~~~~
 
 * Our `talk <https://www.youtube.com/watch?v=cAlJYxFYA04>`__ at Stitch Fix Algo Hour, for a general presentation.
-* Our `paper <https://arxiv.org/abs/2111.09963>`__, with in-depth analysis, detailed use cases and scholarly references.
+* Our `paper <https://dl.acm.org/doi/abs/10.1145/3487553.3524215>`__, with in-depth analysis, detailed use cases and scholarly references (`arxiv <https://arxiv.org/abs/2111.09963>`__).
 * A `colab notebook <https://colab.research.google.com/drive/1Wn5mm0csEkyWqmBBDxNBkfGR6CNfWeH-?usp=sharing>`__, showing how to train a cart recommender model from scratch and use the library to test it.
 * Our `blog post <https://towardsdatascience.com/ndcg-is-not-all-you-need-24eb6d2f1227>`__, with examples and practical tips.
+
 
 Supporters
 ~~~~~~~~
@@ -251,7 +252,7 @@ RecList helps report standard quantitative metrics over popular (or custom) data
 behavioral tests, as agnostic as possible to the underlying models and datasets, while leaving open the possibility of writing
 personalized tests when domain knowledge and custom logic are necessary.
 
-Tests descriptions are available in our (WIP) `docs <https://reclist.readthedocs.io>`__, but we share here some examples from our `paper <https://arxiv.org/abs/2111.09963>`__.
+Tests descriptions are available in our (WIP) `docs <https://reclist.readthedocs.io>`__, but we share here some examples from our `paper <https://dl.acm.org/doi/abs/10.1145/3487553.3524215>`__.
 
 First, RecList allows to compare the performance of models which may have similar aggregate KPIs (e.g. hit rate on the entire
 test set) in different slices. When plotting HR by product popularity, it is easy to spot that
