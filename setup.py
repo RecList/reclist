@@ -2,7 +2,7 @@
 
 """The setup script."""
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 with open("README.rst") as readme_file:
     readme = readme_file.read()
@@ -19,6 +19,12 @@ setup_requirements = [
 
 test_requirements = [
     "pytest>=3",
+]
+
+style_packages = [
+    "black==22.3.0",
+    # "flake8==5.0.4",
+    "isort==5.10.1",
 ]
 
 setup(
@@ -49,4 +55,7 @@ setup(
     url="https://github.com/jacopotagliabue/reclist",
     version="0.2.3",
     zip_safe=False,
+    extras_require={
+        "dev": style_packages + ["pre-commit==2.20.0"],
+    },
 )

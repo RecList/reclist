@@ -1,8 +1,10 @@
 import collections
-from reclist.abstractions import RecList, rec_test
-from typing import List
 import random
+from typing import List
+
 import pandas as pd
+
+from reclist.abstractions import RecList, rec_test
 
 
 class MovieLensRecList(RecList):
@@ -146,9 +148,10 @@ class SpotifySessionRecList(RecList):
         """
         Compute average consistency in model predictions when inputs are perturbed
         """
-        from reclist.metrics.perturbation import session_perturbation_test
         from collections import defaultdict
         from functools import partial
+
+        from reclist.metrics.perturbation import session_perturbation_test
 
         # Step 1: Generate a map from artist uri to track uri
         substitute_mapping = defaultdict(list)

@@ -2,21 +2,23 @@
 
 """Tests for `reclist` package."""
 
+import random
+
+import pandas as pd
+
 from reclist.datasets import *
-from reclist.metrics.standard_metrics import mrr_at_k, hit_rate_at_k
-from reclist.datasets import CoveoDataset, SpotifyDataset, MovieLensDataset
-from reclist.recommenders.prod2vec import (
-    CoveoP2VRecModel,
-    SpotifyP2VRecModel,
-    MovieLensP2VRecModel,
-)
+from reclist.datasets import CoveoDataset, MovieLensDataset, SpotifyDataset
+from reclist.metrics.standard_metrics import hit_rate_at_k, mrr_at_k
 from reclist.reclist import (
     CoveoCartRecList,
-    SpotifySessionRecList,
     MovieLensSimilarItemRecList,
+    SpotifySessionRecList,
 )
-import random
-import pandas as pd
+from reclist.recommenders.prod2vec import (
+    CoveoP2VRecModel,
+    MovieLensP2VRecModel,
+    SpotifyP2VRecModel,
+)
 
 
 def test_basic_dataset_downloading():

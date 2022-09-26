@@ -1,8 +1,10 @@
 import json
+import os
 import tempfile
 import zipfile
-import os
+
 import pandas as pd
+
 from reclist.abstractions import RecDataset
 from reclist.utils.config import *
 

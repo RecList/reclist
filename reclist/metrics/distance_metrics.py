@@ -1,13 +1,15 @@
-from scipy.spatial.distance import cosine
-import matplotlib.pyplot as plt
-from reclist.current import current
-import os
 import json
-import networkx as nx
-from networkx.algorithms.shortest_paths.generic import shortest_path
+import os
 from statistics import mean
-from reclist.metrics.standard_metrics import sample_misses_at_k, sample_hits_at_k
+
+import matplotlib.pyplot as plt
+import networkx as nx
 import numpy as np
+from networkx.algorithms.shortest_paths.generic import shortest_path
+from scipy.spatial.distance import cosine
+
+from reclist.current import current
+from reclist.metrics.standard_metrics import sample_hits_at_k, sample_misses_at_k
 
 
 def error_by_cosine_distance(model, y_test, y_preds, k=3, bins=25, debug=False):

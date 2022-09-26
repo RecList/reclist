@@ -1,6 +1,8 @@
-import numpy as np
-import matplotlib.pyplot as plt
 import os
+
+import matplotlib.pyplot as plt
+import numpy as np
+
 from reclist.current import current
 
 

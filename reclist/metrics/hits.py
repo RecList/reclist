@@ -1,15 +1,16 @@
-from collections import Counter, defaultdict
-import numpy as np
 import math
+import os
+from collections import Counter, defaultdict
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+from reclist.current import current
 from reclist.metrics.standard_metrics import (
     hit_rate_at_k,
     sample_hits_at_k,
     sample_misses_at_k,
 )
-from collections import defaultdict
-import os
-import matplotlib.pyplot as plt
-from reclist.current import current
 
 
 def hits_distribution_by_rating(y_test, y_preds, debug=False):

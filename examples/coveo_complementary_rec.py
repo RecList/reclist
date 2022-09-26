@@ -12,8 +12,8 @@
     your model prediction using the RecModel, and pass it to the CartList.
 """
 from reclist.datasets import CoveoDataset
-from reclist.recommenders.prod2vec import CoveoP2VRecModel
 from reclist.reclist import CoveoCartRecList
+from reclist.recommenders.prod2vec import CoveoP2VRecModel
 
 if __name__ == "__main__":
 
