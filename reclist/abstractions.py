@@ -1,15 +1,17 @@
-from datetime import datetime
+import json
 import os
+import time
 from abc import ABC, abstractmethod
+from datetime import datetime
 from functools import wraps
 from pathlib import Path
-import time
-import json
-from reclist.utils.train_w2v import train_embeddings
-from reclist.current import current
-import pandas as pd
 from typing import Dict
+
+import pandas as pd
 from gensim.models import KeyedVectors
+
+from reclist.current import current
+from reclist.utils.train_w2v import train_embeddings
 
 
 class RecDataset(ABC):

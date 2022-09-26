@@ -1,7 +1,8 @@
-import random
-import itertools
-import numpy as np
 import collections
+import itertools
+import random
+
+import numpy as np
 import pandas as pd
 
 

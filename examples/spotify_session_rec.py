@@ -12,8 +12,8 @@
     your model prediction using the RecModel, and pass it to the RecList.
 """
 from reclist.datasets import SpotifyDataset
-from reclist.recommenders.prod2vec import SpotifyP2VRecModel
 from reclist.reclist import SpotifySessionRecList
+from reclist.recommenders.prod2vec import SpotifyP2VRecModel
 
 if __name__ == "__main__":
 

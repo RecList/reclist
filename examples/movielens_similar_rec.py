@@ -13,9 +13,8 @@
     your model prediction using the RecModel, and pass it to the RecList.
 """
 from reclist.datasets import MovieLensDataset
-from reclist.recommenders.prod2vec import MovieLensP2VRecModel
 from reclist.reclist import MovieLensSimilarItemRecList
-
+from reclist.recommenders.prod2vec import MovieLensP2VRecModel
 
 if __name__ == "__main__":
 

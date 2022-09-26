@@ -1,6 +1,7 @@
-from matrix_factorization import KernelMF
-from reclist.abstractions import RecModel
 import pandas as pd
+from matrix_factorization import KernelMF
+
+from reclist.abstractions import RecModel
 
 
 class MovieLensKernelMFModel(RecModel):

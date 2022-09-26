@@ -1,8 +1,9 @@
-from appdirs import *
-from pathlib import Path
-import requests
-from tqdm import tqdm
 from enum import Enum
+from pathlib import Path
+
+import requests
+from appdirs import *
+from tqdm import tqdm
 
 COVEO_INTERACTION_DATASET_S3_URL = "https://reclist-datasets-6d3c836d-6djh887d.s3.us-west-2.amazonaws.com/coveo_sigir.zip"
 SPOTIFY_PLAYLIST_DATASET_S3_URL = "https://reclist-datasets-6d3c836d-6djh887d.s3.us-west-2.amazonaws.com/small_spotify_playlist.zip"
