@@ -4,10 +4,11 @@ import requests
 from tqdm import tqdm
 from enum import Enum
 
-COVEO_INTERACTION_DATASET_S3_URL = 'https://reclist-datasets-6d3c836d-6djh887d.s3.us-west-2.amazonaws.com/coveo_sigir.zip'
-SPOTIFY_PLAYLIST_DATASET_S3_URL = 'https://reclist-datasets-6d3c836d-6djh887d.s3.us-west-2.amazonaws.com/small_spotify_playlist.zip'
+COVEO_INTERACTION_DATASET_S3_URL = "https://reclist-datasets-6d3c836d-6djh887d.s3.us-west-2.amazonaws.com/coveo_sigir.zip"
+SPOTIFY_PLAYLIST_DATASET_S3_URL = "https://reclist-datasets-6d3c836d-6djh887d.s3.us-west-2.amazonaws.com/small_spotify_playlist.zip"
 MOVIELENS_DATASET_S3_URL = "https://reclist-datasets-6d3c836d-6djh887d.s3.us-west-2.amazonaws.com/movielens_25m.zip"
-MOVIELENS_UI_DATASET_S3_URL= "https://reclist-datasets-6d3c836d-6djh887d.s3.us-west-2.amazonaws.com/movielens_25m_useritem.zip"
+MOVIELENS_UI_DATASET_S3_URL = "https://reclist-datasets-6d3c836d-6djh887d.s3.us-west-2.amazonaws.com/movielens_25m_useritem.zip"
+
 
 def download_with_progress(url, destination):
     """
@@ -21,9 +22,13 @@ def download_with_progress(url, destination):
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
         raise SystemExit(e)
-    with tqdm.wrapattr(open(destination, "wb"), "write",
-                       miniters=1, desc=url.split('/')[-1],
-                       total=int(response.headers.get('content-length', 0))) as fout:
+    with tqdm.wrapattr(
+        open(destination, "wb"),
+        "write",
+        miniters=1,
+        desc=url.split("/")[-1],
+        total=int(response.headers.get("content-length", 0)),
+    ) as fout:
         for chunk in response.iter_content(chunk_size=4096):
             fout.write(chunk)
 
@@ -42,7 +47,7 @@ def get_cache_directory():
 
 
 class Dataset(Enum):
-    COVEO = 'coveo'
-    COVEO_INTERNAL = 'coveo-internal'
-    MOVIELENS = 'movielens'
-    SPOTIFY = 'spotify'
+    COVEO = "coveo"
+    COVEO_INTERNAL = "coveo-internal"
+    MOVIELENS = "movielens"
+    SPOTIFY = "spotify"
