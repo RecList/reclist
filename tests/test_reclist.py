@@ -5,10 +5,19 @@
 from reclist.datasets import *
 from reclist.metrics.standard_metrics import mrr_at_k, hit_rate_at_k
 from reclist.datasets import CoveoDataset, SpotifyDataset, MovieLensDataset
-from reclist.recommenders.prod2vec import CoveoP2VRecModel, SpotifyP2VRecModel, MovieLensP2VRecModel
-from reclist.reclist import CoveoCartRecList, SpotifySessionRecList, MovieLensSimilarItemRecList
+from reclist.recommenders.prod2vec import (
+    CoveoP2VRecModel,
+    SpotifyP2VRecModel,
+    MovieLensP2VRecModel,
+)
+from reclist.reclist import (
+    CoveoCartRecList,
+    SpotifySessionRecList,
+    MovieLensSimilarItemRecList,
+)
 import random
 import pandas as pd
+
 
 def test_basic_dataset_downloading():
     CoveoDataset()
@@ -36,11 +45,21 @@ def test_basic_dataset_downloading():
 #     # invoke rec_list to run tests
 #     rec_list(verbose=True)
 
+
 def test_hits():
 
-    df_b = pd.DataFrame([[9, 0, 32, 12], [1, 0, 7, 12], [0, 1, 5, 12], [12, 32, 66, 99]])
+    df_b = pd.DataFrame(
+        [[9, 0, 32, 12], [1, 0, 7, 12], [0, 1, 5, 12], [12, 32, 66, 99]]
+    )
     df_a = pd.DataFrame([[0], [1], [5], [99]])
-    df_c = pd.DataFrame([[10000, 10000, 10000], [10000, 10000, 10000], [10000, 10000, 10000], [10000, 10000, 10000]])
+    df_c = pd.DataFrame(
+        [
+            [10000, 10000, 10000],
+            [10000, 10000, 10000],
+            [10000, 10000, 10000],
+            [10000, 10000, 10000],
+        ]
+    )
 
     assert hit_rate_at_k(df_b, df_a, 5) == 1
     assert hit_rate_at_k(df_b, df_a, 100) == 1  # out of bounds

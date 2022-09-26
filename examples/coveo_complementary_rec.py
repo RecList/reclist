@@ -27,10 +27,6 @@ if __name__ == "__main__":
 
     # instantiate rec_list object, prepared with standard quantitative tests
     # and sensible behavioral tests (check the paper for details!)
-    rec_list = CoveoCartRecList(
-        model=model,
-        dataset=coveo_dataset
-    )
+    rec_list = CoveoCartRecList(model=model, dataset=coveo_dataset)
     # invoke rec_list to run tests
     rec_list(verbose=True)
-

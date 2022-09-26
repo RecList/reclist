@@ -8,6 +8,7 @@ class CoveoP2VRecModel(RecModel):
     Implement of the prod2vec model through the standard RecModel interface.
 
     """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -20,7 +21,7 @@ class CoveoP2VRecModel(RecModel):
         :param products: list of json
         :return:
         """
-        x_train_skus = [[e['product_sku'] for e in s] for s in products]
+        x_train_skus = [[e["product_sku"] for e in s] for s in products]
         self._model = train_embeddings(x_train_skus, iterations=iterations)
 
     def predict(self, prediction_input: list, *args, **kwargs):
@@ -37,10 +38,14 @@ class CoveoP2VRecModel(RecModel):
         for _x in prediction_input:
             # we assume here that every X is a list of one-element, the product already in the cart
             # i.e. our prediction_input list is [[sku_1], [sku_3], ...]
-            key_item = _x[0]['product_sku']
-            nn_products = self._model.most_similar(key_item, topn=10) if key_item in self._model else None
+            key_item = _x[0]["product_sku"]
+            nn_products = (
+                self._model.most_similar(key_item, topn=10)
+                if key_item in self._model
+                else None
+            )
             if nn_products:
-                predictions.append([{'product_sku': _[0]} for _ in nn_products])
+                predictions.append([{"product_sku": _[0]} for _ in nn_products])
             else:
                 predictions.append([])
 
@@ -60,13 +65,16 @@ class SpotifyP2VRecModel(RecModel):
     Since init is ok, we just need to overwrite the prediction methods to get predictions
     out of it.
     """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     model_name = "prod2vec"
 
     def train(self, playlists, iterations=15):
-        x_train_uris = [[track['track_uri'] for track in playlist] for playlist in playlists]
+        x_train_uris = [
+            [track["track_uri"] for track in playlist] for playlist in playlists
+        ]
         self._model = train_embeddings(x_train_uris, iterations=iterations)
 
     def predict(self, prediction_input: list, *args, **kwargs):
@@ -79,11 +87,15 @@ class SpotifyP2VRecModel(RecModel):
         """
         predictions = []
         for _x in prediction_input:
-            embeddings = [self._model[track['track_uri']] for track in _x if track['track_uri'] in self._model]
+            embeddings = [
+                self._model[track["track_uri"]]
+                for track in _x
+                if track["track_uri"] in self._model
+            ]
             if embeddings:
                 avg_playlist_vector = np.average(embeddings, axis=0)
                 nn_tracks = self._model.similar_by_vector(avg_playlist_vector, topn=100)
-                predictions.append([{'track_uri':_[0]} for _ in nn_tracks])
+                predictions.append([{"track_uri": _[0]} for _ in nn_tracks])
             else:
                 predictions.append([])
 
@@ -95,10 +107,12 @@ class SpotifyP2VRecModel(RecModel):
         except Exception as e:
             return []
 
+
 class MovieLensP2VRecModel(RecModel):
     """
     Prod2Vec implementation for MovieLens 25M dataset
     """
+
     model_name = "prod2vec"
 
     def __init__(self, **kwargs):
