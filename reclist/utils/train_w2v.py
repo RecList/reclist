@@ -8,7 +8,8 @@ def train_embeddings(
     window: int = 5,
     iterations: int = 15,
     ns_exponent: float = 0.75,
-    is_debug: bool = True):
+    is_debug: bool = True,
+):
     """
     Train CBOW to get product embeddings with sensible defaults (https://arxiv.org/abs/2007.14906).
 
@@ -22,12 +23,14 @@ def train_embeddings(
 
     :return: trained product embedding model
     """
-    model = gensim.models.Word2Vec(sentences=sessions,
-                                   min_count=min_c,
-                                   vector_size=size,
-                                   window=window,
-                                   epochs=iterations,
-                                   ns_exponent=ns_exponent)
+    model = gensim.models.Word2Vec(
+        sentences=sessions,
+        min_count=min_c,
+        vector_size=size,
+        window=window,
+        epochs=iterations,
+        ns_exponent=ns_exponent,
+    )
 
     if is_debug:
         print("# items in the space: {}".format(len(model.wv.index_to_key)))

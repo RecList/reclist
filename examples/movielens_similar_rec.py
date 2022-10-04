@@ -13,9 +13,8 @@
     your model prediction using the RecModel, and pass it to the RecList.
 """
 from reclist.datasets import MovieLensDataset
-from reclist.recommenders.prod2vec import MovieLensP2VRecModel
 from reclist.reclist import MovieLensSimilarItemRecList
-
+from reclist.recommenders.prod2vec import MovieLensP2VRecModel
 
 if __name__ == "__main__":
 
@@ -29,10 +28,7 @@ if __name__ == "__main__":
 
     # instantiate rec_list object, prepared with standard quantitative tests
     # and sensible behavioral tests (check the paper for details!)
-    rec_list = MovieLensSimilarItemRecList(
-        model=model,
-        dataset=movielens_dataset
-    )
+    rec_list = MovieLensSimilarItemRecList(model=model, dataset=movielens_dataset)
 
     # invoke rec_list to run tests
     rec_list(verbose=True)

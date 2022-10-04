@@ -1,21 +1,24 @@
-
-from datetime import datetime
+import json
 import os
+import time
 from abc import ABC, abstractmethod
+from datetime import datetime
 from functools import wraps
 from pathlib import Path
-import time
-import json
-from reclist.utils.train_w2v import train_embeddings
-from reclist.current import current
-import pandas as pd
 from typing import Dict
+
+import pandas as pd
 from gensim.models import KeyedVectors
+
+from reclist.current import current
+from reclist.utils.train_w2v import train_embeddings
+
 
 class RecDataset(ABC):
     """
     Implements an abstract class for the dataset
     """
+
     def __init__(self, force_download=False, **kwargs):
         """
         :param force_download: allows to force the download of the dataset in case it is needed.
@@ -91,6 +94,7 @@ def rec_test(test_type: str):
     """
     Rec test decorator
     """
+
     def decorator(f):
         @wraps(f)
         def w(*args, **kwargs):
@@ -115,9 +119,11 @@ def rec_test(test_type: str):
 
 
 class RecList(ABC):
-    META_DATA_FOLDER = '.reclist'
+    META_DATA_FOLDER = ".reclist"
 
-    def __init__(self, model: RecModel, dataset: RecDataset, y_preds: pd.DataFrame = None):
+    def __init__(
+        self, model: RecModel, dataset: RecDataset, y_preds: pd.DataFrame = None
+    ):
         """
         :param model:
         :param dataset:
@@ -130,7 +136,11 @@ class RecList(ABC):
         self._y_train: pd.DataFrame = dataset.y_train
         self._x_test: pd.DataFrame = dataset.x_test
         self._y_test: pd.DataFrame = dataset.y_test
-        self._y_preds: pd.DataFrame = model.predict(dataset.x_test) if isinstance(y_preds, type(None)) else y_preds
+        self._y_preds: pd.DataFrame = (
+            model.predict(dataset.x_test)
+            if isinstance(y_preds, type(None))
+            else y_preds
+        )
         self.rec_model = model
         self.product_data: Dict[pd.DataFrame] = dataset.catalog
         self._test_results = []
@@ -143,17 +153,21 @@ class RecList(ABC):
         try:
             self._dense_repr = KeyedVectors.load(path_to_word_vectors)
         except Exception as e:
-            print('WARNING: Dense representation not loaded \n Reason : {}'.format(e))
+            print("WARNING: Dense representation not loaded \n Reason : {}".format(e))
 
     def train_dense_repr(self, type_name: str, type_fn):
         """
         Train a dense representation over a type of meta-data & store into object
         """
         # type_fn: given a SKU returns some type i.e. brand
-        x_train_transformed = [[type_fn(e) for e in session if type_fn(e)] for session in self._x_train]
+        x_train_transformed = [
+            [type_fn(e) for e in session if type_fn(e)] for session in self._x_train
+        ]
         wv = train_embeddings(x_train_transformed)
         # store a dict
-        self._dense_repr[type_name] = {word: list(wv.get_vector(word)) for word in wv.key_to_index}
+        self._dense_repr[type_name] = {
+            word: list(wv.get_vector(word)) for word in wv.key_to_index
+        }
 
     def get_tests(self):
         """
@@ -162,10 +176,10 @@ class RecList(ABC):
 
         nodes = {}
         for _ in self.__dir__():
-            if not hasattr(self,_):
+            if not hasattr(self, _):
                 continue
             func = getattr(self, _)
-            if hasattr(func, 'is_test'):
+            if hasattr(func, "is_test"):
                 nodes[func.name] = func
 
         return nodes
@@ -173,24 +187,34 @@ class RecList(ABC):
     def __call__(self, verbose=True, *args, **kwargs):
         run_epoch_time_ms = round(time.time() * 1000)
         # create datastore
-        current._report_path = os.path.join(self.META_DATA_FOLDER,
-                                        self.name,
-                                        self.rec_model.__class__.__name__,
-                                        str(run_epoch_time_ms))
+        current._report_path = os.path.join(
+            self.META_DATA_FOLDER,
+            self.name,
+            self.rec_model.__class__.__name__,
+            str(run_epoch_time_ms),
+        )
 
-        Path(os.path.join(current.report_path, 'artifacts')).mkdir(parents=True, exist_ok=True)
-        Path(os.path.join(current.report_path, 'results')).mkdir(parents=True, exist_ok=True)
-        Path(os.path.join(current.report_path, 'plots')).mkdir(parents=True, exist_ok=True)
+        Path(os.path.join(current.report_path, "artifacts")).mkdir(
+            parents=True, exist_ok=True
+        )
+        Path(os.path.join(current.report_path, "results")).mkdir(
+            parents=True, exist_ok=True
+        )
+        Path(os.path.join(current.report_path, "plots")).mkdir(
+            parents=True, exist_ok=True
+        )
 
         # iterate through tests
         for test_func_name, test in self._rec_tests.items():
             test_result = test(*args, **kwargs)
             # we could store the results in the test function itself
             # test.__func__.test_result = test_result
-            self._test_results.append({
-                'test_name': test.test_type,
-                'description': test.test_desc,
-                'test_result': test_result}
+            self._test_results.append(
+                {
+                    "test_name": test.test_type,
+                    "description": test.test_desc,
+                    "test_result": test_result,
+                }
             )
             if verbose:
                 print("============= TEST RESULTS ===============")
@@ -208,7 +232,7 @@ class RecList(ABC):
             self.META_DATA_FOLDER,
             self.name,
             self.rec_model.__class__.__name__,
-            str(epoch_time_ms)
+            str(epoch_time_ms),
         )
 
         # now, dump results
@@ -218,28 +242,29 @@ class RecList(ABC):
         return report_path
 
     def store_artifacts(self, report_path: str):
-        target_path = os.path.join(current.report_path, 'artifacts')
+        target_path = os.path.join(current.report_path, "artifacts")
         # store predictions
 
-        self._x_test.to_parquet(os.path.join(target_path,'x_test.pk'))
-        self._y_test.to_parquet(os.path.join(target_path,'y_test.pk'))
-        self._y_preds.to_parquet(os.path.join(target_path,'y_preds.pk'))
+        self._x_test.to_parquet(os.path.join(target_path, "x_test.pk"))
+        self._y_test.to_parquet(os.path.join(target_path, "y_test.pk"))
+        self._y_preds.to_parquet(os.path.join(target_path, "y_preds.pk"))
 
-
-    def dump_results_to_json(self, test_results: list, report_path: str, epoch_time_ms: int):
-        target_path = os.path.join(report_path, 'results')
+    def dump_results_to_json(
+        self, test_results: list, report_path: str, epoch_time_ms: int
+    ):
+        target_path = os.path.join(report_path, "results")
         # make sure the folder is there, with all intermediate parents
         Path(target_path).mkdir(parents=True, exist_ok=True)
         report = {
-            'metadata': {
-                'run_time': epoch_time_ms,
-                'model_name': self.rec_model.__class__.__name__,
-                'reclist': self.name,
-                'tests': list(self._rec_tests.keys())
+            "metadata": {
+                "run_time": epoch_time_ms,
+                "model_name": self.rec_model.__class__.__name__,
+                "reclist": self.name,
+                "tests": list(self._rec_tests.keys()),
             },
-            'data': test_results
+            "data": test_results,
         }
-        with open(os.path.join(target_path, 'report.json'), 'w') as f:
+        with open(os.path.join(target_path, "report.json"), "w") as f:
             json.dump(report, f, indent=2)
 
     @property

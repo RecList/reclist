@@ -1,4 +1,4 @@
-class Current():
+class Current:
     def __init__(self):
         self._report_path = None
 
