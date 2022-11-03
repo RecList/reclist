@@ -1,4 +1,4 @@
-gensim==4.0.1
+gensim==4.2.0
 appdirs==1.4.4
 wget==3.2
 requests>=2.22.0
