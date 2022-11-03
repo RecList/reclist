@@ -18,8 +18,8 @@ setup_requirements = ['pytest-runner', ]
 test_requirements = ['pytest>=3', ]
 
 setup(
-    author="Federico Bianchi",
-    author_email='f.bianchi@unibocconi.it',
+    author="RecList",
+    author_email='',
     python_requires='>=3.6',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
