@@ -61,7 +61,7 @@ Quick Links
 
 
 Supporters
-~~~~~~~~
+~~~~~~~~~~
 RecList is a community project made possible by the generous support of these awesome folks. Make sure to check them out!
 
 Comet
