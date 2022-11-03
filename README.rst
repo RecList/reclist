@@ -79,7 +79,7 @@ Neptune
    :width: 175
 
 Gantry
-=======
+======
 
 .. image:: https://github.com/jacopotagliabue/reclist/raw/main/images/gantry.png
    :target: https://gantry.io/
@@ -301,7 +301,7 @@ The original authors are:
 If you have questions or feedback, please reach out to: :code:`jacopo dot tagliabue at tooso dot ai`.
 
 Talks and Presentations
---------------------
+-----------------------
 
 Past and upcoming talks and presentations can be found at our new `website <https://reclist.io/>`__.
 
