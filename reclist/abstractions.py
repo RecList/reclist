@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List, Union
 
 import pandas as pd
 from gensim.models import KeyedVectors
@@ -250,7 +250,10 @@ class RecList(ABC):
         self._y_preds.to_parquet(os.path.join(target_path, "y_preds.pk"))
 
     def dump_results_to_json(
-        self, test_results: list, report_path: str, epoch_time_ms: int
+        self,
+        test_results: Union[List, pd.DataFrame],
+        report_path: str,
+        epoch_time_ms: int,
     ):
         target_path = os.path.join(report_path, "results")
         # make sure the folder is there, with all intermediate parents
@@ -265,7 +268,10 @@ class RecList(ABC):
             "data": test_results,
         }
         with open(os.path.join(target_path, "report.json"), "w") as f:
-            json.dump(report, f, indent=2)
+            if isinstance(test_results, pd.DataFrame):
+                test_results.to_json(f, orient="records", lines=True)
+            else:
+                json.dump(report, f, indent=2)
 
     @property
     def test_results(self):
