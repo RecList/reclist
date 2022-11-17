@@ -251,13 +251,20 @@ class RecList(ABC):
 
     def dump_results_to_json(
         self,
-        test_results: Union[List, pd.DataFrame],
+        test_results: List,
         report_path: str,
         epoch_time_ms: int,
     ):
         target_path = os.path.join(report_path, "results")
         # make sure the folder is there, with all intermediate parents
         Path(target_path).mkdir(parents=True, exist_ok=True)
+
+        for i in range(len(test_results)):
+            for key in test_results[i].keys():
+                if isinstance(test_results[i][key], pd.DataFrame) or isinstance(
+                    test_results[i][key], pd.Series
+                ):
+                    test_results[i][key] = test_results[i][key].to_dict()
         report = {
             "metadata": {
                 "run_time": epoch_time_ms,
@@ -268,10 +275,7 @@ class RecList(ABC):
             "data": test_results,
         }
         with open(os.path.join(target_path, "report.json"), "w") as f:
-            if isinstance(test_results, pd.DataFrame):
-                test_results.to_json(f, orient="records", lines=True)
-            else:
-                json.dump(report, f, indent=2)
+            json.dump(report, f, indent=2)
 
     @property
     def test_results(self):
