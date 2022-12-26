@@ -1,7 +1,7 @@
 import collections
 import itertools
 import random
-
+from typing import List, Tuple
 import numpy as np
 import pandas as pd
 
@@ -71,10 +71,10 @@ def mrr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int) -> float:
 
 
 def statistics(x_train, y_train, x_test, y_test, y_pred):
-    train_size = len(x_train)
-    test_size = len(x_test)
+    train_size: int = len(x_train)
+    test_size: int = len(x_test)
     # num non-zero preds
-    num_preds = len([p for p in y_pred if p])
+    num_preds: int = len([p for p in y_pred if p])
     return {
         "training_set__size": train_size,
         "test_set_size": test_size,
@@ -117,11 +117,11 @@ def sample_misses_at_k(y_preds, y_test, x_test=None, k=3, size=3):
 
 
 def hit_rate_at_k_nep(y_preds, y_test, k=3):
-    y_test = [[k] for k in y_test]
+    y_test = [[k] for k in y_test]# --> already done in the main
     return hit_rate_at_k_list(y_preds, y_test, k=k)
 
 
-def hit_rate_at_k_list(y_preds, y_test, k=3) -> float:
+def hit_rate_at_k_list(y_preds:List[List[int]], y_test:List[List[int]], k=3) -> float:
     hits = 0
     for _p, _y in zip(y_preds, y_test):
         if len(set(_p[:k]).intersection(set(_y))) > 0:
@@ -202,3 +202,44 @@ def recall_at_k(y_preds, y_test, k=3):
         for _p, _y in zip(y_preds, y_test)
     ]
     return np.average(recall_ls)
+
+
+if __name__ == "__main__":
+    # random data:
+    x_train = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    y_train = [[1], [2], [3]]
+    x_test = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    # y_test = [[1, 3, 5], [2, 5], [3, 4]]
+    y_test = [1, 2, 3]
+    y_pred = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    # product data
+    data = pd.DataFrame()
+    data['product_data'] = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9}
+    # compute statistics
+    stats = statistics(x_train, y_train, x_test, y_test, y_pred)
+    # sample hits
+    hits = sample_hits_at_k(y_pred, y_test, x_test, k=3, size=3)
+    # sample misses
+    misses = sample_misses_at_k(y_pred, y_test, x_test, k=3, size=3)
+    # compute hit rate
+    hit_rate = hit_rate_at_k_nep(y_pred, y_test, k=3)
+    # compute mrr
+    mrr = mrr_at_k_nep_list(y_pred, y_test, k=3)
+    # compute coverage
+    coverage = coverage_at_k(y_pred, data["product_data"], k=3)
+    # compute popularity bias
+    pop_bias = popularity_bias_at_k(y_pred, x_train, k=3)
+    # compute precision
+    precision = precision_at_k(y_pred, y_test, k=3)
+    # compute recall
+    recall = recall_at_k(y_pred, y_test, k=3)
+    # print results
+    print("STATS", stats)
+    print("HITS", hits)
+    print("MISSES", misses)
+    print("HIT_RATE", hit_rate)
+    print("MRR", mrr)
+    print("COVERAGE", coverage)
+    print("POP_BIAS", pop_bias)
+    print("PRECISION", precision)
+    print("RECALL", recall)

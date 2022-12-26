@@ -25,11 +25,11 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    MOVIES_DATA_PATH = args.movies_data_path
-    RATINGS_DATA_PATH = args.ratings_data_path
-    OUTPUT_FOLDER_PATH = args.output_folder_path
-    RANDOM_SEED = args.random_seed
-    DATA_FRAC = args.train_frac
+    MOVIES_DATA_PATH: str = args.movies_data_path
+    RATINGS_DATA_PATH: str = args.ratings_data_path
+    OUTPUT_FOLDER_PATH: str = args.output_folder_path
+    RANDOM_SEED: int = args.random_seed
+    DATA_FRAC: float = args.train_frac
 
     if not os.path.exists(OUTPUT_FOLDER_PATH):
         raise FileNotFoundError

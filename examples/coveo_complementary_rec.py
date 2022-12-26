@@ -13,16 +13,17 @@
 """
 from reclist.datasets import CoveoDataset
 from reclist.reclist import CoveoCartRecList
+from reclist.abstractions import RecModel, RecDataset
 from reclist.recommenders.prod2vec import CoveoP2VRecModel
 
 if __name__ == "__main__":
 
     # get the coveo data challenge dataset as a RecDataset object
-    coveo_dataset = CoveoDataset()
+    coveo_dataset:RecDataset = CoveoDataset()
 
     # re-use a skip-gram model from reclist to train a latent product space, to be used
     # (through knn) to build a recommender
-    model = CoveoP2VRecModel()
+    model:RecModel = CoveoP2VRecModel()
     model.train(coveo_dataset.x_train)
 
     # instantiate rec_list object, prepared with standard quantitative tests

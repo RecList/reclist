@@ -1,7 +1,7 @@
 import math
 import os
 from collections import Counter, defaultdict
-
+import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -13,7 +13,7 @@ from reclist.metrics.standard_metrics import (
 )
 
 
-def hits_distribution_by_rating(y_test, y_preds, debug=False):
+def hits_distribution_by_rating(y_test, y_preds, debug:bool=False):
     """
     Calculates the distribution of hit-rate across movie ratings in testing data
     """
