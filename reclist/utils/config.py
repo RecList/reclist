@@ -2,16 +2,17 @@ from enum import Enum
 from pathlib import Path
 
 import requests
+from requests.models import Response
 from appdirs import *
 from tqdm import tqdm
 
-COVEO_INTERACTION_DATASET_S3_URL = "https://reclist-datasets-6d3c836d-6djh887d.s3.us-west-2.amazonaws.com/coveo_sigir.zip"
-SPOTIFY_PLAYLIST_DATASET_S3_URL = "https://reclist-datasets-6d3c836d-6djh887d.s3.us-west-2.amazonaws.com/small_spotify_playlist.zip"
-MOVIELENS_DATASET_S3_URL = "https://reclist-datasets-6d3c836d-6djh887d.s3.us-west-2.amazonaws.com/movielens_25m.zip"
-MOVIELENS_UI_DATASET_S3_URL = "https://reclist-datasets-6d3c836d-6djh887d.s3.us-west-2.amazonaws.com/movielens_25m_useritem.zip"
+COVEO_INTERACTION_DATASET_S3_URL:str = "https://reclist-datasets-6d3c836d-6djh887d.s3.us-west-2.amazonaws.com/coveo_sigir.zip"
+SPOTIFY_PLAYLIST_DATASET_S3_URL:str = "https://reclist-datasets-6d3c836d-6djh887d.s3.us-west-2.amazonaws.com/small_spotify_playlist.zip"
+MOVIELENS_DATASET_S3_URL:str = "https://reclist-datasets-6d3c836d-6djh887d.s3.us-west-2.amazonaws.com/movielens_25m.zip"
+MOVIELENS_UI_DATASET_S3_URL:str = "https://reclist-datasets-6d3c836d-6djh887d.s3.us-west-2.amazonaws.com/movielens_25m_useritem.zip"
 
 
-def download_with_progress(url, destination):
+def download_with_progress(url:str, destination:str):
     """
     Downloads a file with a progress bar
 
@@ -19,7 +20,7 @@ def download_with_progress(url, destination):
     :destination: file path for saving data
     """
     try:
-        response = requests.get(url, stream=True)
+        response:Response = requests.get(url, stream=True)
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
         raise SystemExit(e)
@@ -38,9 +39,9 @@ def get_cache_directory():
     """
     Returns the cache directory on the system
     """
-    appname = "reclist"
-    appauthor = "reclist"
-    cache_dir = user_cache_dir(appname, appauthor)
+    appname:str = "reclist"
+    appauthor:str = "reclist"
+    cache_dir:str = user_cache_dir(appname, appauthor)
 
     Path(cache_dir).mkdir(parents=True, exist_ok=True)
 
@@ -48,7 +49,7 @@ def get_cache_directory():
 
 
 class Dataset(Enum):
-    COVEO = "coveo"
-    COVEO_INTERNAL = "coveo-internal"
-    MOVIELENS = "movielens"
-    SPOTIFY = "spotify"
+    COVEO:str = "coveo"
+    COVEO_INTERNAL:str = "coveo-internal"
+    MOVIELENS:str = "movielens"
+    SPOTIFY:str = "spotify"
