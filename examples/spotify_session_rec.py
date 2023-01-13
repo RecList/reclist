@@ -14,19 +14,20 @@
 from reclist.datasets import SpotifyDataset
 from reclist.reclist import SpotifySessionRecList
 from reclist.recommenders.prod2vec import SpotifyP2VRecModel
+from reclist.abstractions import RecModel, RecDataset, RecList
 
 if __name__ == "__main__":
 
     # get the Spotify million playlist dataset as a RecDataset object
-    spotify_dataset = SpotifyDataset()
+    spotify_dataset: RecDataset = SpotifyDataset()
 
     # re-use a skip-gram model from reclist to train a latent product space, to be used
     # (through knn) to build a recommender
-    model = SpotifyP2VRecModel()
+    model: RecModel = SpotifyP2VRecModel()
     model.train(spotify_dataset.x_train)
 
     # instantiate rec_list object, prepared with standard quantitative tests
     # and sensible behavioral tests (check the paper for details!)
-    rec_list = SpotifySessionRecList(model=model, dataset=spotify_dataset)
+    rec_list: RecList = SpotifySessionRecList(model=model, dataset=spotify_dataset)
     # invoke rec_list to run tests
     rec_list(verbose=True)

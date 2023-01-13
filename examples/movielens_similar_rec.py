@@ -15,20 +15,21 @@
 from reclist.datasets import MovieLensDataset
 from reclist.reclist import MovieLensSimilarItemRecList
 from reclist.recommenders.prod2vec import MovieLensP2VRecModel
+from reclist.abstractions import RecModel, RecDataset, RecList
 
 if __name__ == "__main__":
 
     # get the MovieLens 25M dataset as a RecDataset object
-    movielens_dataset = MovieLensDataset()
+    movielens_dataset: RecDataset= MovieLensDataset()
 
     # re-use a skip-gram model from reclist to train a latent product space, to be used
     # (through knn) to build a recommender
-    model = MovieLensP2VRecModel()
+    model: RecModel= MovieLensP2VRecModel()
     model.train(movielens_dataset.x_train)
 
     # instantiate rec_list object, prepared with standard quantitative tests
     # and sensible behavioral tests (check the paper for details!)
-    rec_list = MovieLensSimilarItemRecList(model=model, dataset=movielens_dataset)
+    rec_list: RecList = MovieLensSimilarItemRecList(model=model, dataset=movielens_dataset)
 
     # invoke rec_list to run tests
     rec_list(verbose=True)
