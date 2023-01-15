@@ -4,14 +4,17 @@ import random
 
 import numpy as np
 import pandas as pd
+from typing import Union, List, Dict
 
 
 def hits_at_k(
-    y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int
-) -> (np.array, pd.DataFrame):
+    y_pred: pd.DataFrame, y_test:pd.DataFrame, k: int
+) -> np.array:
     """
     N = number test cases
     M = number ground truth per test case
+    returns array(N, preds_per_user, k)
+
     """
     y_test_mask = y_test.values != -1  # N x M
 
@@ -27,12 +30,11 @@ def hits_at_k(
     return hits
 
 
-def ranks_at_k(
-    y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int
-) -> (np.array, pd.DataFrame):
+def ranks_at_k(y_pred: pd.DataFrame, y_test:pd.DataFrame, k: int) -> np.array:
     """
     N = number test cases
     M = number ground truth per test case
+    returns shape (N, preds_per_user)
     """
     hits = hits_at_k(y_pred, y_test, k)  # N x M x k
     ranks = hits * np.arange(1, k + 1, 1)[None, None, :]  # N x M x k
@@ -42,12 +44,21 @@ def ranks_at_k(
 
 def misses_at_k(
     y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int
-) -> (np.array, pd.DataFrame):
+) -> np.array:
+    """_summary_
+
+    Args:
+        y_pred (pd.DataFrame): predictions
+        y_test (pd.DataFrame): ground truth
+        k (int): top k
+    Returns:
+        np.array: same shape as hits_at_k
+    """
     hits = hits_at_k(y_pred, y_test, k)  # N x M x k
     return 1 - hits
 
 
-def hit_rate_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int):
+def hit_rate_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int) -> float:
     """
     N = number test cases
     M = number ground truth per test case
@@ -57,7 +68,10 @@ def hit_rate_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int):
     return hits.max(axis=1).mean()  # 1
 
 
-def rr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int):
+def rr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int)-> np.array:
+    """
+    returns shape (N,)
+    """
     ranks = ranks_at_k(y_pred, y_test, k).astype(np.float64)  # N x M
     reciprocal_ranks = np.reciprocal(ranks, out=ranks, where=ranks > 0)  # N x M
     return reciprocal_ranks.max(axis=1)  # N
@@ -71,10 +85,10 @@ def mrr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int) -> float:
 
 
 def statistics(x_train, y_train, x_test, y_test, y_pred):
-    train_size = len(x_train)
-    test_size = len(x_test)
+    train_size:int = len(x_train)
+    test_size:int = len(x_test)
     # num non-zero preds
-    num_preds = len([p for p in y_pred if p])
+    num_preds:int = len([p for p in y_pred if p])
     return {
         "training_set__size": train_size,
         "test_set_size": test_size,
@@ -82,7 +96,7 @@ def statistics(x_train, y_train, x_test, y_test, y_pred):
     }
 
 
-def sample_hits_at_k(y_preds, y_test, x_test=None, k=3, size=3):
+def sample_hits_at_k(y_preds:List[List[str]], y_test:List[List[str]], x_test=None, k:int=3, size:int=3)-> List:
     hits = []
     for idx, (_p, _y) in enumerate(zip(y_preds, y_test)):
         if _y[0] in _p[:k]:
@@ -99,7 +113,12 @@ def sample_hits_at_k(y_preds, y_test, x_test=None, k=3, size=3):
     return random.sample(hits, k=size)
 
 
-def sample_misses_at_k(y_preds, y_test, x_test=None, k=3, size=3):
+def sample_misses_at_k(y_preds:List[List[str]], y_test:List[List[str]], x_test=None, k:int=3, size:int=3)-> List[Dict]:
+    '''
+    returns a list of dicts with the following keys:
+    Y_TEST: the ground truth
+    Y_PRED: the predictions
+    '''
     misses = []
     for idx, (_p, _y) in enumerate(zip(y_preds, y_test)):
         if _y[0] not in _p[:k]:
@@ -116,12 +135,17 @@ def sample_misses_at_k(y_preds, y_test, x_test=None, k=3, size=3):
     return random.sample(misses, k=size)
 
 
-def hit_rate_at_k_nep(y_preds, y_test, k=3):
+def hit_rate_at_k_nep(y_preds:List[str], y_test:List[str], k:int=3)-> float:
+    """
+    1d array of predictions
+    1d array of ground truth
+    """
+    
     y_test = [[k] for k in y_test]
     return hit_rate_at_k_list(y_preds, y_test, k=k)
 
 
-def hit_rate_at_k_list(y_preds, y_test, k=3) -> float:
+def hit_rate_at_k_list(y_preds:List[List[str]], y_test:List[List[str]], k:int=3) -> float:
     hits = 0
     for _p, _y in zip(y_preds, y_test):
         if len(set(_p[:k]).intersection(set(_y))) > 0:
@@ -129,7 +153,7 @@ def hit_rate_at_k_list(y_preds, y_test, k=3) -> float:
     return hits / len(y_test)
 
 
-def mrr_at_k_nep_list(y_preds, y_test, k=3):
+def mrr_at_k_nep_list(y_preds:List[str], y_test:List[str], k:int=3)-> float:
     """
     Computes MRR
 
@@ -141,7 +165,7 @@ def mrr_at_k_nep_list(y_preds, y_test, k=3):
     return mrr_at_k_list(y_preds, y_test, k=k)
 
 
-def mrr_at_k_list(y_preds, y_test, k=3):
+def mrr_at_k_list(y_preds:List[List[str]], y_test:List[List[str]], k:int=3)-> float:
     """
     Computes MRR
 
@@ -161,7 +185,10 @@ def mrr_at_k_list(y_preds, y_test, k=3):
     return np.mean(rr)
 
 
-def coverage_at_k(y_preds, product_data, k=3):
+def coverage_at_k(y_preds:List[List[str]], product_data:Dict, k:int=3)-> float:
+    """
+    product_data: dict with product ids as keys
+    """
     pred_skus = set(itertools.chain.from_iterable(y_preds[:k]))
     all_skus = set(product_data.keys())
     nb_overlap_skus = len(pred_skus.intersection(all_skus))
@@ -169,9 +196,9 @@ def coverage_at_k(y_preds, product_data, k=3):
     return nb_overlap_skus / len(all_skus)
 
 
-def popularity_bias_at_k(y_preds, x_train, k=3):
+def popularity_bias_at_k(y_preds:List[List[str]], x_train:List[List[str]], k:int=3)-> float:
     # estimate popularity from training data
-    pop_map = collections.defaultdict(lambda: 0)
+    pop_map:Dict = collections.defaultdict(lambda: 0)
     num_interactions = 0
     for session in x_train:
         for event in session:
@@ -188,7 +215,7 @@ def popularity_bias_at_k(y_preds, x_train, k=3):
     return sum(all_popularity) / len(y_preds)
 
 
-def precision_at_k(y_preds, y_test, k=3):
+def precision_at_k(y_preds:List[List[str]], y_test:List[List[str]], k:int=3)-> float:
     precision_ls = [
         len(set(_y).intersection(set(_p[:k]))) / len(_p[:k]) if _p else 1
         for _p, _y in zip(y_preds, y_test)
@@ -196,7 +223,7 @@ def precision_at_k(y_preds, y_test, k=3):
     return np.average(precision_ls)
 
 
-def recall_at_k(y_preds, y_test, k=3):
+def recall_at_k(y_preds:List[List[str]], y_test:List[List[str]], k:int=3)-> float:
     recall_ls = [
         len(set(_y).intersection(set(_p[:k]))) / len(_y) if _y else 1
         for _p, _y in zip(y_preds, y_test)
