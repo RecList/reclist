@@ -1,5 +1,5 @@
 import os
-
+from typing import Callable, Dict, List
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -7,8 +7,8 @@ from reclist.current import current
 
 
 def price_homogeneity_test(
-    y_test, y_preds, product_data, price_sel_fn, bins=25, debug=True
-):
+    y_test: List[List[str]], y_preds:List[List[str]], product_data:Dict, price_sel_fn:Callable, bins:int=25, debug:bool=True
+)-> Dict:
     """
 
     :param y_test: test data
@@ -17,7 +17,11 @@ def price_homogeneity_test(
     :param bins: bins on which we split the data for the product comparison
     :param debug: shows plots
     :param key: key from the product data to find the product price
-    @return:
+    @return: mean of the absolute log price difference and histogram of the absolute log price difference
+    {
+        mean: float,
+        histogram: (list, list) i.e tuple of two lists (counts, bins)
+    }
     """
     abs_log_price_diff = []
     for idx, (_y, _y_pred) in enumerate(zip(y_test, y_preds)):
