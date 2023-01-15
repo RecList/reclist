@@ -1,15 +1,17 @@
 import gensim
+from gensim.models import KeyedVectors
+from typing import List
 
 
 def train_embeddings(
-    sessions: list,
+    sessions: List[List[str]],
     min_c: int = 3,
     size: int = 48,
     window: int = 5,
     iterations: int = 15,
     ns_exponent: float = 0.75,
     is_debug: bool = True,
-):
+)-> KeyedVectors:
     """
     Train CBOW to get product embeddings with sensible defaults (https://arxiv.org/abs/2007.14906).
 
