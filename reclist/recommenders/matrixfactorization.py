@@ -9,7 +9,7 @@ class MovieLensKernelMFModel(RecModel):
     KernelMF implementation for MovieLens 25M dataset
     """
 
-    model_name = "KernelMF"
+    model_name:str = "KernelMF"
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
