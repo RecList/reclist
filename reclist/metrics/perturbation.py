@@ -1,7 +1,12 @@
 import numpy as np
+from reclist.abstractions import RecModel
+from typing import Callable
 
 
-def session_perturbation_test(model, x_test, y_preds, perturbation_fn, id_fn, k):
+def session_perturbation_test(model: RecModel, x_test, y_preds, perturbation_fn:Callable, id_fn:Callable, k:int)-> float:
+    '''
+    model: RecList model
+    '''
     # generate perturbations
     perturbed_pairs = [
         (perturbation_fn(_x), _y_p)
