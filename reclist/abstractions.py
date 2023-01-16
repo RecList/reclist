@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Callable
 
 import pandas as pd
 from gensim.models import KeyedVectors
@@ -19,7 +19,7 @@ class RecDataset(ABC):
     Implements an abstract class for the dataset
     """
 
-    def __init__(self, force_download=False, **kwargs):
+    def __init__(self, force_download:bool=False, **kwargs):
         """
         :param force_download: allows to force the download of the dataset in case it is needed.
         :type: force_download: bool, optional
@@ -119,7 +119,7 @@ def rec_test(test_type: str):
 
 
 class RecList(ABC):
-    META_DATA_FOLDER = ".reclist"
+    META_DATA_FOLDER:str = ".reclist"
 
     def __init__(
         self, model: RecModel, dataset: RecDataset, y_preds: pd.DataFrame = None
@@ -131,7 +131,7 @@ class RecList(ABC):
         """
 
         self.name = self.__class__.__name__
-        self._rec_tests = self.get_tests()
+        self._rec_tests:Dict[Callable] = self.get_tests()
         self._x_train: pd.DataFrame = dataset.x_train
         self._y_train: pd.DataFrame = dataset.y_train
         self._x_test: pd.DataFrame = dataset.x_test
@@ -141,7 +141,7 @@ class RecList(ABC):
             if isinstance(y_preds, type(None))
             else y_preds
         )
-        self.rec_model = model
+        self.rec_model: RecModel= model
         self.product_data: Dict[pd.DataFrame] = dataset.catalog
         self._test_results = []
         self._test_data = {}
@@ -155,7 +155,7 @@ class RecList(ABC):
         except Exception as e:
             print("WARNING: Dense representation not loaded \n Reason : {}".format(e))
 
-    def train_dense_repr(self, type_name: str, type_fn):
+    def train_dense_repr(self, type_name: str, type_fn:Callable):
         """
         Train a dense representation over a type of meta-data & store into object
         """
@@ -184,7 +184,7 @@ class RecList(ABC):
 
         return nodes
 
-    def __call__(self, verbose=True, *args, **kwargs):
+    def __call__(self, verbose:bool=True, *args, **kwargs):
         run_epoch_time_ms = round(time.time() * 1000)
         # create datastore
         current._report_path = os.path.join(
@@ -251,7 +251,7 @@ class RecList(ABC):
 
     def dump_results_to_json(
         self, test_results: list, report_path: str, epoch_time_ms: int
-    ):
+    )-> None:
         target_path = os.path.join(report_path, "results")
         # make sure the folder is there, with all intermediate parents
         Path(target_path).mkdir(parents=True, exist_ok=True)
