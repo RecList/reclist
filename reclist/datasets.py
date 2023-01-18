@@ -7,6 +7,62 @@ import pandas as pd
 
 from reclist.abstractions import RecDataset
 from reclist.utils.config import *
+from sklearn.model_selection import train_test_split
+import numpy as np
+
+
+class SyntheticDataset(RecDataset):
+    """
+    Synthetic Dataset
+    -------------------
+
+    This dataset is used for testing purposes. It generates a random dataset with the following parameters:
+
+    - n_users: number of users
+    - n_items: number of items
+    - n_interactions: number of interactions
+    - size: size of the dataset
+    - seed: seed for the random number generator
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    
+    def produce_dataset(self, n_users, n_items, n_interactions=None, size=100, seed=42):
+        if self.n_interactions is None:
+            self.n_interactions = 1 
+        user_ids = np.random.randint(0, self.n_users, self.size)
+        item_ids = np.random.randint(0, self.n_items, self.size)
+        interactions = np.random.randint(0, self.n_interactions, self.size)
+        return pd.DataFrame({'user_id':user_ids, 'item_id':item_ids, 'interactions':interactions})
+    
+    def get_train_test(self, ratio=0.2):
+        self.n_users = 10
+        self.n_items = 20
+        self.size = 100
+        self.n_interactions = 5
+        self.seed = 42
+        self.ratio = 0.2
+        data = self.produce_dataset()
+        return train_test_split(data, test_size=ratio, random_state=self.seed)
+    
+    def make_user_data(self, user_id, feature_type='categorical', n_features=10):
+       pass
+
+    def make_item_data(self, item_id, feature_type={'categorical':8, 'regression':2}, n_features=10):
+        pass
+    
+    def load(self, **kwargs):
+        print("Loading Synthetic Dataset ...")
+        train, test = self.get_train_test()
+        features = ['user_id', 'item_id']
+        to_predict = ['interactions']
+        self._x_train = train[features]
+        self._y_train = test[features]
+        self._y_test = test[to_predict]
+        self._catalog = None
+        self._x_test = train[to_predict]
+    
 
 
 class MovieLensDatasetDF(RecDataset):
@@ -18,6 +74,7 @@ class MovieLensDatasetDF(RecDataset):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        print("MovieLensDatasetDF")
 
     def load(self, **kwargs):
         cache_dir = get_cache_directory()
