@@ -67,7 +67,7 @@ class SyntheticDataset(RecDataset):
         to_predict = ['interactions']
         self._x_train = train[features]
         self._y_train = train[to_predict]
-        self._x_test = train[features]
+        self._x_test = test[features]
         self._y_test = test[to_predict]
         self._catalog = None
     
