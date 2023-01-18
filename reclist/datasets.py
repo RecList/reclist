@@ -26,9 +26,17 @@ class SyntheticDataset(RecDataset):
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.n_users = None
+        self.n_items = None
+        self.n_interactions=None, 
+        self.size=100, 
+        self.seed=42
+
+    def set_n_users(self, n_users):
+        self.n_users = n_users
 
     
-    def produce_dataset(self, n_users, n_items, n_interactions=None, size=100, seed=42):
+    def produce_dataset(self):
         if self.n_interactions is None:
             self.n_interactions = 1 
         user_ids = np.random.randint(0, self.n_users, self.size)
