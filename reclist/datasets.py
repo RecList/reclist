@@ -70,7 +70,6 @@ class SyntheticDataset(RecDataset):
         self._x_test = train[features]
         self._y_test = test[to_predict]
         self._catalog = None
-        self._x_test = train[to_predict]
     
 
 
