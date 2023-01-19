@@ -3,12 +3,12 @@ import os
 import tempfile
 import zipfile
 
+import numpy as np
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
 from reclist.abstractions import RecDataset
 from reclist.utils.config import *
-from sklearn.model_selection import train_test_split
-import numpy as np
 
 
 class SyntheticDataset(RecDataset):
@@ -24,26 +24,28 @@ class SyntheticDataset(RecDataset):
     - size: size of the dataset
     - seed: seed for the random number generator
     """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.n_users = None
         self.n_items = None
-        self.n_interactions=None, 
-        self.size=100, 
-        self.seed=42
+        self.n_interactions = (None,)
+        self.size = (100,)
+        self.seed = 42
 
     def set_n_users(self, n_users):
         self.n_users = n_users
 
-    
     def produce_dataset(self):
-        if self.n_interactions is None: #if None, then it's a session-based dataset
-            self.n_interactions = 1 
+        if self.n_interactions is None:  # if None, then it's a session-based dataset
+            self.n_interactions = 1
         user_ids = np.random.randint(0, self.n_users, self.size)
         item_ids = np.random.randint(0, self.n_items, self.size)
         interactions = np.random.randint(0, self.n_interactions, self.size)
-        return pd.DataFrame({'user_id':user_ids, 'item_id':item_ids, 'interactions':interactions})
-    
+        return pd.DataFrame(
+            {"user_id": user_ids, "item_id": item_ids, "interactions": interactions}
+        )
+
     def get_train_test(self, ratio=0.2):
         self.n_users = 10
         self.n_items = 20
@@ -53,24 +55,25 @@ class SyntheticDataset(RecDataset):
         self.ratio = 0.2
         data = self.produce_dataset()
         return train_test_split(data, test_size=ratio, random_state=self.seed)
-    
-    def make_user_data(self, user_id, feature_type='categorical', n_features=10):
-       pass
 
-    def make_item_data(self, item_id, feature_type={'categorical':8, 'regression':2}, n_features=10):
+    def make_user_data(self, user_id, feature_type="categorical", n_features=10):
         pass
-    
+
+    def make_item_data(
+        self, item_id, feature_type={"categorical": 8, "regression": 2}, n_features=10
+    ):
+        pass
+
     def load(self, **kwargs):
         print("Loading Synthetic Dataset ...")
         train, test = self.get_train_test()
-        features = ['user_id', 'item_id']
-        to_predict = ['interactions']
+        features = ["user_id", "item_id"]
+        to_predict = ["interactions"]
         self._x_train = train[features]
         self._y_train = train[to_predict]
         self._x_test = test[features]
         self._y_test = test[to_predict]
         self._catalog = None
-    
 
 
 class MovieLensDatasetDF(RecDataset):
