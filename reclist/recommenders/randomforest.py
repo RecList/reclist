@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import sklearn
+import sklearn.ensemble
 from reclist.abstractions import RecModel
 
 #TODO: Add methods for sequential problem
