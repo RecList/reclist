@@ -37,7 +37,7 @@ class SyntheticDataset(RecDataset):
 
     
     def produce_dataset(self):
-        if self.n_interactions is None:
+        if self.n_interactions is None: #if None, then it's a session-based dataset
             self.n_interactions = 1 
         user_ids = np.random.randint(0, self.n_users, self.size)
         item_ids = np.random.randint(0, self.n_items, self.size)
