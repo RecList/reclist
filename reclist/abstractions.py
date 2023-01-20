@@ -118,6 +118,35 @@ def rec_test(test_type: str):
     return decorator
 
 
+def plot_test_model(plot_name: str):
+    """
+    Rec test decorator
+    """
+
+    def decorator(f):
+        @wraps(f)
+        def w(*args, **kwargs):
+            return f(*args, **kwargs)
+
+        # add attributes to f
+        w.is_plot = True
+        w.is_same_model = True
+        w.plot_name = plot_name
+        try:
+            w.plot_desc = f.__doc__.lstrip().rstrip()
+        except:
+            w.plot_desc = ""
+        try:
+            # python 3
+            w.name = w.__name__
+        except:
+            # python 2
+            w.name = w.__func__.func_name
+        return w
+
+    return decorator
+
+
 class RecList(ABC):
     META_DATA_FOLDER = ".reclist"
 
@@ -132,6 +161,7 @@ class RecList(ABC):
 
         self.name = self.__class__.__name__
         self._rec_tests = self.get_tests()
+        self._rec_plots = self.get_plots()
         self._x_train: pd.DataFrame = dataset.x_train
         self._y_train: pd.DataFrame = dataset.y_train
         self._x_test: pd.DataFrame = dataset.x_test
@@ -184,6 +214,21 @@ class RecList(ABC):
 
         return nodes
 
+    def get_plots(self):
+        """
+        Helper to extract methods decorated with rec_test
+        """
+
+        nodes = {}
+        for _ in self.__dir__():
+            if not hasattr(self, _):
+                continue
+            func = getattr(self, _)
+            if hasattr(func, "is_plot"):
+                nodes[func.name] = func
+
+        return nodes
+
     def __call__(self, verbose=True, *args, **kwargs):
         run_epoch_time_ms = round(time.time() * 1000)
         # create datastore
@@ -224,6 +269,16 @@ class RecList(ABC):
         # at the end, we dump it locally
         if verbose:
             print("Generating reports at {}".format(datetime.utcnow()))
+
+        # iterate through plots & store them
+        print("Generating plots ...")
+        print("=============================================")
+        for plot_func_name, plot in self._rec_plots.items():
+            fig = plot(*args, **kwargs)
+            fig.savefig(os.path.join(current.report_path, "plots", plot_func_name))
+            print("{} saved".format(plot_func_name))
+        print("==========================================")
+
         return self.generate_report(run_epoch_time_ms)
 
     def generate_report(self, epoch_time_ms: int):
@@ -278,3 +333,7 @@ class RecList(ABC):
     @property
     def rec_tests(self):
         return self._rec_tests
+
+    @property
+    def rec_plots(self):
+        return self._rec_plots

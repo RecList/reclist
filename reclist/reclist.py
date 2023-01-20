@@ -4,7 +4,7 @@ from typing import List
 
 import pandas as pd
 
-from reclist.abstractions import RecList, rec_test
+from reclist.abstractions import RecList, plot_test_model, rec_test
 
 
 class MovieLensRecList(RecList):
@@ -390,3 +390,15 @@ class SyntheticRatingClassifierRecList(RecList):
         for i in range(1, k):
             rmse_at_k[f"rmse@{i}"] = self.rmse_at_k(i)
         return rmse_at_k
+
+    @plot_test_model(plot_name="scatter_true_pred")
+    def plot_true_pred(self):
+        import matplotlib.pyplot as plt
+
+        fig, ax = plt.subplots()
+        ax.scatter(self._y_test.values, self._y_preds.values)
+        ax.set_xlabel("True")
+        ax.set_ylabel("Predicted")
+        ax.set_title("True vs Predicted")
+
+        return fig
