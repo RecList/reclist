@@ -68,6 +68,10 @@ class SyntheticDataset(RecDataset):
         print("Loading Synthetic Dataset ...")
         train, test = self.get_train_test()
         features = ["user_id", "item_id"]
+        categorical_variables = ["user_id", "item_id"]
+        for var in categorical_variables:
+            train[var] = train[var].astype("category")
+            test[var] = test[var].astype("category")
         to_predict = ["interactions"]
         self._x_train = train[features]
         self._y_train = train[to_predict]

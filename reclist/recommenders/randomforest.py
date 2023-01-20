@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 import pandas as pd
 import sklearn
@@ -50,10 +52,14 @@ class RandomForest(RecModel):
         self._model.fit(X_train, y_train.values.ravel())
 
     def candidate_generation(
-        self, X_train: pd.DataFrame, y_train: pd.DataFrame, y_test, k: int = 10
+        self,
+        X_train: pd.DataFrame,
+        y_train: pd.DataFrame,
+        y_test,
+        k: Optional[int] = 10,
     ):
         """
-        Generates candidates based on the defined criteria. Implemneted in case of sequential problem.
+        Generates candidates based on the defined criteria.
         This method is then called to predict.
         Args:
             X_train (pd.DataFrame): Training data.
