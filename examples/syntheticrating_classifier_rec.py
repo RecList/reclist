@@ -3,7 +3,7 @@ from reclist.reclist import SyntheticRatingClassifierRecList
 from reclist.recommenders import randomforest
 
 if __name__ == "__main__":
-
+    # TODO: Add config file for this SyntheticDataset & way to name it while saving it
     # get the synthetic dataset as a RecDataset object
     synthetic_dataset = SyntheticDataset()
 

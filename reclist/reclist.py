@@ -402,3 +402,36 @@ class SyntheticRatingClassifierRecList(RecList):
         ax.set_title("True vs Predicted")
 
         return fig
+
+    @plot_test_model(plot_name="rmse_by_user")
+    def plot_rmse_by_user(self):
+        import json
+
+        import matplotlib.pyplot as plt
+
+        fig, ax = plt.subplots()
+        for test in self.test_results:
+            if test["test_name"] == "rmse_by_user":
+                test_result = test["test_result"]
+                break
+        test_result = json.loads(test_result)
+        ax.set_xlabel("User")
+        ax.set_ylabel("RMSE")
+        ax.set_title("RMSE by User")
+        ax.bar(test_result.keys(), test_result.values())
+        return fig
+
+    @plot_test_model(plot_name="rmse@k-all")
+    def plot_rmse_at_k_all(self):
+        import matplotlib.pyplot as plt
+
+        fig, ax = plt.subplots()
+        for test in self.test_results:
+            if test["test_name"] == "rmse@k-all":
+                test_result = test["test_result"]
+                break
+        ax.set_xlabel("k")
+        ax.set_ylabel("RMSE")
+        ax.set_title("RMSE at k")
+        ax.plot(test_result.keys(), test_result.values())
+        return fig
