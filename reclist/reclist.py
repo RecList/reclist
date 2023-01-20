@@ -322,3 +322,71 @@ class MovieLensSimilarItemRecList(RecList):
 
     def movie_only(self, movies):
         return [[x["movieId"] for x in y] for y in movies]
+
+
+class SyntheticRatingClassifierRecList(RecList):
+    def __init__(self, model, dataset):
+        super().__init__(model, dataset)
+        self._y_preds.columns = self._y_test.columns
+        self.name = "SyntheticRating" + "_" + "Classifier"
+
+    @rec_test(test_type="min_stats")
+    def statistics(self):
+        statistics = {}
+        statistics["x_test"] = self._x_test.describe(include="all").to_json()
+        statistics["x_train"] = self._x_train.describe(include="all").to_json()
+        statistics["y_train"] = self._y_train.describe(include="all").to_json()
+        statistics["y_test"] = self._y_test.describe(include="all").to_json()
+        statistics["y_preds"] = self._y_preds.describe(include="all").to_json()
+        return statistics
+
+    @rec_test(test_type="rmse")
+    def rmse(self):
+        from sklearn.metrics import mean_squared_error
+
+        return mean_squared_error(
+            self._y_test, self._y_preds, squared=False, multioutput="uniform_average"
+        )
+
+    @rec_test(test_type="rmse_by_user")
+    def rmse_by_groups(self, group_by_columns=["user_id"]):
+        from sklearn.metrics import mean_squared_error
+
+        temp = pd.DataFrame()
+        temp["user_id"] = self._x_test["user_id"]
+        temp["y_test"] = self._y_test["interactions"]
+        temp["y_pred"] = self._y_preds["interactions"]
+        rmse_user = temp.groupby(group_by_columns).apply(
+            lambda x: mean_squared_error(
+                x["y_test"], x["y_pred"], squared=False, multioutput="uniform_average"
+            )
+        )
+        del temp
+        return rmse_user.to_json()
+
+    @rec_test(test_type="classification_report")
+    def classification_report(self, k: int = 3):
+        import sklearn
+
+        return sklearn.metrics.classification_report(self._y_test, self._y_preds)
+
+    @rec_test(test_type="rmse@3")
+    def rmse_at_k(self, k: int = 3, filter_by="interactions", filter_func=None):
+        from sklearn.metrics import mean_squared_error
+
+        filter_ = self._y_test[filter_by] >= k
+        if filter_.sum() == 0:
+            return 0
+        return mean_squared_error(
+            self._y_test[filter_],
+            self._y_preds[filter_],
+            squared=False,
+            multioutput="uniform_average",
+        )
+
+    @rec_test(test_type="rmse@k-all")
+    def rmse_at_k_all(self, k: int = 5):
+        rmse_at_k = {}
+        for i in range(1, k):
+            rmse_at_k[f"rmse@{i}"] = self.rmse_at_k(i)
+        return rmse_at_k
