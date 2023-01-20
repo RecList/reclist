@@ -87,6 +87,6 @@ class RandomForest(RecModel):
         assert self.is_train, f"{self.name} not trained yet"
 
         preds = self._model.predict(test_data)
-        preds = pd.DataFrame(preds)
+        preds = pd.DataFrame(preds, index=test_data.index, columns=["preds"])
 
         return preds
