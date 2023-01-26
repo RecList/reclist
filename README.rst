@@ -55,7 +55,7 @@ Quick Links
 
 * Our `talk <https://www.youtube.com/watch?v=cAlJYxFYA04>`__ at Stitch Fix Algo Hour, for a general presentation.
 * Our original `paper <https://dl.acm.org/doi/abs/10.1145/3487553.3524215>`__, with in-depth analysis, detailed use cases and scholarly references (`arxiv <https://arxiv.org/abs/2111.09963>`__).
-* Our CIKM Data Challenge (`paper <https://www.nature.com/articles/s42256-022-00606-0>`__, `code <https://github.com/RecList/evalRS-CIKM-2022>`__) for music recommendations, based on RecList.
+* Our CIKM Data Challenge (`paper <https://rdcu.be/c4dXy>`__, `code <https://github.com/RecList/evalRS-CIKM-2022>`__) for music recommendations, based on RecList.
 * A `colab notebook <https://colab.research.google.com/drive/1Wn5mm0csEkyWqmBBDxNBkfGR6CNfWeH-?usp=sharing>`__, showing how to train a cart recommender model from scratch and use the library to test it.
 * Our `blog post <https://towardsdatascience.com/ndcg-is-not-all-you-need-24eb6d2f1227>`__, with examples and practical tips.
 
