@@ -40,8 +40,7 @@ Overview
 --------
 
 *RecList* is an open source library providing behavioral, "black-box" testing for recommender systems. Inspired by the pioneering work of
-`Ribeiro et al. 2020 <https://aclanthology.org/2020.acl-main.442.pdf>`__ in NLP, we introduce a general plug-and-play procedure to scale up behavioral testing,
-with an easy-to-extend interface for custom use cases.
+`Ribeiro et al. 2020 <https://aclanthology.org/2020.acl-main.442.pdf>`__ in NLP, we introduce a general plug-and-play procedure to scale up behavioral testing, with an easy-to-extend interface for custom use cases.
 
 While quantitative metrics over held-out data points are important, a lot more tests are needed for recommenders
 to properly function in the wild and not erode our confidence in them: for example, a model may boast an accuracy improvement over the entire dataset, but actually be significantly worse than another on rare items or new users; or again, a model that correctly recommends HDMI cables as add-on for shoppers buying a TV, may also wrongly  recommend TVs to shoppers just buying a cable.
@@ -55,35 +54,36 @@ Quick Links
 ~~~~~~~~~~~
 
 * Our `talk <https://www.youtube.com/watch?v=cAlJYxFYA04>`__ at Stitch Fix Algo Hour, for a general presentation.
-* Our `paper <https://dl.acm.org/doi/abs/10.1145/3487553.3524215>`__, with in-depth analysis, detailed use cases and scholarly references (`arxiv <https://arxiv.org/abs/2111.09963>`__).
+* Our original `paper <https://dl.acm.org/doi/abs/10.1145/3487553.3524215>`__, with in-depth analysis, detailed use cases and scholarly references (`arxiv <https://arxiv.org/abs/2111.09963>`__).
+* Our CIKM Data Challenge (`paper <https://www.nature.com/articles/s42256-022-00606-0>`__, `code <https://github.com/RecList/evalRS-CIKM-2022>`__) for music recommendations, based on RecList.
 * A `colab notebook <https://colab.research.google.com/drive/1Wn5mm0csEkyWqmBBDxNBkfGR6CNfWeH-?usp=sharing>`__, showing how to train a cart recommender model from scratch and use the library to test it.
 * Our `blog post <https://towardsdatascience.com/ndcg-is-not-all-you-need-24eb6d2f1227>`__, with examples and practical tips.
 
 
 Supporters
 ~~~~~~~~~~
-RecList is a community project made possible by the generous support of these awesome folks. Make sure to check them out!
+RecList is a community project made possible by the generous support of awesome folks. Between June and December 2022, RecList has been supported by:
 
 Comet
 =====
 
 .. image:: https://github.com/jacopotagliabue/reclist/raw/main/images/comet.png
    :target: https://www.comet.com/?utm_source=jacopot&utm_medium=referral&utm_campaign=online_jacopot_2022&utm_content=github_reclist
-   :width: 175
+   :width: 100
 
 Neptune
 =======
 
 .. image:: https://github.com/jacopotagliabue/reclist/raw/main/images/neptune.png
    :target: https://neptune.ai
-   :width: 175
+   :width: 100
 
 Gantry
 ======
 
 .. image:: https://github.com/jacopotagliabue/reclist/raw/main/images/gantry.png
    :target: https://gantry.io/
-   :width: 175
+   :width: 100
 
 
 Project updates
@@ -92,8 +92,7 @@ Project updates
 *Community Support*: RecList is an open source community project made possible by the support of the awesome folks at `Comet <https://www.comet.ml/site/>`__, `Neptune <https://neptune.ai/>`__ and `Gantry <https://gantry.io/>`__.
 Soon RecList tests will be natively integrated with the MLOps tools you already know and love!
 
-*June 2022*: We launched a `website <https://reclist.io/>`__ to collect RecList materials, such as talks and presentations.
-RecList is powering the `Data Challenge <https://reclist.io/cikm2022-cup/>`__ at CIKM 2022: fill `the form <https://docs.google.com/forms/d/e/1FAIpQLSfAypzM1mvd79JfRGRbb9QMfXGMoVYosdjU9C4NFEWNSNUZXQ/viewform>`__ for updates.
+*January 2023*: We concluded the RecList-powered `Data Challenge <https://reclist.io/cikm2022-cup/>`__ at CIKM 2022 and released all the materials to the community. We shared our learnings in a `paper <https://www.nature.com/articles/s42256-022-00606-0>`__ on Nature Machine Intelligence, and prepare the release of RecList Beta.
 
 In the last few months, we presented this library to practioners at Tubi, eBay, NVIDIA, BBC and other RecSys companies: we are in the process of collecting our thoughts after all the feedback we received, as we plan a beta release for this package in the next few months - come back often for updates, as we will also open a call for collaboration!
 
