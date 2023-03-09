@@ -115,7 +115,7 @@ def popularity_bias_at_k(y_preds, x_train, k=3):
     pop_map = {k:v/num_interactions for k,v in pop_map.items()}
     all_popularity = []
     for p in y_preds:
-        average_pop = sum(pop_map.get(_, 0.0) for _ in p[:k]) / len(p) if len(p) > 0 else 0
+        average_pop = sum(pop_map.get(_, 0.0) for _ in p[:k]) / len(p[:k]) if len(p) > 0 else 0
         all_popularity.append(average_pop)
     return sum(all_popularity) / len(y_preds)
 
