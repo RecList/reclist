@@ -4,9 +4,19 @@ import time
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
-from reclist.current import current
 from functools import wraps
+from reclogger import logger_factory
 
+class Current:
+    def __init__(self):
+        self._report_path = None
+
+    @property
+    def report_path(self):
+        return self._report_path
+
+
+current = Current()
 
 def rec_test(test_type: str):
     """
@@ -50,14 +60,7 @@ class RecList(ABC):
         self.model = model
         self.dataset = dataset
         self.metadata = metadata
-
-    @abstractmethod
-    def get_targets(self):
-        pass
-
-    @abstractmethod
-    def predict(self):
-        pass
+        self._test_results = []
 
     def get_tests(self):
         """
@@ -74,13 +77,15 @@ class RecList(ABC):
 
         return nodes
 
-    def __call__(self, verbose=True, *args, **kwargs):
+    def __call__(self, verbose=True, logger="comet", *args, **kwargs):
+        logger = logger_factory(logger)()
+
         run_epoch_time_ms = round(time.time() * 1000)
         # create datastore
         current._report_path = os.path.join(
             self.META_DATA_FOLDER,
             self.name,
-            self.rec_model.__class__.__name__,
+            self.model.__class__.__name__,
             str(run_epoch_time_ms),
         )
 
@@ -106,6 +111,8 @@ class RecList(ABC):
                     "test_result": test_result,
                 }
             )
+            logger.write(test.test_type, test_result)
+
             if verbose:
                 print("============= TEST RESULTS ===============")
                 print("Test Type        : {}".format(test.test_type))
@@ -121,12 +128,13 @@ class RecList(ABC):
         report_path = os.path.join(
             self.META_DATA_FOLDER,
             self.name,
-            self.rec_model.__class__.__name__,
+            self.model.__class__.__name__,
             str(epoch_time_ms),
         )
 
         # now, dump results
         self.dump_results_to_json(self._test_results, report_path, epoch_time_ms)
+
         # now, store artifacts
         self.store_artifacts(report_path)
         return report_path
@@ -135,9 +143,9 @@ class RecList(ABC):
         target_path = os.path.join(current.report_path, "artifacts")
         # store predictions
 
-        self._x_test.to_parquet(os.path.join(target_path, "x_test.pk"))
-        self._y_test.to_parquet(os.path.join(target_path, "y_test.pk"))
-        self._y_preds.to_parquet(os.path.join(target_path, "y_preds.pk"))
+        #self._x_test.to_parquet(os.path.join(target_path, "x_test.pk"))
+        #self.get_targets().to_parquet(os.path.join(target_path, "y_test.pk"))
+        #self.predict().to_parquet(os.path.join(target_path, "y_preds.pk"))
 
     def dump_results_to_json(
         self, test_results: list, report_path: str, epoch_time_ms: int
@@ -148,7 +156,7 @@ class RecList(ABC):
         report = {
             "metadata": {
                 "run_time": epoch_time_ms,
-                "model_name": self.rec_model.__class__.__name__,
+                "model_name": self.model.__class__.__name__,
                 "reclist": self.name,
                 "tests": list(self._rec_tests.keys()),
             },
@@ -171,15 +179,23 @@ class SessionRecList(RecList):
 
         super().__init__(model, dataset, metadata)
 
-    @rec_test(test_type="HR@10")
-    def hit_rate_at_k(self):
-        """
-        Compute the rate in which the top-k predictions contain the item to be predicted
-        """
-        from reclist.metrics.standard_metrics import hit_rate_at_k
+    @abstractmethod
+    def get_targets(self):
+        pass
 
-        return hit_rate_at_k(
-            self.get_targets(), self.predict(), k=10
+    @abstractmethod
+    def predict(self):
+        pass
+
+    @rec_test(test_type="Accuracy")
+    def accuracy(self):
+        """
+        Compute the accuracy
+        """
+        from sklearn.metrics import accuracy_score
+
+        return accuracy_score(
+            self.get_targets(), self.predict()
         )
 
 
@@ -197,8 +213,14 @@ class CoveoSessionRecList(SessionRecList):
         """
         Do something
         """
+        return [0]*len(self.dataset)
 
     def get_targets(self):
         """
         Do something
         """
+        return self.dataset
+
+
+cd = CoveoSessionRecList("", [1, 0, 1, 0], {})
+cd(verbose=True)
