@@ -234,5 +234,5 @@ class CoveoSessionRecList(SessionRecList):
 
 
 cd = CoveoSessionRecList("", [1, 1, 1, 0],
-                         {"categories": ["cat", "cat", "cat", "dog"]})
-cd(verbose=True, logger=LOGGER.COMET)
+                         {"categories": ["cat", "cat", "cat", "dog"]}, "")
+cd(verbose=True, logger=LOGGER.LOCAL)
