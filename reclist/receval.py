@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
 from functools import wraps
-from reclogger import logger_factory
+from reclogger import logger_factory, LOGGER
 
 class Current:
     def __init__(self):
@@ -49,7 +49,7 @@ def rec_test(test_type: str):
 class RecList(ABC):
     META_DATA_FOLDER = ".reclist"
 
-    def __init__(self, model, dataset, metadata):
+    def __init__(self, model, dataset, metadata, logging_parameters=None):
         """
         :param model:
         :param dataset:
@@ -77,7 +77,7 @@ class RecList(ABC):
 
         return nodes
 
-    def __call__(self, verbose=True, logger="comet", *args, **kwargs):
+    def __call__(self, verbose=True, logger=LOGGER.COMET, *args, **kwargs):
         logger = logger_factory(logger)()
 
         run_epoch_time_ms = round(time.time() * 1000)
@@ -201,19 +201,20 @@ class SessionRecList(RecList):
 
 class CoveoSessionRecList(SessionRecList):
 
-    def __init__(self, model, dataset, metadata):
+    def __init__(self, model, dataset, metadata, similarity_model):
         """
         :param model:
         :param dataset:
         """
 
         super().__init__(model, dataset, metadata)
+        self.similarity_model = similarity_model
 
     def predict(self):
         """
         Do something
         """
-        return [0]*len(self.dataset)
+        return [1, 1, 1, 1]
 
     def get_targets(self):
         """
@@ -221,6 +222,17 @@ class CoveoSessionRecList(SessionRecList):
         """
         return self.dataset
 
+    @rec_test(test_type="SlicedAccuracy")
+    def sliced_accuracy(self):
+        """
+        Compute the accuracy
+        """
+        from metrics.standard_metrics import accuracy_per_slice
+        return accuracy_per_slice(
+            self.get_targets(), self.predict(), self.metadata["categories"]
+        )
 
-cd = CoveoSessionRecList("", [1, 0, 1, 0], {})
-cd(verbose=True)
+
+cd = CoveoSessionRecList("", [1, 1, 1, 0],
+                         {"categories": ["cat", "cat", "cat", "dog"]})
+cd(verbose=True, logger=LOGGER.COMET)

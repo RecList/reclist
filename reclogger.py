@@ -1,12 +1,18 @@
 from comet_ml import Experiment
+import os
+import logging
+from enum import Enum
+
+class LOGGER(Enum):
+    LOCAL = 1
+    COMET = 2
 
 
 def logger_factory(label):
-    if label == "comet":
+    if label == LOGGER.COMET:
         return CometLogger
     else:
         return RecLogger
-
 
 
 class RecLogger:
@@ -15,16 +21,17 @@ class RecLogger:
         pass
 
     def write(self, label, value):
-        pass
+        logging.info(f"{label}:{value}")
 
 
 class CometLogger(RecLogger):
 
     def __init__(self):
+        super().__init__()
         self.experiment = Experiment(
-            api_key="",
-            project_name="",
-            workspace="",
+            api_key=os.environ["COMET_KEY"],
+            project_name=os.environ["COMET_PROJECT_NAME"],
+            workspace=os.environ["COMET_WORKSPACE"],
         )
 
     def write(self, label, value):

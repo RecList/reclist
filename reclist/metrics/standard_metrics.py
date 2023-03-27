@@ -1,10 +1,28 @@
 import collections
 import itertools
 import random
-
 import numpy as np
 import pandas as pd
+from sklearn.metrics import accuracy_score
 
+
+def func_per_slice(y_test, y_pred, categories, func):
+    labels = set(categories)
+
+    c = []
+    global_score = func(y_test, y_pred)
+
+    for label in labels:
+        mask = np.array([True if k == label else False for k in categories])
+        local_score = func(y_test[mask], y_pred[mask])
+        c.append(np.abs(local_score - global_score))
+    return np.mean(c)
+
+def accuracy_per_slice(y_test, y_pred, categories):
+
+    y_test = np.array(y_test)
+    y_pred = np.array(y_pred)
+    return func_per_slice(y_test, y_pred, categories, accuracy_score)
 
 def hits_at_k(
     y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int

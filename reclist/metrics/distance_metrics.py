@@ -12,6 +12,9 @@ from reclist.current import current
 from reclist.metrics.standard_metrics import sample_hits_at_k, sample_misses_at_k
 
 
+def similarity_item(function, item1, item2):
+    return function(item1, item2)
+
 def error_by_cosine_distance(model, y_test, y_preds, k=3, bins=25, debug=False):
     if not (
         hasattr(model.__class__, "get_vector")
