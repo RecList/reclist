@@ -391,7 +391,10 @@ class RecList(ABC):
                 ax.set_title(test_result['name'])
                 data = test_result['result'].keys()
                 ax.bar(data, [test_result['result'][_] for _ in data])
-                fig.savefig(plot_file_name)
+                # TODO: decide if we want to save the plot in S3 or not
+                # for now we save it only locally
+                if self.metadata_store == METADATA_STORE.LOCAL:
+                    fig.savefig(plot_file_name)
                 test_2_fig[test_result['name']] = fig
 
         return test_2_fig
@@ -538,7 +541,7 @@ cd = CoveoSessionRecList(
     dataset=[1, 1, 1, 0],
     metadata={"categories": ["cat", "cat", "cat", "dog"]},
     logger=LOGGER.COMET,
-    metadata_store= METADATA_STORE.LOCAL,
+    metadata_store= METADATA_STORE.S3,
     **{
         "COMET_KEY":  os.environ["COMET_KEY"],
         "COMET_PROJECT_NAME": os.environ["COMET_PROJECT_NAME"],
