@@ -232,7 +232,13 @@ class CoveoSessionRecList(SessionRecList):
             self.get_targets(), self.predict(), self.metadata["categories"]
         )
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except:
+    print("Dotenv not loaded: if you need ENV variables, make sure you export them manually")
+
 
 cd = CoveoSessionRecList("", [1, 1, 1, 0],
                          {"categories": ["cat", "cat", "cat", "dog"]}, "")
-cd(verbose=True, logger=LOGGER.LOCAL)
+cd(verbose=True, logger=LOGGER.COMET)
