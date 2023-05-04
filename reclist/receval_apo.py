@@ -17,6 +17,18 @@ from functools import wraps
 
 """
 
+### CHART TYPE ###
+
+"""
+
+
+class CHART_TYPE(Enum):
+    SCALAR = 'scalar'
+    BINS = 'bins'
+
+
+"""
+
 ### METADATA STORE SECTION ###
 
 """
@@ -39,7 +51,7 @@ class MetaStore(ABC):
 
 def metadata_store_factory(label) -> MetaStore:
     if label == METADATA_STORE.S3:
-        raise S3MetaStore
+        return S3MetaStore
     else:
         return LocalMetaStore
 
@@ -79,7 +91,7 @@ class S3MetaStore(MetaStore):
         s3 = s3fs.S3FileSystem(anon=False)
         if is_json:
             with s3.open(path, 'wb') as f:
-                json.dump(data, f, indent=2)
+                f.write(json.dumps(data).encode('utf-8'))
         else:
             with s3.open(path, 'wb') as f:
                 f.write(data)
@@ -108,6 +120,10 @@ class RecLogger(ABC):
     def write(self, label, value):
         pass
 
+    @abstractmethod
+    def save_plot(self, name, fig, *args, **kwargs):
+        pass
+
 
 def logger_factory(label) -> RecLogger:
     if label == LOGGER.COMET:
@@ -129,6 +145,9 @@ class LocalLogger(RecLogger):
         print(f"[italic red]{label}[/italic red]:{value}")
 
         return
+
+    def save_plot(self, name, fig, *args, **kwargs):
+        pass
 
 
 class CometLogger(RecLogger):
@@ -156,8 +175,17 @@ class CometLogger(RecLogger):
         return
 
     def write(self, label, value):
-        self.experiment.log_metric(label, value)
+        if isinstance(value, float):
+            self.experiment.log_metric(label, value)
         return
+
+    def save_plot(self, name, fig, *args, **kwargs):
+        import tempfile
+        with tempfile.NamedTemporaryFile() as temp:
+            file_name = temp.name + ".png"
+            fig.savefig(file_name)
+            self.experiment.log_image(file_name, name=name)
+
 
 """
 
@@ -165,7 +193,7 @@ class CometLogger(RecLogger):
 
 """
 
-def rec_test(test_type: str):
+def rec_test(test_type: str, display_type: CHART_TYPE = None):
     """
     Rec test decorator
     """
@@ -178,6 +206,7 @@ def rec_test(test_type: str):
         # add attributes to f
         w.is_test = True
         w.test_type = test_type
+        w.display_type = display_type
         try:
             w.test_desc = f.__doc__.lstrip().rstrip()
         except:
@@ -281,10 +310,18 @@ class RecList(ABC):
         table.add_column("Description ", style="magenta", no_wrap=False)
         table.add_column("Result", justify="right", style="green")
         for result in results:
+            # rich needs strings to display
+            printable_result = None
+            if isinstance(result['result'], float):
+                printable_result = str(round(result['result'], 4))
+            elif isinstance(result['result'], dict):
+                printable_result = json.dumps(result['result'], indent=4)
+            else:
+                printable_result = str(result['result'])
             table.add_row(
                 result['name'],
                 result['description'],
-                str(round(result['result'], 4)) # rich needs strings to display
+                printable_result
                 )
         # print out the table
         console = Console()
@@ -295,7 +332,7 @@ class RecList(ABC):
     def __call__(self, verbose=True, *args, **kwargs):
         from rich.progress import track
 
-        self.report_path = self.create_data_store()
+        self.meta_store_path = self.create_data_store()
         # iterate through tests
         for test_func_name, test in track(self._rec_tests.items(), description="Running RecTests"):
             test_result = test(*args, **kwargs)
@@ -306,24 +343,58 @@ class RecList(ABC):
                     "name": test.test_type,
                     "description": test.test_desc,
                     "result": test_result,
+                    "display_type": str(test.display_type),
                 }
             )
             self.logger_service.write(test.test_type, test_result)
         # finally, display all results in a table
         self._display_rich_table(self.name, self._test_results)
-        # at the end, we dump it locally
-        return self._generate_report(self._test_results, self.report_path)
+        # at the end, dump results to json and generate plots
+        test_2_fig = self._generate_report_and_plot(self._test_results, self.meta_store_path)
+        for test, fig in test_2_fig.items():
+            self.logger_service.save_plot(name=test, fig=fig)
 
-    def _generate_report(self, test_results: list, report_path: str):
+        return
+
+    def _generate_report_and_plot(self, test_results: list, meta_store_path: str):
         """
         Store a copy of the results into a file in the metadata store
 
-        TODO: decide what to do with plots and artifacts
+        TODO: decide what to do with artifacts
         """
-        report_file_name = self._dump_results_to_json(test_results, report_path)
+        # dump results to json
+        report_file_name = self._dump_results_to_json(test_results, meta_store_path)
+        # generate plots
+        test_2_fig = self._generate_plots(test_results, meta_store_path)
         # TODO: decide how store artifacts / if / where
         # self.store_artifacts(report_path)
-        return report_path
+        return test_2_fig
+
+    def _generate_plots(self, test_results: list, meta_store_path: str):
+        import matplotlib.pyplot as plt
+
+        test_2_fig = {}
+        for test_result in test_results:
+            display_type = test_result['display_type']
+            if display_type == str(CHART_TYPE.SCALAR):
+                # TODO: decide how to plot scalars
+                pass
+            elif display_type == str(CHART_TYPE.BINS):
+                plot_file_name = os.path.join(
+                    meta_store_path,
+                    "plots",
+                    "{}.png".format(test_result['name'])
+                    )
+                fig, ax = plt.subplots()
+                ax.set_xlabel('x')
+                ax.set_ylabel('y')
+                ax.set_title(test_result['name'])
+                data = test_result['result'].keys()
+                ax.bar(data, [test_result['result'][_] for _ in data])
+                fig.savefig(plot_file_name)
+                test_2_fig[test_result['name']] = fig
+
+        return test_2_fig
 
     def _dump_results_to_json(self, test_results: list, report_path: str):
         report = {
@@ -391,7 +462,7 @@ class CoveoSessionRecList(RecList):
         """
         return self.dataset
 
-    @rec_test(test_type="SlicedAccuracy")
+    @rec_test(test_type="SlicedAccuracy", display_type=CHART_TYPE.SCALAR)
     def sliced_accuracy(self):
         """
         Compute the accuracy by slice
@@ -405,7 +476,7 @@ class CoveoSessionRecList(RecList):
             self.get_targets(), self.predict(), self.metadata["categories"]
         )
 
-    @rec_test(test_type="Accuracy")
+    @rec_test(test_type="Accuracy", display_type=CHART_TYPE.SCALAR)
     def accuracy(self):
         """
         Compute the accuracy
@@ -418,6 +489,19 @@ class CoveoSessionRecList(RecList):
         return accuracy_score(
             self.get_targets(), self.predict()
         )
+
+    @rec_test(test_type="AccuracyByCountry", display_type=CHART_TYPE.BINS)
+    def accuracy_by_country(self):
+        """
+        Compute the accuracy by country
+        """
+        from metrics.standard_metrics import accuracy_per_slice
+        # fake some processing time
+        import time
+        time.sleep(2)
+        from random import randint
+        # TODO: note that is a static test, used to showcase the bin display
+        return { "US": randint(0, 100), "CA": randint(0, 100), "FR": randint(0, 100) }
 
 """
 
@@ -458,9 +542,10 @@ cd = CoveoSessionRecList(
     **{
         "COMET_KEY":  os.environ["COMET_KEY"],
         "COMET_PROJECT_NAME": os.environ["COMET_PROJECT_NAME"],
-        "COMET_WORKSPACE": os.environ["COMET_WORKSPACE"]
+        "COMET_WORKSPACE": os.environ["COMET_WORKSPACE"],
+        "bucket": os.environ["S3_BUCKET"],
     }
 )
 
-# run the reclist
+# run reclist
 cd(verbose=True)

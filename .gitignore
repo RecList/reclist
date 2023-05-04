@@ -112,3 +112,5 @@ ENV/
 
 # mac file
 .DS_Store
+
+*.png
