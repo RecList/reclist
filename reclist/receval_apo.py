@@ -704,12 +704,12 @@ cd = CoveoSessionRecList(
     model=apo_model,
     dataset=[1, 1, 1, 0],
     metadata={"categories": ["cat", "cat", "cat", "dog"]},
-    logger=LOGGER.NEPTUNE,
+    logger=LOGGER.COMET,
     metadata_store= METADATA_STORE.LOCAL,
+    bucket=os.environ["S3_BUCKET"],
     COMET_KEY=os.environ["COMET_KEY"],
     COMET_PROJECT_NAME=os.environ["COMET_PROJECT_NAME"],
     COMET_WORKSPACE=os.environ["COMET_WORKSPACE"],
-    bucket=os.environ["S3_BUCKET"]
 )
 
 # run reclist
