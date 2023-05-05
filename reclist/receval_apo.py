@@ -258,7 +258,7 @@ def logger_factory(label) -> RecLogger:
     if label == LOGGER.COMET:
         return CometLogger
     elif label == LOGGER.NEPTUNE:
-        raise NotImplementedError
+        return NeptuneLogger
     else:
         return LocalLogger
 
@@ -277,6 +277,41 @@ class LocalLogger(RecLogger):
 
     def save_plot(self, name, fig, *args, **kwargs):
         pass
+
+
+class NeptuneLogger(RecLogger):
+
+    def __init__(self, *args, **kwargs):
+        """
+
+        In order of priority, use first the kwargs, then the env variables
+
+        """
+        super().__init__(*args, **kwargs)
+        import neptune
+
+        api_key = kwargs["NEPTUNE_KEY"] if "NEPTUNE_KEY" in kwargs else os.environ["NEPTUNE_KEY"]
+        project_name = kwargs["NEPTUNE_PROJECT_NAME"] if "NEPTUNE_PROJECT_NAME" in kwargs else os.environ["NEPTUNE_PROJECT_NAME"]
+
+        self.experiment = neptune.init_run(
+            project=project_name,
+            api_token=api_key,
+        )
+
+        return
+
+    def write(self, label, value):
+        if isinstance(value, float):
+            self.experiment[label] = value
+        return
+
+    def save_plot(self, name, fig, *args, **kwargs):
+        import tempfile
+        with tempfile.NamedTemporaryFile() as temp:
+            file_name = temp.name + ".png"
+            fig.savefig(file_name)
+            self.experiment[name].upload(file_name)
+
 
 
 class CometLogger(RecLogger):
@@ -669,7 +704,7 @@ cd = CoveoSessionRecList(
     model=apo_model,
     dataset=[1, 1, 1, 0],
     metadata={"categories": ["cat", "cat", "cat", "dog"]},
-    logger=LOGGER.COMET,
+    logger=LOGGER.NEPTUNE,
     metadata_store= METADATA_STORE.LOCAL,
     COMET_KEY=os.environ["COMET_KEY"],
     COMET_PROJECT_NAME=os.environ["COMET_PROJECT_NAME"],
