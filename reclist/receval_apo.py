@@ -24,7 +24,9 @@ from functools import wraps
 
 class CHART_TYPE(Enum):
     SCALAR = 'scalar'
+    BARS = 'bars'
     BINS = 'bins'
+
 
 
 """
@@ -72,7 +74,9 @@ class SkigramSimilarityModel(SimilarityModel):
         """
         We return the distance in the latent space
         """
-        raise NotImplementedError
+        # TODO: replace this with the actual distance
+        from random import random
+        return random()
 
 
 class GPT3SimilarityModel(SimilarityModel):
@@ -142,18 +146,6 @@ class GPT3SimilarityModel(SimilarityModel):
 
     def similarity_gradient(self, query, target, *args, **kwargs) -> float:
         raise Exception("No gradient is available for GPT3")
-
-
-"""
-
-### CHART TYPE ###
-
-"""
-
-
-class CHART_TYPE(Enum):
-    SCALAR = 'scalar'
-    BINS = 'bins'
 
 
 """
@@ -480,6 +472,11 @@ class RecList(ABC):
                 printable_result = str(round(result['result'], 4))
             elif isinstance(result['result'], dict):
                 printable_result = json.dumps(result['result'], indent=4)
+            elif isinstance(result['result'], list):
+                printable_result = json.dumps(
+                    result['result'][:3] + ["..."],
+                    indent=4
+                )
             else:
                 printable_result = str(result['result'])
             table.add_row(
@@ -528,40 +525,59 @@ class RecList(ABC):
         """
         # dump results to json
         report_file_name = self._dump_results_to_json(test_results, meta_store_path)
-        # generate plots
-        test_2_fig = self._generate_plots(test_results, meta_store_path)
+        # generate and save plots if applicable
+        test_2_fig = self._generate_plots(test_results)
+        for test_name, fig in test_2_fig.items():
+            if self.metadata_store == METADATA_STORE.LOCAL:
+                # TODO: decide if we want to save the plot in S3 or not
+                fig.savefig(os.path.join(meta_store_path, "plots", "{}.png".format(test_name)))
         # TODO: decide how store artifacts / if / where
         # self.store_artifacts(report_path)
         return test_2_fig
 
-    def _generate_plots(self, test_results: list, meta_store_path: str):
-        import matplotlib.pyplot as plt
-
+    def _generate_plots(self, test_results: list):
         test_2_fig = {}
         for test_result in test_results:
             display_type = test_result['display_type']
+            fig = None
             if display_type == str(CHART_TYPE.SCALAR):
                 # TODO: decide how to plot scalars
                 pass
+            elif display_type == str(CHART_TYPE.BARS):
+                fig = self._bar_chart(test_result)
             elif display_type == str(CHART_TYPE.BINS):
-                plot_file_name = os.path.join(
-                    meta_store_path,
-                    "plots",
-                    "{}.png".format(test_result['name'])
-                    )
-                fig, ax = plt.subplots()
-                ax.set_xlabel('x')
-                ax.set_ylabel('y')
-                ax.set_title(test_result['name'])
-                data = test_result['result'].keys()
-                ax.bar(data, [test_result['result'][_] for _ in data])
-                # TODO: decide if we want to save the plot in S3 or not
-                # for now we save it only locally
-                if self.metadata_store == METADATA_STORE.LOCAL:
-                    fig.savefig(plot_file_name)
+                fig = self._bin_chart(test_result)
+            # append fig to the mapping
+            if fig is not None:
                 test_2_fig[test_result['name']] = fig
 
         return test_2_fig
+
+    def _bin_chart(self, test_result: dict):
+        import matplotlib.pyplot as plt
+
+        fig, ax = plt.subplots()
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_title(test_result['name'])
+        data = test_result['result']
+        assert isinstance(data, list), "data must be a list"
+        ax.hist(data, color='lightgreen', ec='black')
+
+        return fig
+
+    def _bar_chart(self, test_result: dict):
+        import matplotlib.pyplot as plt
+
+        fig, ax = plt.subplots()
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_title(test_result['name'])
+        data = test_result['result'].keys()
+        ax.bar(data, [test_result['result'][_] for _ in data])
+
+        return fig
+
 
     def _dump_results_to_json(self, test_results: list, report_path: str):
         report = {
@@ -629,15 +645,23 @@ class CoveoSessionRecList(RecList):
         """
         return self.dataset
 
+    @rec_test(test_type="LessWrong", display_type=CHART_TYPE.BINS)
+    def less_wrong(self):
+        truths = self.get_targets()
+        predictions = self.predict()
+        model_misses = [(t, p) for t, p in zip(truths, predictions) if t != p]
+        similarity_scores = [
+            self.similarity_model.similarity_gradient(t, p) for t, p in model_misses
+        ]
+
+        return similarity_scores
+
     @rec_test(test_type="SlicedAccuracy", display_type=CHART_TYPE.SCALAR)
     def sliced_accuracy(self):
         """
         Compute the accuracy by slice
         """
         from metrics.standard_metrics import accuracy_per_slice
-        # fake some processing time
-        import time
-        time.sleep(3)
 
         return accuracy_per_slice(
             self.get_targets(), self.predict(), self.metadata["categories"]
@@ -649,25 +673,18 @@ class CoveoSessionRecList(RecList):
         Compute the accuracy
         """
         from sklearn.metrics import accuracy_score
-        # fake some processing time
-        import time
-        time.sleep(3)
 
         return accuracy_score(
             self.get_targets(), self.predict()
         )
 
-    @rec_test(test_type="AccuracyByCountry", display_type=CHART_TYPE.BINS)
+    @rec_test(test_type="AccuracyByCountry", display_type=CHART_TYPE.BARS)
     def accuracy_by_country(self):
         """
         Compute the accuracy by country
         """
-        from metrics.standard_metrics import accuracy_per_slice
-        # fake some processing time
-        import time
-        time.sleep(2)
-        from random import randint
         # TODO: note that is a static test, used to showcase the bin display
+        from random import randint
         return { "US": randint(0, 100), "CA": randint(0, 100), "FR": randint(0, 100) }
 
 """
@@ -687,25 +704,32 @@ assert os.environ["COMET_KEY"], "Please set COMET_KEY in your environment"
 
 class myModel:
 
-    def __init__(self):
-        pass
+    def __init__(self, n):
+        self.n = n
 
     def predict(self):
         """
         Do something
         """
-        return [1, 1, 1, 1]
+        from random import randint
+        return [randint(0, 1) for _ in range(self.n)]
 
-
-apo_model = myModel()
+# create a dataset randomly
+from random import randint, choice
+n = 10000
+dataset = [randint(0, 1) for _ in range(n)]
+metadata = {"categories": [choice(["cat", "dog", "capybara"]) for _ in range(n)]}
+apo_model = myModel(n)
+my_sim_model = SkigramSimilarityModel()
 
 # initialize with everything
 cd = CoveoSessionRecList(
     model=apo_model,
-    dataset=[1, 1, 1, 0],
-    metadata={"categories": ["cat", "cat", "cat", "dog"]},
+    dataset=dataset,
+    metadata=metadata,
     logger=LOGGER.COMET,
     metadata_store= METADATA_STORE.LOCAL,
+    similarity_model=my_sim_model,
     bucket=os.environ["S3_BUCKET"],
     COMET_KEY=os.environ["COMET_KEY"],
     COMET_PROJECT_NAME=os.environ["COMET_PROJECT_NAME"],
@@ -732,4 +756,5 @@ p2 = {
     Blue cotton monogram badge cap from Balmain featuring logo patch to the front, mesh detailing, fabric-covered button at the crown and adjustable fit.
     '''
 }
-print(sim_model.similarity_binary(p1, p2, verbose=True))
+similarity_judgement = sim_model.similarity_binary(p1, p2, verbose=False)
+print("P1 {} and P2 {} are similar: {}".format(p1["name"], p2["name"], similarity_judgement))
