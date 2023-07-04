@@ -10,7 +10,6 @@ import os
 import time
 from enum import Enum
 from abc import ABC, abstractmethod
-from datetime import datetime
 from pathlib import Path
 from functools import wraps
 
@@ -601,13 +600,21 @@ class RecList(ABC):
     def rec_tests(self):
         return self._rec_tests
 
-    @abstractmethod
+    #@abstractmethod
+    #def get_inputs(self):
+    #    pass
+
+    #@abstractmethod
     def get_targets(self):
         pass
 
     @abstractmethod
     def predict(self):
         pass
+
+    #@abstractmethod
+    #def get_metadata(self):
+    #    pass
 
 
 class CoveoSessionRecList(RecList):
