@@ -12,6 +12,8 @@ from enum import Enum
 from abc import ABC, abstractmethod
 from pathlib import Path
 from functools import wraps
+import pandas as pd
+import numpy as np
 
 
 """
@@ -132,6 +134,10 @@ class GPT3SimilarityModel(SimilarityModel):
             "Authorization": "Bearer {}".format(self.api_key)
             }
         r = requests.post(self.API_URL, data=json.dumps(data), headers=headers)
+        # NOTE: we break if API call fails, alternative behavior are possible of course
+        if r.status_code != 200:
+            raise Exception("Error in GPT3 API call: {}".format(r.text))
+
         completion = json.loads(r.text)['choices'][0]['text']
         if kwargs.get("verbose", False):
             print("Query: {}".format(query_str))
@@ -281,8 +287,8 @@ class NeptuneLogger(RecLogger):
         super().__init__(*args, **kwargs)
         import neptune
 
-        api_key = kwargs["NEPTUNE_KEY"] if "NEPTUNE_KEY" in kwargs else os.environ["NEPTUNE_KEY"]
-        project_name = kwargs["NEPTUNE_PROJECT_NAME"] if "NEPTUNE_PROJECT_NAME" in kwargs else os.environ["NEPTUNE_PROJECT_NAME"]
+        api_key = kwargs.get("NEPTUNE_KEY", os.environ["NEPTUNE_KEY"])
+        project_name = kwargs.get("NEPTUNE_PROJECT_NAME", os.environ["NEPTUNE_PROJECT_NAME"])
 
         self.experiment = neptune.init_run(
             project=project_name,
@@ -316,9 +322,9 @@ class CometLogger(RecLogger):
         super().__init__(*args, **kwargs)
         from comet_ml import Experiment
 
-        api_key = kwargs["COMET_KEY"] if "COMET_KEY" in kwargs else os.environ["COMET_KEY"]
-        project_name = kwargs["COMET_PROJECT_NAME"] if "COMET_PROJECT_NAME" in kwargs else os.environ["COMET_PROJECT_NAME"]
-        workspace = kwargs["COMET_WORKSPACE"] if "COMET_WORKSPACE" in kwargs else os.environ["COMET_WORKSPACE"]
+        api_key = kwargs.get("COMET_KEY", os.environ["COMET_KEY"])
+        project_name = kwargs.get("COMET_PROJECT_NAME", os.environ["COMET_PROJECT_NAME"])
+        workspace = kwargs.get("COMET_WORKSPACE", os.environ["COMET_WORKSPACE"])
 
         # set up the experiment
         self.experiment = Experiment(
@@ -386,9 +392,7 @@ class RecList(ABC):
 
     def __init__(
             self,
-            model,
-            dataset,
-            metadata,
+            model_name: str,
             logger: LOGGER = LOGGER.LOCAL,
             metadata_store: METADATA_STORE = METADATA_STORE.LOCAL,
             **kwargs,
@@ -399,10 +403,8 @@ class RecList(ABC):
         """
 
         self.name = self.__class__.__name__
+        self.model_name = model_name
         self._rec_tests = self.get_tests()
-        self.model = model
-        self.dataset = dataset
-        self.metadata = metadata
         self._test_results = []
         self.logger = logger
         self.logger_service = logger_factory(logger)(**kwargs)
@@ -443,7 +445,7 @@ class RecList(ABC):
             bucket,
             self.META_DATA_FOLDER,
             self.name,
-            self.model.__class__.__name__,
+            self.model_name,
             str(run_epoch_time_ms),
         )
         # create subfolders in the local file system if needed
@@ -581,7 +583,7 @@ class RecList(ABC):
     def _dump_results_to_json(self, test_results: list, report_path: str):
         report = {
             "metadata": {
-                "model_name": self.model.__class__.__name__,
+                "model_name": self.model_name,
                 "reclist": self.name,
                 "tests": list(self._rec_tests.keys()),
             },
@@ -600,62 +602,36 @@ class RecList(ABC):
     def rec_tests(self):
         return self._rec_tests
 
-    #@abstractmethod
-    #def get_inputs(self):
-    #    pass
 
-    #@abstractmethod
-    def get_targets(self):
-        pass
-
-    @abstractmethod
-    def predict(self):
-        pass
-
-    #@abstractmethod
-    #def get_metadata(self):
-    #    pass
-
-
-class CoveoSessionRecList(RecList):
+class FreeSessionRecList(RecList):
 
     def __init__(
         self,
-        model,
         dataset,
         metadata,
+        predictions,
+        model_name,
         logger: LOGGER,
         metadata_store: METADATA_STORE,
         **kwargs
     ):
         super().__init__(
-            model,
-            dataset,
-            metadata,
+            model_name,
             logger,
             metadata_store,
             **kwargs
         )
+        self.dataset = dataset
+        self.metadata = metadata
+        self.predictions = predictions
         self.similarity_model = kwargs.get("similarity_model", None)
 
         return
 
-    def predict(self):
-        """
-        Do something
-        """
-        return self.model.predict()
-
-    def get_targets(self):
-        """
-        Do something
-        """
-        return self.dataset
-
     @rec_test(test_type="LessWrong", display_type=CHART_TYPE.BINS)
     def less_wrong(self):
-        truths = self.get_targets()
-        predictions = self.predict()
+        truths = self.dataset
+        predictions = self.predictions
         model_misses = [(t, p) for t, p in zip(truths, predictions) if t != p]
         similarity_scores = [
             self.similarity_model.similarity_gradient(t, p) for t, p in model_misses
@@ -671,7 +647,7 @@ class CoveoSessionRecList(RecList):
         from metrics.standard_metrics import accuracy_per_slice
 
         return accuracy_per_slice(
-            self.get_targets(), self.predict(), self.metadata["categories"]
+            self.dataset, self.predictions, self.metadata["categories"]
         )
 
     @rec_test(test_type="Accuracy", display_type=CHART_TYPE.SCALAR)
@@ -681,9 +657,7 @@ class CoveoSessionRecList(RecList):
         """
         from sklearn.metrics import accuracy_score
 
-        return accuracy_score(
-            self.get_targets(), self.predict()
-        )
+        return accuracy_score(self.dataset, self.predictions)
 
     @rec_test(test_type="AccuracyByCountry", display_type=CHART_TYPE.BARS)
     def accuracy_by_country(self):
@@ -693,6 +667,63 @@ class CoveoSessionRecList(RecList):
         # TODO: note that is a static test, used to showcase the bin display
         from random import randint
         return { "US": randint(0, 100), "CA": randint(0, 100), "FR": randint(0, 100) }
+
+
+class DFSessionRecList(RecList):
+
+    def __init__(
+        self,
+        dataset,
+        predictions,
+        model_name,
+        logger: LOGGER,
+        metadata_store: METADATA_STORE,
+        **kwargs
+    ):
+        super().__init__(
+            model_name,
+            logger,
+            metadata_store,
+            **kwargs
+        )
+        self.dataset = dataset
+        self._y_preds = predictions
+        self._y_test = kwargs.get("y_test", None)
+        self.similarity_model = kwargs.get("similarity_model", None)
+
+        return
+
+    @rec_test('HIT_RATE')
+    def hit_rate_at_100(self):
+        hr = self.hit_rate_at_k(self._y_preds, self._y_test, k=100)
+        return hr
+
+    def hit_rate_at_k(self, y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int):
+        """
+        N = number test cases
+        M = number ground truth per test case
+        """
+        hits = self.hits_at_k(y_pred, y_test, k)  # N x M x k
+        hits = hits.max(axis=1)  # N x k
+        return hits.max(axis=1).mean()  # 1
+
+    def hits_at_k(self, y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int):
+        """
+        N = number test cases
+        M = number ground truth per test case
+        """
+        y_test_mask = y_test.values != -1  # N x M
+
+        y_pred_mask = y_pred.values[:, :k] != -1  # N x k
+
+        y_test = y_test.values[:, :, None]  # N x M x 1
+        y_pred = y_pred.values[:, None, :k]  # N x 1 x k
+
+        hits = y_test == y_pred  # N x M x k
+        hits = hits * y_test_mask[:, :, None]  # N x M x k
+        hits = hits * y_pred_mask[:, None, :]  # N x M x k
+
+        return hits
 
 """
 
@@ -706,8 +737,6 @@ try:
 except:
     print("Dotenv not loaded: if you need ENV variables, make sure you export them manually")
 
-# since we are testing comet, make sure it is set
-assert os.environ["COMET_KEY"], "Please set COMET_KEY in your environment"
 
 class myModel:
 
@@ -721,19 +750,24 @@ class myModel:
         from random import randint
         return [randint(0, 1) for _ in range(self.n)]
 
+
 # create a dataset randomly
 from random import randint, choice
 n = 10000
+apo_model = myModel(n)
 dataset = [randint(0, 1) for _ in range(n)]
 metadata = {"categories": [choice(["cat", "dog", "capybara"]) for _ in range(n)]}
-apo_model = myModel(n)
+predictions = apo_model.predict()
 my_sim_model = SkigramSimilarityModel()
+assert len(dataset) == len(predictions), "dataset, predictions must have the same length"
+
 
 # initialize with everything
-cd = CoveoSessionRecList(
-    model=apo_model,
+cd = FreeSessionRecList(
     dataset=dataset,
     metadata=metadata,
+    predictions=predictions,
+    model_name="myRandomModel",
     logger=LOGGER.COMET,
     metadata_store= METADATA_STORE.LOCAL,
     similarity_model=my_sim_model,
@@ -747,21 +781,84 @@ cd = CoveoSessionRecList(
 cd(verbose=True)
 
 # test the similarity model with open ai :clownface:
-assert os.environ["OPENAI_API_KEY"], "Please set OPENAI_API_KEY in your environment"
-sim_model = GPT3SimilarityModel(api_key=os.environ["OPENAI_API_KEY"])
-p1 = {
-    "name": "logo-print cotton cap",
-    "brand": 'Palm Angels',
-    "description": '''
-    Known for a laid-back aesthetic, Palm Angels knows how to portray its Californian inspiration. This classic cap carries the brand's logo printed on the front, adding a touch of recognition to a relaxed look.
-    '''
-}
-p2 = {
-    "name": "monogram badge cap",
-    "brand": 'Balmain',
-    "description": '''
-    Blue cotton monogram badge cap from Balmain featuring logo patch to the front, mesh detailing, fabric-covered button at the crown and adjustable fit.
-    '''
-}
-similarity_judgement = sim_model.similarity_binary(p1, p2, verbose=False)
-print("P1 {} and P2 {} are similar: {}".format(p1["name"], p2["name"], similarity_judgement))
+#sim_model = GPT3SimilarityModel(api_key=os.environ["OPENAI_API_KEY"])
+#p1 = {
+#    "name": "logo-print cotton cap",
+#    "brand": 'Palm Angels',
+#    "description": '''
+#    Known for a laid-back aesthetic, Palm Angels knows how to portray its Californian inspiration. This classic cap carries the brand's logo printed on the front, adding a touch of recognition to a relaxed look.
+#    '''
+#}
+#p2 = {
+#    "name": "monogram badge cap",
+#    "brand": 'Balmain',
+#    "description": '''
+#    Blue cotton monogram badge cap from Balmain featuring logo patch to the front, mesh detailing, fabric-covered button at the crown and adjustable fit.
+#    '''
+#}
+#similarity_judgement = sim_model.similarity_binary(p1, p2, verbose=False)
+#print("P1 {} and P2 {} are similar: {}".format(p1["name"], p2["name"], similarity_judgement))
+
+
+class MySuperModel():
+
+    def __init__(self, items: pd.DataFrame, top_k: int=10, **kwargs):
+        self.items = items
+        self.top_k = top_k
+        print("Received additional arguments: {}".format(kwargs))
+        return
+
+    def predict(self, user_ids: pd.DataFrame) -> pd.DataFrame:
+        k = self.top_k
+        num_users = len(user_ids)
+        pred = self.items.sample(n=k*num_users, replace=True).index.values
+        pred = pred.reshape(num_users, k)
+        pred = np.concatenate((user_ids[['user_id']].values, pred), axis=1)
+        return pd.DataFrame(pred, columns=['user_id', *[str(i) for i in range(k)]]).set_index('user_id')
+
+
+print("\n\n ======> Loading dataset. \n\n")
+df_events = pd.read_csv('evalrs_dataset_KDD23/evalrs_events.csv', index_col=0, dtype='int32')
+df_tracks = pd.read_csv('evalrs_dataset_KDD23/evalrs_tracks.csv',
+                                dtype={
+                                    'track_id': 'int32',
+                                    'artist_id': 'int32'
+                                }).set_index('track_id')
+
+df_users = pd.read_csv('evalrs_dataset_KDD23/evalrs_users.csv',
+                            dtype={
+                                'user_id': 'int32',
+                                'playcount': 'int32',
+                                'country_id': 'int32',
+                                'timestamp': 'int32',
+                                'age': 'int32',
+                            })
+
+my_df_model = MySuperModel(df_tracks, top_k=10)
+df_predictions = my_df_model.predict(df_users)
+# build a mock dataset for the golden standard
+all_tracks = df_tracks.index.values
+from random import choice
+df_dataset = pd.DataFrame(
+    {
+        'track_id': [choice(all_tracks) for _ in range(len(df_predictions))]
+    }
+)
+
+# initialize with everything
+cdf = DFSessionRecList(
+    dataset=df_events,
+    model_name="myDataFrameRandomModel",
+    predictions=df_predictions,
+    # I can specify the gold standard here, or doing it in the init of course
+    y_test=df_dataset,
+    logger=LOGGER.NEPTUNE,
+    metadata_store= METADATA_STORE.LOCAL,
+    similarity_model=my_sim_model,
+    bucket=os.environ["S3_BUCKET"],
+    NEPTUNE_KEY=os.environ["NEPTUNE_KEY"],
+    NEPTUNE_PROJECT_NAME=os.environ["NEPTUNE_PROJECT_NAME"],
+)
+
+# run reclist
+cdf(verbose=True)
