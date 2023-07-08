@@ -1,324 +1,386 @@
-import collections
-import random
-from typing import List
-
+import json
+import os
+import time
+from abc import ABC
+from pathlib import Path
+from functools import wraps
 import pandas as pd
+from charts import CHART_TYPE
+from logs import LOGGER, logger_factory
+from metadata import METADATA_STORE, metadata_store_factory
 
-from reclist.abstractions import RecList, rec_test
+
+def rec_test(test_type: str, display_type: CHART_TYPE = None):
+    """
+    Rec test decorator
+    """
+
+    def decorator(f):
+        @wraps(f)
+        def w(*args, **kwargs):
+            return f(*args, **kwargs)
+
+        # add attributes to f
+        w.is_test = True
+        w.test_type = test_type
+        w.display_type = display_type
+        try:
+            w.test_desc = f.__doc__.lstrip().rstrip()
+        except:
+            w.test_desc = ""
+        try:
+            # python 3
+            w.name = w.__name__
+        except:
+            # python 2
+            w.name = w.__func__.func_name
+        return w
+
+    return decorator
 
 
-class MovieLensRecList(RecList):
-    def squared_error(self, y_true, y_pred):
-        return (y_true - y_pred) ** 2
+class RecList(ABC):
 
-    def rmse_by_slice(self, slice: str):
-        sq_error = self.squared_error(
-            self._y_preds[["rating"]], self._y_test[["rating"]]
+    # this is the target metadata folder
+    # it can be overwritten by the user
+    # if an env variable is set
+    META_DATA_FOLDER = os.environ.get("RECLIST_META_DATA_FOLDER", ".reclist")
+
+    def __init__(
+            self,
+            model_name: str,
+            logger: LOGGER = LOGGER.LOCAL,
+            metadata_store: METADATA_STORE = METADATA_STORE.LOCAL,
+            **kwargs,
+            ):
+        """
+        :param model:
+        :param dataset:
+        """
+
+        self.name = self.__class__.__name__
+        self.model_name = model_name
+        self._rec_tests = self.get_tests()
+        self._test_results = []
+        self.logger = logger
+        self.logger_service = logger_factory(logger)(**kwargs)
+        # if s3 is used, we need to specify the bucket
+        self.metadata_bucket = kwargs["bucket"] if "bucket" in kwargs else None
+        assert self.metadata_bucket is not None if metadata_store == METADATA_STORE.S3 else True, \
+            "If using S3, you need to specify the bucket"
+        self.metadata_store_service = metadata_store_factory(metadata_store)(**kwargs)
+        self.metadata_store = metadata_store
+
+        return
+
+    def get_tests(self):
+        """
+        Helper to extract methods decorated with rec_test
+        """
+
+        nodes = {}
+        for _ in self.__dir__():
+            if not hasattr(self, _):
+                continue
+            func = getattr(self, _)
+            if hasattr(func, "is_test"):
+                nodes[func.name] = func
+
+        return nodes
+
+    def create_data_store(self):
+        """
+        Each reclist run stores artifacts in
+
+        METADATA_FOLDER/ReclistName/ModelName/RunEpochTimeMs
+        """
+        run_epoch_time_ms = round(time.time() * 1000)
+        # specify a bucket as the root of the datastore if using s3
+        bucket = self.metadata_bucket if self.metadata_store == METADATA_STORE.S3 else ''
+        # create datastore path
+        report_path = os.path.join(
+            bucket,
+            self.META_DATA_FOLDER,
+            self.name,
+            self.model_name,
+            str(run_epoch_time_ms),
         )
-        sq_error[slice] = self.product_data.loc[self._x_test["movie_id"]][slice].values
-        return sq_error.explode(slice).groupby(slice)["rating"].agg("mean")
+        # create subfolders in the local file system if needed
+        folders = ["artifacts", "results", "plots"]
+        if self.metadata_store == METADATA_STORE.LOCAL:
+            for folder in folders:
+                Path(os.path.join(report_path, folder)).mkdir(
+                    parents=True, exist_ok=True
+                )
 
-    @rec_test(test_type="stats")
-    def basic_stats(self):
-        return self._y_preds.describe()
+        return report_path
 
-    @rec_test(test_type="rmse")
-    def rmse(self):
-        return (
-            self.squared_error(self._y_preds["rating"], self._y_test["rating"]).mean()
-            ** 0.5
-        )
+    def _display_rich_table(self, table_name: str, results: list):
+        from rich.console import Console
+        from rich.table import Table
+        # build the rich table
+        table = Table(title=table_name)
+        table.add_column("Type", justify="right", style="cyan", no_wrap=True)
+        table.add_column("Description ", style="magenta", no_wrap=False)
+        table.add_column("Result", justify="right", style="green")
+        for result in results:
+            # rich needs strings to display
+            printable_result = None
+            if isinstance(result['result'], float):
+                printable_result = str(round(result['result'], 4))
+            elif isinstance(result['result'], dict):
+                printable_result = json.dumps(result['result'], indent=4)
+            elif isinstance(result['result'], list):
+                printable_result = json.dumps(
+                    result['result'][:3] + ["..."],
+                    indent=4
+                )
+            else:
+                printable_result = str(result['result'])
+            table.add_row(
+                result['name'],
+                result['description'],
+                printable_result
+                )
+        # print out the table
+        console = Console()
+        console.print(table)
 
-    @rec_test(test_type="rmse_by_genre")
-    def rmse_by_genre(self):
-        return self.rmse_by_slice("genres")
+        return
 
+    def __call__(self, verbose=True, *args, **kwargs):
+        from rich.progress import track
 
-class CoveoCartRecList(RecList):
-    @rec_test(test_type="stats")
-    def basic_stats(self):
+        self.meta_store_path = self.create_data_store()
+        # iterate through tests
+        for test_func_name, test in track(self._rec_tests.items(), description="Running RecTests"):
+            test_result = test(*args, **kwargs)
+            # we could store the results in the test function itself
+            # test.__func__.test_result = test_result
+            self._test_results.append(
+                {
+                    "name": test.test_type,
+                    "description": test.test_desc,
+                    "result": test_result,
+                    "display_type": str(test.display_type),
+                }
+            )
+            self.logger_service.write(test.test_type, test_result)
+        # finally, display all results in a table
+        self._display_rich_table(self.name, self._test_results)
+        # at the end, dump results to json and generate plots
+        test_2_fig = self._generate_report_and_plot(self._test_results, self.meta_store_path)
+        for test, fig in test_2_fig.items():
+            self.logger_service.save_plot(name=test, fig=fig)
+
+        return
+
+    def _generate_report_and_plot(self, test_results: list, meta_store_path: str):
         """
-        Basic statistics on training, test and prediction data
+        Store a copy of the results into a file in the metadata store
+
+        TODO: decide what to do with artifacts
         """
-        from reclist.metrics.standard_metrics import statistics
+        # dump results to json
+        report_file_name = self._dump_results_to_json(test_results, meta_store_path)
+        # generate and save plots if applicable
+        test_2_fig = self._generate_plots(test_results)
+        for test_name, fig in test_2_fig.items():
+            if self.metadata_store == METADATA_STORE.LOCAL:
+                # TODO: decide if we want to save the plot in S3 or not
+                fig.savefig(os.path.join(meta_store_path, "plots", "{}.png".format(test_name)))
+        # TODO: decide how store artifacts / if / where
+        # self.store_artifacts(report_path)
+        return test_2_fig
 
-        return statistics(
-            self._x_train, self._y_train, self._x_test, self._y_test, self._y_preds
-        )
+    def _generate_plots(self, test_results: list):
+        test_2_fig = {}
+        for test_result in test_results:
+            display_type = test_result['display_type']
+            fig = None
+            if display_type == str(CHART_TYPE.SCALAR):
+                # TODO: decide how to plot scalars
+                pass
+            elif display_type == str(CHART_TYPE.BARS):
+                fig = self._bar_chart(test_result)
+            elif display_type == str(CHART_TYPE.BINS):
+                fig = self._bin_chart(test_result)
+            # append fig to the mapping
+            if fig is not None:
+                test_2_fig[test_result['name']] = fig
 
-    @rec_test(test_type="price_homogeneity")
-    def price_test(self):
-        """
-        Measures the absolute log ratio of ground truth and prediction price
-        """
-        from reclist.metrics.price_homogeneity import price_homogeneity_test
+        return test_2_fig
 
-        return price_homogeneity_test(
-            y_test=self.sku_only(self._y_test),
-            y_preds=self.sku_only(self._y_preds),
-            product_data=self.product_data,
-            price_sel_fn=lambda x: float(x["price_bucket"])
-            if x["price_bucket"]
-            else None,
-        )
+    def _bin_chart(self, test_result: dict):
+        import matplotlib.pyplot as plt
 
-    @rec_test(test_type="Coverage@10")
-    def coverage_at_k(self):
-        """
-        Coverage is the proportion of all possible products which the RS
-        recommends based on a set of sessions
-        """
-        from reclist.metrics.standard_metrics import coverage_at_k
+        fig, ax = plt.subplots()
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_title(test_result['name'])
+        data = test_result['result']
+        assert isinstance(data, list), "data must be a list"
+        ax.hist(data, color='lightgreen', ec='black')
 
-        return coverage_at_k(self.sku_only(self._y_preds), self.product_data, k=10)
+        return fig
 
-    @rec_test(test_type="HR@10")
-    def hit_rate_at_k(self):
-        """
-        Compute the rate in which the top-k predictions contain the item to be predicted
-        """
-        from reclist.metrics.standard_metrics import hit_rate_at_k
+    def _bar_chart(self, test_result: dict):
+        import matplotlib.pyplot as plt
 
-        return hit_rate_at_k(
-            self.sku_only(self._y_preds), self.sku_only(self._y_test), k=10
-        )
+        fig, ax = plt.subplots()
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_title(test_result['name'])
+        data = test_result['result'].keys()
+        ax.bar(data, [test_result['result'][_] for _ in data])
 
-    @rec_test(test_type="hits_distribution")
-    def hits_distribution(self):
-        """
-        Compute the distribution of hit-rate across product frequency in training data
-        """
-        from reclist.metrics.hits import hits_distribution
-
-        return hits_distribution(
-            self.sku_only(self._x_train),
-            self.sku_only(self._x_test),
-            self.sku_only(self._y_test),
-            self.sku_only(self._y_preds),
-            k=10,
-            debug=True,
-        )
-
-    @rec_test(test_type="distance_to_query")
-    def dist_to_query(self):
-        """
-        Compute the distribution of distance from query to label and query to prediction
-        """
-        from reclist.metrics.distance_metrics import distance_to_query
-
-        return distance_to_query(
-            self.rec_model,
-            self.sku_only(self._x_test),
-            self.sku_only(self._y_test),
-            self.sku_only(self._y_preds),
-            k=10,
-            bins=25,
-            debug=True,
-        )
-
-    def sku_only(self, l: List[List]):
-        return [[e["product_sku"] for e in s] for s in l]
+        return fig
 
 
-class SpotifySessionRecList(RecList):
-    @rec_test(test_type="basic_stats")
-    def basic_stats(self):
-        """
-        Basic statistics on training, test and prediction data for Next Event Prediction
-        """
-        from reclist.metrics.standard_metrics import statistics
-
-        return statistics(
-            self._x_train, self._y_train, self._x_test, self._y_test, self._y_preds
-        )
-
-    @rec_test(test_type="HR@10")
-    def hit_rate_at_k(self):
-        """
-        Compute the rate at which the top-k predictions contain the item to be predicted
-        """
-        from reclist.metrics.standard_metrics import hit_rate_at_k
-
-        return hit_rate_at_k(
-            self.uri_only(self._y_preds), self.uri_only(self._y_test), k=10
-        )
-
-    @rec_test(test_type="perturbation_test")
-    def perturbation_at_k(self):
-        """
-        Compute average consistency in model predictions when inputs are perturbed
-        """
-        from collections import defaultdict
-        from functools import partial
-
-        from reclist.metrics.perturbation import session_perturbation_test
-
-        # Step 1: Generate a map from artist uri to track uri
-        substitute_mapping = defaultdict(list)
-        for track_uri, row in self.product_data.items():
-            substitute_mapping[row["artist_uri"]].append(track_uri)
-
-        # Step 2: define a custom perturbation function
-        def perturb(session, sub_map):
-            last_item = session[-1]
-            last_item_artist = self.product_data[last_item["track_uri"]]["artist_uri"]
-            substitutes = set(sub_map.get(last_item_artist, [])) - {
-                last_item["track_uri"]
-            }
-            if substitutes:
-                similar_item = random.sample(substitutes, k=1)
-                new_session = session[:-1] + [{"track_uri": similar_item[0]}]
-                return new_session
-            return []
-
-        # Step 3: call test
-        return session_perturbation_test(
-            self.rec_model,
-            self._x_test,
-            self._y_preds,
-            partial(perturb, sub_map=substitute_mapping),
-            self.uri_only,
-            k=10,
-        )
-
-    @rec_test(test_type="shuffle_session")
-    def perturbation_shuffle_at_k(self):
-        """
-        Compute average consistency in model predictions when inputs are re-ordered
-        """
-        from reclist.metrics.perturbation import session_perturbation_test
-
-        # Step 1: define a custom perturbation function
-        def perturb(session):
-            return random.sample(session, len(session))
-
-        # Step 2: call test
-        return session_perturbation_test(
-            self.rec_model, self._x_test, self._y_preds, perturb, self.uri_only, k=10
-        )
-
-    @rec_test(test_type="hits_distribution_by_slice")
-    def hits_distribution_by_slice(self):
-        """
-        Compute the distribution of hit-rate across various slices of data
-        """
-        from reclist.metrics.hits import hits_distribution_by_slice
-
-        len_map = collections.defaultdict(list)
-        for idx, playlist in enumerate(self._x_test):
-            len_map[len(playlist)].append(idx)
-        slices = collections.defaultdict(list)
-        bins = [(x * 5, (x + 1) * 5) for x in range(max(len_map) // 5 + 1)]
-        for bin_min, bin_max in bins:
-            for i in range(bin_min + 1, bin_max + 1, 1):
-                slices[f"({bin_min}, {bin_max}]"].extend(len_map[i])
-                del len_map[i]
-        assert len(len_map) == 0
-
-        return hits_distribution_by_slice(
-            slices,
-            self.uri_only(self._y_test),
-            self.uri_only(self._y_preds),
-            debug=True,
-        )
-
-    @rec_test(test_type="Coverage@10")
-    def coverage_at_k(self):
-        """
-        Coverage is the proportion of all possible products which the RS
-        recommends based on a set of sessions
-        """
-        from reclist.metrics.standard_metrics import coverage_at_k
-
-        return coverage_at_k(
-            self.uri_only(self._y_preds),
-            self.product_data,
-            # this contains all the track URIs from train and test sets
-            k=10,
-        )
-
-    @rec_test(test_type="Popularity@10")
-    def popularity_bias_at_k(self):
-        """
-        Compute average frequency of occurrence across recommended items in training data
-        """
-        from reclist.metrics.standard_metrics import popularity_bias_at_k
-
-        return popularity_bias_at_k(
-            self.uri_only(self._y_preds), self.uri_only(self._x_train), k=10
-        )
-
-    @rec_test(test_type="MRR@10")
-    def mrr_at_k(self):
-        """
-        MRR calculates the mean reciprocal of the rank at which the first
-        relevant item was retrieved
-        """
-        from reclist.metrics.standard_metrics import mrr_at_k
-
-        return mrr_at_k(self.uri_only(self._y_preds), self.uri_only(self._y_test))
-
-    def uri_only(self, playlists: List[dict]):
-        return [[track["track_uri"] for track in playlist] for playlist in playlists]
-
-
-class MovieLensSimilarItemRecList(RecList):
-    @rec_test(test_type="stats")
-    def basic_stats(self):
-        """
-        Basic statistics on training, test and prediction data
-        """
-        from reclist.metrics.standard_metrics import statistics
-
-        return statistics(
-            self._x_train, self._y_train, self._x_test, self._y_test, self._y_preds
+    def _dump_results_to_json(self, test_results: list, report_path: str):
+        report = {
+            "metadata": {
+                "model_name": self.model_name,
+                "reclist": self.name,
+                "tests": list(self._rec_tests.keys()),
+            },
+            "data": test_results,
+        }
+        report_file_name = os.path.join(report_path, "results", "report.json")
+        self.metadata_store_service.write_file(
+            report_file_name,
+            report,
+            is_json=True
         )
 
-    @rec_test(test_type="HR@10")
-    def hit_rate_at_k(self):
-        """
-        Compute the rate at which the top-k predictions contain the movie to be predicted
-        """
-        from reclist.metrics.standard_metrics import hit_rate_at_k
+        return report_file_name
 
-        return hit_rate_at_k(
-            self.movie_only(self._y_preds), self.movie_only(self._y_test), k=10
+    @property
+    def rec_tests(self):
+        return self._rec_tests
+
+
+class FreeSessionRecList(RecList):
+
+    def __init__(
+        self,
+        dataset,
+        metadata,
+        predictions,
+        model_name,
+        logger: LOGGER,
+        metadata_store: METADATA_STORE,
+        **kwargs
+    ):
+        super().__init__(
+            model_name,
+            logger,
+            metadata_store,
+            **kwargs
+        )
+        self.dataset = dataset
+        self.metadata = metadata
+        self.predictions = predictions
+        self.similarity_model = kwargs.get("similarity_model", None)
+
+        return
+
+    @rec_test(test_type="LessWrong", display_type=CHART_TYPE.BINS)
+    def less_wrong(self):
+        truths = self.dataset
+        predictions = self.predictions
+        model_misses = [(t, p) for t, p in zip(truths, predictions) if t != p]
+        similarity_scores = [
+            self.similarity_model.similarity_gradient(t, p) for t, p in model_misses
+        ]
+
+        return similarity_scores
+
+    @rec_test(test_type="SlicedAccuracy", display_type=CHART_TYPE.SCALAR)
+    def sliced_accuracy(self):
+        """
+        Compute the accuracy by slice
+        """
+        from metrics.standard_metrics import accuracy_per_slice
+
+        return accuracy_per_slice(
+            self.dataset, self.predictions, self.metadata["categories"]
         )
 
-    @rec_test(test_type="Coverage@10")
-    def coverage_at_k(self):
+    @rec_test(test_type="Accuracy", display_type=CHART_TYPE.SCALAR)
+    def accuracy(self):
         """
-        Coverage is the proportion of all possible movies which the RS
-        recommends based on a set of movies and their respective ratings
+        Compute the accuracy
         """
-        from reclist.metrics.standard_metrics import coverage_at_k
+        from sklearn.metrics import accuracy_score
 
-        return coverage_at_k(self.movie_only(self._y_preds), self.product_data, k=10)
+        return accuracy_score(self.dataset, self.predictions)
 
-    @rec_test(test_type="hits_distribution")
-    def hits_distribution(self):
+    @rec_test(test_type="AccuracyByCountry", display_type=CHART_TYPE.BARS)
+    def accuracy_by_country(self):
         """
-        Compute the distribution of hit-rate across movie frequency in training data
+        Compute the accuracy by country
         """
-        from reclist.metrics.hits import hits_distribution
+        # TODO: note that is a static test, used to showcase the bin display
+        from random import randint
+        return { "US": randint(0, 100), "CA": randint(0, 100), "FR": randint(0, 100) }
 
-        return hits_distribution(
-            self.movie_only(self._x_train),
-            self.movie_only(self._x_test),
-            self.movie_only(self._y_test),
-            self.movie_only(self._y_preds),
-            k=10,
-            debug=True,
+
+class DFSessionRecList(RecList):
+
+    def __init__(
+        self,
+        dataset,
+        predictions,
+        model_name,
+        logger: LOGGER,
+        metadata_store: METADATA_STORE,
+        **kwargs
+    ):
+        super().__init__(
+            model_name,
+            logger,
+            metadata_store,
+            **kwargs
         )
+        self.dataset = dataset
+        self._y_preds = predictions
+        self._y_test = kwargs.get("y_test", None)
+        self.similarity_model = kwargs.get("similarity_model", None)
 
-    @rec_test(test_type="hits_distribution_by_rating")
-    def hits_distribution_by_rating(self):
+        return
+
+    @rec_test('HIT_RATE')
+    def hit_rate_at_100(self):
+        hr = self.hit_rate_at_k(self._y_preds, self._y_test, k=100)
+        return hr
+
+    def hit_rate_at_k(self, y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int):
         """
-        Compute the distribution of hit-rate across movie ratings in testing data
+        N = number test cases
+        M = number ground truth per test case
         """
-        from reclist.metrics.hits import hits_distribution_by_rating
+        hits = self.hits_at_k(y_pred, y_test, k)  # N x M x k
+        hits = hits.max(axis=1)  # N x k
+        return hits.max(axis=1).mean()  # 1
 
-        return hits_distribution_by_rating(self._y_test, self._y_preds, debug=True)
+    def hits_at_k(self, y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int):
+        """
+        N = number test cases
+        M = number ground truth per test case
+        """
+        y_test_mask = y_test.values != -1  # N x M
 
-    def movie_only(self, movies):
-        return [[x["movieId"] for x in y] for y in movies]
+        y_pred_mask = y_pred.values[:, :k] != -1  # N x k
+
+        y_test = y_test.values[:, :, None]  # N x M x 1
+        y_pred = y_pred.values[:, None, :k]  # N x 1 x k
+
+        hits = y_test == y_pred  # N x M x k
+        hits = hits * y_test_mask[:, :, None]  # N x M x k
+        hits = hits * y_pred_mask[:, None, :]  # N x M x k
+
+        return hits
+
+
+
