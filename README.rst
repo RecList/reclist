@@ -54,9 +54,9 @@ Quick Links
 
 
 Status
--------
+~~~~~~~~~~~
 
-RecList is free software released under the MIT license, and it has been adopted by popular `open-source <https://github.com/RecList/evalRS-CIKM-2022>`__  `data challenges<https://reclist.io/kdd2023-cup/>`__.
+RecList is free software released under the MIT license, and it has been adopted by popular `open-source <https://github.com/RecList/evalRS-CIKM-2022>`__  `data challenges <https://reclist.io/kdd2023-cup/>`__.
 
 The current version, after a major API re-factoring, is a *beta*.
 
