@@ -1,3 +1,4 @@
+import numpy as np
 from reclist.logs import LOGGER
 from reclist.similarity_models import SkigramSimilarityModel
 from reclist.metadata import METADATA_STORE
@@ -32,7 +33,7 @@ class FreeSessionRecList(RecList):
 
         return
 
-    @rec_test(test_type="LessWrong", display_type=CHART_TYPE.BINS)
+    @rec_test(test_type="LessWrong", display_type=CHART_TYPE.SCALAR)
     def less_wrong(self):
         truths = self.dataset
         predictions = self.predictions
@@ -41,7 +42,7 @@ class FreeSessionRecList(RecList):
             self.similarity_model.similarity_gradient(t, p) for t, p in model_misses
         ]
 
-        return similarity_scores
+        return np.average(similarity_scores)
 
     @rec_test(test_type="SlicedAccuracy", display_type=CHART_TYPE.SCALAR)
     def sliced_accuracy(self):
@@ -70,9 +71,7 @@ class FreeSessionRecList(RecList):
         """
         # TODO: note that is a static test, used to showcase the bin display
         from random import randint
-        return { "US": randint(0, 100), "CA": randint(0, 100), "FR": randint(0, 100) }
-
-
+        return {"US": randint(0, 100), "CA": randint(0, 100), "FR": randint(0, 100) }
 
 
 try:

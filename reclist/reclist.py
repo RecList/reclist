@@ -5,9 +5,9 @@ from abc import ABC
 from pathlib import Path
 from functools import wraps
 import pandas as pd
-from charts import CHART_TYPE
-from logs import LOGGER, logger_factory
-from metadata import METADATA_STORE, metadata_store_factory
+from reclist.charts import CHART_TYPE
+from reclist.logs import LOGGER, logger_factory
+from reclist.metadata import METADATA_STORE, metadata_store_factory
 
 
 def rec_test(test_type: str, display_type: CHART_TYPE = None):
