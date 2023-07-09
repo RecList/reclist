@@ -1,11 +1,79 @@
 from reclist.logs import LOGGER
 from reclist.similarity_models import SkigramSimilarityModel
-from reclist.reclist import FreeSessionRecList
 from reclist.metadata import METADATA_STORE
-import pandas as pd
-from reclist.reclist import DFSessionRecList
-import numpy as np
+from reclist.reclist import RecList
+from random import randint, choice
 import os
+from reclist.reclist import rec_test
+from reclist.charts import CHART_TYPE
+
+class FreeSessionRecList(RecList):
+
+    def __init__(
+        self,
+        dataset,
+        metadata,
+        predictions,
+        model_name,
+        logger: LOGGER,
+        metadata_store: METADATA_STORE,
+        **kwargs
+    ):
+        super().__init__(
+            model_name,
+            logger,
+            metadata_store,
+            **kwargs
+        )
+        self.dataset = dataset
+        self.metadata = metadata
+        self.predictions = predictions
+        self.similarity_model = kwargs.get("similarity_model", None)
+
+        return
+
+    @rec_test(test_type="LessWrong", display_type=CHART_TYPE.BINS)
+    def less_wrong(self):
+        truths = self.dataset
+        predictions = self.predictions
+        model_misses = [(t, p) for t, p in zip(truths, predictions) if t != p]
+        similarity_scores = [
+            self.similarity_model.similarity_gradient(t, p) for t, p in model_misses
+        ]
+
+        return similarity_scores
+
+    @rec_test(test_type="SlicedAccuracy", display_type=CHART_TYPE.SCALAR)
+    def sliced_accuracy(self):
+        """
+        Compute the accuracy by slice
+        """
+        from reclist.metrics.standard_metrics import accuracy_per_slice
+
+        return accuracy_per_slice(
+            self.dataset, self.predictions, self.metadata["categories"]
+        )
+
+    @rec_test(test_type="Accuracy", display_type=CHART_TYPE.SCALAR)
+    def accuracy(self):
+        """
+        Compute the accuracy
+        """
+        from sklearn.metrics import accuracy_score
+
+        return accuracy_score(self.dataset, self.predictions)
+
+    @rec_test(test_type="AccuracyByCountry", display_type=CHART_TYPE.BARS)
+    def accuracy_by_country(self):
+        """
+        Compute the accuracy by country
+        """
+        # TODO: note that is a static test, used to showcase the bin display
+        from random import randint
+        return { "US": randint(0, 100), "CA": randint(0, 100), "FR": randint(0, 100) }
+
+
+
 
 try:
     from dotenv import load_dotenv
@@ -14,7 +82,7 @@ except:
     print("Dotenv not loaded: if you need ENV variables, make sure you export them manually")
 
 
-class myModel:
+class DummyModel:
 
     def __init__(self, n):
         self.n = n
@@ -28,9 +96,9 @@ class myModel:
 
 
 # create a dataset randomly
-from random import randint, choice
+
 n = 10000
-apo_model = myModel(n)
+apo_model = DummyModel(n)
 dataset = [randint(0, 1) for _ in range(n)]
 metadata = {"categories": [choice(["cat", "dog", "capybara"]) for _ in range(n)]}
 predictions = apo_model.predict()
@@ -55,24 +123,4 @@ cd = FreeSessionRecList(
 
 # run reclist
 cd(verbose=True)
-
-# test the similarity model with open ai :clownface:
-#sim_model = GPT3SimilarityModel(api_key=os.environ["OPENAI_API_KEY"])
-#p1 = {
-#    "name": "logo-print cotton cap",
-#    "brand": 'Palm Angels',
-#    "description": '''
-#    Known for a laid-back aesthetic, Palm Angels knows how to portray its Californian inspiration. This classic cap carries the brand's logo printed on the front, adding a touch of recognition to a relaxed look.
-#    '''
-#}
-#p2 = {
-#    "name": "monogram badge cap",
-#    "brand": 'Balmain',
-#    "description": '''
-#    Blue cotton monogram badge cap from Balmain featuring logo patch to the front, mesh detailing, fabric-covered button at the crown and adjustable fit.
-#    '''
-#}
-#similarity_judgement = sim_model.similarity_binary(p1, p2, verbose=False)
-#print("P1 {} and P2 {} are similar: {}".format(p1["name"], p2["name"], similarity_judgement))
-
 

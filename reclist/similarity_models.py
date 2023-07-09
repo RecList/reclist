@@ -117,3 +117,24 @@ class GPT3SimilarityModel(SimilarityModel):
     def similarity_gradient(self, query, target, *args, **kwargs) -> float:
         raise Exception("No gradient is available for GPT3")
 
+# test the similarity model with open ai :clownface:
+#sim_model = GPT3SimilarityModel(api_key=os.environ["OPENAI_API_KEY"])
+#p1 = {
+#    "name": "logo-print cotton cap",
+#    "brand": 'Palm Angels',
+#    "description": '''
+#    Known for a laid-back aesthetic, Palm Angels knows how to portray its Californian inspiration. This classic cap carries the brand's logo printed on the front, adding a touch of recognition to a relaxed look.
+#    '''
+#}
+#p2 = {
+#    "name": "monogram badge cap",
+#    "brand": 'Balmain',
+#    "description": '''
+#    Blue cotton monogram badge cap from Balmain featuring logo patch to the front, mesh detailing, fabric-covered button at the crown and adjustable fit.
+#    '''
+#}
+#similarity_judgement = sim_model.similarity_binary(p1, p2, verbose=False)
+#print("P1 {} and P2 {} are similar: {}".format(p1["name"], p2["name"], similarity_judgement))
+
+
+
