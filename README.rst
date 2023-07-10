@@ -2,6 +2,10 @@
 RecList
 =======
 
+.. image:: images/reclist.png
+        :width: 30%
+        :alt: Rocket Emoji
+
 
 .. image:: https://img.shields.io/pypi/v/reclist.svg
         :target: https://pypi.python.org/pypi/reclist
@@ -29,9 +33,6 @@ RecList
         :target: https://www.youtube.com/watch?v=cAlJYxFYA04
         :alt: YouTube
 
-.. image:: images/reclist.png
-        :width: 30%
-        :alt: Rocket Emoji
 
 
 Overview
