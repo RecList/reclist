@@ -5,47 +5,9 @@
 import random
 
 import pandas as pd
-
-from reclist.datasets import *
-from reclist.datasets import CoveoDataset, MovieLensDataset, SpotifyDataset
 from reclist.metrics.standard_metrics import hit_rate_at_k, mrr_at_k
-from reclist.reclist import (
-    CoveoCartRecList,
-    MovieLensSimilarItemRecList,
-    SpotifySessionRecList,
-)
-from reclist.recommenders.prod2vec import (
-    CoveoP2VRecModel,
-    MovieLensP2VRecModel,
-    SpotifyP2VRecModel,
-)
 
 
-def test_basic_dataset_downloading():
-    CoveoDataset()
-    MovieLensDataset()
-    MovieLensDataset()
-
-
-# def test_coveo_example():
-#     # get the coveo data challenge dataset as a RecDataset object
-#     coveo_dataset = CoveoDataset()
-#
-#     # re-use a skip-gram model from reclist to train a latent product space, to be used
-#     # (through knn) to build a recommender
-#     model = CoveoP2VRecModel()
-#     x_train = random.sample(coveo_dataset.x_train, 2000)
-#     model.train(x_train, iterations=1)
-#
-#     # instantiate rec_list object, prepared with standard quantitative tests
-#     # and sensible behavioral tests (check the paper for details!)
-#     rec_list = CoveoCartRecList(
-#         model=model,
-#         dataset=coveo_dataset
-#     )
-#
-#     # invoke rec_list to run tests
-#     rec_list(verbose=True)
 
 
 def test_hits():
