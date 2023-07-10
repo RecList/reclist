@@ -29,6 +29,9 @@ RecList
         :target: https://www.youtube.com/watch?v=cAlJYxFYA04
         :alt: YouTube
 
+.. image:: images/reclist.png
+        :alt: Rocket Emoji
+
 
 Overview
 --------
