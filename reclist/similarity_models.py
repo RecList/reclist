@@ -16,7 +16,7 @@ class SimilarityModel(ABC):
         pass
 
 
-class SkigramSimilarityModel(SimilarityModel):
+class FakeSimilarityModel(SimilarityModel):
 
     """
     TODO: this is a stub, to showcase the idea of a similarity model

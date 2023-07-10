@@ -58,12 +58,9 @@ class NeptuneLogger(RecLogger):
             api_token=api_key,
         )
 
-        return
-
     def write(self, label, value):
         if isinstance(value, float):
             self.experiment[label] = value
-        return
 
     def save_plot(self, name, fig, *args, **kwargs):
         import tempfile
@@ -95,12 +92,9 @@ class CometLogger(RecLogger):
             workspace=workspace,
         )
 
-        return
-
     def write(self, label, value):
         if isinstance(value, float):
             self.experiment.log_metric(label, value)
-        return
 
     def save_plot(self, name, fig, *args, **kwargs):
         import tempfile
@@ -108,6 +102,7 @@ class CometLogger(RecLogger):
             file_name = temp.name + ".png"
             fig.savefig(file_name)
             self.experiment.log_image(file_name, name=name)
+
 
 def logger_factory(label) -> RecLogger:
     if label == LOGGER.COMET:

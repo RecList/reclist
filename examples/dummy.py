@@ -1,6 +1,6 @@
 import numpy as np
 from reclist.logs import LOGGER
-from reclist.similarity_models import SkigramSimilarityModel
+from reclist.similarity_models import FakeSimilarityModel
 from reclist.metadata import METADATA_STORE
 from reclist.reclist import RecList
 from random import randint, choice
@@ -101,7 +101,7 @@ apo_model = DummyModel(n)
 dataset = [randint(0, 1) for _ in range(n)]
 metadata = {"categories": [choice(["cat", "dog", "capybara"]) for _ in range(n)]}
 predictions = apo_model.predict()
-my_sim_model = SkigramSimilarityModel()
+my_sim_model = FakeSimilarityModel()
 assert len(dataset) == len(predictions), "dataset, predictions must have the same length"
 
 
