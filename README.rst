@@ -121,14 +121,30 @@ For example, the following code only assumes you have a dataset with golden labe
     cdf(verbose=True)
 
 Our library pre-packages standard recSys KPIs and important behavioral tests, but it is built with extensibility in mind: you can re-use tests in new suites, or you can write new domain-specific suites and tests.
+Any suite must inherit from the main interface, and then declare its tests as functions decorated with *@rec_test*. In the example, an instance is created with one slice-based test: the decorator and return type are used to automatically generate a chart.
 
-Any suite must inherit the *RecList* interface, and then declare with Pytonic decorators its tests. Here, we inherit all the tests from an existing "parent" RecList and just add one more test to create a new suite:
+.. code-block:: python
+
+    class MyRecList(RecList):
+
+        @rec_test(test_type="AccuracyByCountry", display_type=CHART_TYPE.BARS)
+        def accuracy_by_country(self):
+            """
+            Compute the accuracy by country
+
+            NOTE: the accuracy here is just a random number.
+            """
+            from random import randint
+            return {"US": randint(0, 100), "CA": randint(0, 100), "FR": randint(0, 100) }
+
+
+Inheritance is powerful, as we can build new suites by re-using existing ones. Here, we inherit the tests from an existing "parent" list and just add one more to create a new suite:
 
 .. code-block:: python
 
     class ChildRecList(MyParentRecList):
 
-        @rec_test(test_type='custom_test', display_type='scalar')
+        @rec_test(test_type='custom_test', display_type=CHART_TYPE.SCALAR)
         def my_test(self):
             """
             Custom test, returning my lucky number as an example
@@ -138,8 +154,8 @@ Any suite must inherit the *RecList* interface, and then declare with Pytonic de
             return { "luck_number": randint(0, 100) }
 
 
-Any model can be tested, as no assumption is made on the model's structure, but only the availability of `predictions`
-and `ground truth`. Once again, while our example leverages a DataFrame-shaped dataset for these entities, you are free to build your own
+Any model can be tested, as no assumption is made on the model's structure, but only the availability of *predictions*
+and *ground truth*. Once again, while our example leverages a DataFrame-shaped dataset for these entities, you are free to build your own
 RecList instance with any shape you prefer, provided you implement the metrics accordingly.
 
 Once you run a suite of tests, results are dumped automatically and versioned in a folder (local or on S3), structured as follows
@@ -153,8 +169,8 @@ Once you run a suite of tests, results are dumped automatically and versioned in
           1637357392/
           1637357404/
 
-If you start using *RecList* as part of your standard testings - either for research or production purposes - you can use the JSON report
-for machine-to-machine communication with downstream system (e.g. you may want to automatically fail the pipeline if certain behavioral tests are not passed).
+If you use *RecList* as part of your standard testings - either for research or production purposes - you can use the JSON report
+for machine-to-machine communication with downstream system (e.g. you may want to automatically fail the `pipeline <https://github.com/jacopotagliabue/recs-at-resonable-scale>`__  if tests are not passed).
 
 Capabilities
 ------------
@@ -164,9 +180,9 @@ based on DataFrames to make existing tests and metrics fully re-usable, but we d
 
 * tests and metrics to be used on your own datasets and models;
 
-* automated storage of results, with versioning, both in a local folder or on S3 in the cloud;
+* automated storage of results, with versioning, both in a local folder or on S3;
 
-* flexible, Python interface to declare tests-as-functions, and annotate them with `display_type` for automated charts;
+* flexible, Python interface to declare tests-as-functions, and annotate them with *display_type* for automated charts;
 
 * pre-built connectors with popular experiment trackers (e.g. Neptune, Comet), and an extensible interface to add your own;
 
