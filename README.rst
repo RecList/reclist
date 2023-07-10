@@ -54,16 +54,15 @@ Quick Links
 
 * The original `paper <https://dl.acm.org/doi/abs/10.1145/3487553.3524215>`__ (`arxiv <https://arxiv.org/abs/2111.09963>`__) and initial `release post <https://towardsdatascience.com/ndcg-is-not-all-you-need-24eb6d2f1227>`__.
 * `EvalRS22@CIKM <https://github.com/RecList/evalRS-CIKM-2022>`__ and `EvalRS23@KDD <https://reclist.io/kdd2023-cup/>`__ , for music recommendations with RecList.
-* A `colab notebook <https://colab.research.google.com/drive/1Wn5mm0csEkyWqmBBDxNBkfGR6CNfWeH-?usp=sharing>`__, for a quick interactive tour.
+* A `colab notebook <https://colab.research.google.com/drive/1GVsVB1a3H9qbRQvwtb0TBDxq8A5nXc5w>`__, for a quick interactive tour.
 * Our `website <https://reclist.io/>`__ for past talks and presentations.
 
 
 Status
 ~~~~~~~~~~~
 
-RecList is free software released under the MIT license, and it has been adopted by popular `open-source <https://github.com/RecList/evalRS-CIKM-2022>`__  `data challenges <https://reclist.io/kdd2023-cup/>`__.
-
-The current version, after a major API re-factoring, is a *beta*.
+* *RecList* is free software released under the MIT license, and it has been adopted by popular `open-source <https://github.com/RecList/evalRS-CIKM-2022>`__  `data challenges <https://reclist.io/kdd2023-cup/>`__.
+* After a major API re-factoring, *RecList* is now in *beta*.
 
 Summary
 ~~~~~~~
@@ -79,7 +78,7 @@ This doc is structured as follows:
 Quick Start
 -----------
 
-If you want to see *RecList* in action, clone the repository, create and activate a virtual env, and install the required packages from pip (you can install from root of course). If you prefer to experiment in an interactive, no-installation-required fashion, try out our `colab notebook <https://colab.research.google.com/drive/1Wn5mm0csEkyWqmBBDxNBkfGR6CNfWeH-?usp=sharing>`__.
+If you want to see *RecList* in action, clone the repository, create and activate a virtual env, and install the required packages from pip (you can install from root of course). If you prefer to experiment in an interactive, no-installation-required fashion, try out our `colab notebook <https://colab.research.google.com/drive/1GVsVB1a3H9qbRQvwtb0TBDxq8A5nXc5w>`__.
 
 .. code-block:: bash
 
@@ -97,8 +96,8 @@ A Guided Tour
 
 An instance of `RecList <https://github.com/jacopotagliabue/reclist/blob/main/reclist/reclist.py>`__ represents a suite of tests for recommender systems.
 
-As the sample `examples/evalrs_2023.py` script shows, we leave users quite a large range of options when building a RecList instance: we provide out of the box standard metrics
-in case your dataset is DataFrame-shaped (or you can / wish turn it into such a shape), but don't force you any pattern if you just want to use RecList
+As the sample `examples/evalrs_2023.py` script shows, we leave users quite a large range of options: we provide out of the box standard metrics
+in case your dataset is DataFrame-shaped (or you can / wish turn it into such a shape), but don't force you any pattern if you just want to use *RecList*
 for the scaffolding it provides.
 
 For example, the following code only assumes you have a dataset with golden labels, predictions, and metadata (e.g. item features) in the form of a DataFrame:
@@ -123,31 +122,25 @@ For example, the following code only assumes you have a dataset with golden labe
 
 Our library pre-packages standard recSys KPIs and important behavioral tests, but it is built with extensibility in mind: you can re-use tests in new suites, or you can write new domain-specific suites and tests.
 
-Any suite must inherit the *RecList* interface, and then declare with Pytonic decorators its tests. In this case, the test re-uses a standard function:
+Any suite must inherit the *RecList* interface, and then declare with Pytonic decorators its tests. Here, we inherit all the tests from an existing "parent" RecList and just add one more test to create a new suite:
 
 .. code-block:: python
 
-    class MyRecList(RecList):
+    class ChildRecList(MyParentRecList):
 
-        @rec_test(test_type='stats')
-        def basic_stats(self):
+        @rec_test(test_type='custom_test', display_type='scalar')
+        def my_test(self):
             """
-            Basic statistics on training, test and prediction data
+            Custom test, returning my lucky number as an example
             """
-            from reclist.metrics.standard_metrics import statistics
-            return statistics(self._x_train,
-                self._y_train,
-                self._x_test,
-                self._y_test,
-                self._y_preds)
+            from random import randint
+
+            return { "luck_number": randint(0, 100) }
 
 
-Any model can be tested, as RecList does not make any assumption on the model's internal structure, but only the availability of `predictions`
+Any model can be tested, as no assumption is made on the model's structure, but only the availability of `predictions`
 and `ground truth`. Once again, while our example leverages a DataFrame-shaped dataset for these entities, you are free to build your own
 RecList instance with any shape you prefer, provided you implement the metrics accordingly.
-
-*RecList* recognizes that outside of academic benchmarks, some mistakes are worse than others, and not all inputs are created equal: when possible, it tries
-to operationalize through scalable code behavioral insights for debugging and error analysis; it also provides extensible abstractions when domain knowledge and custom logic are needed.
 
 Once you run a suite of tests, results are dumped automatically and versioned in a folder (local or on S3), structured as follows
 (name of the suite, name of the model, run timestamp):
@@ -161,7 +154,7 @@ Once you run a suite of tests, results are dumped automatically and versioned in
           1637357404/
 
 If you start using *RecList* as part of your standard testings - either for research or production purposes - you can use the JSON report
-for machine-to-machine communication with downstream system (e.g. you may want to automatically fail the model pipeline if certain behavioral tests are not passed).
+for machine-to-machine communication with downstream system (e.g. you may want to automatically fail the pipeline if certain behavioral tests are not passed).
 
 Capabilities
 ------------
@@ -173,7 +166,9 @@ based on DataFrames to make existing tests and metrics fully re-usable, but we d
 
 * automated storage of results, with versioning, both in a local folder or on S3 in the cloud;
 
-* pre-built connectors with popular experiment trackers (Neptune, Comet), and an extensible interface to add your own;
+* flexible, Python interface to declare tests-as-functions, and annotate them with `display_type` for automated charts;
+
+* pre-built connectors with popular experiment trackers (e.g. Neptune, Comet), and an extensible interface to add your own;
 
 * reference implementations based on popular data challenges that used RecList.
 
@@ -181,7 +176,7 @@ based on DataFrames to make existing tests and metrics fully re-usable, but we d
 Acknowledgments
 ---------------
 
-The original authors of RecList are:
+The original authors are:
 
 * Patrick John Chia - `LinkedIn <https://www.linkedin.com/in/patrick-john-chia-b0a34019b/>`__, `GitHub <https://github.com/patrickjohncyh>`__
 * Jacopo Tagliabue - `LinkedIn <https://www.linkedin.com/in/jacopotagliabue/>`__, `GitHub <https://github.com/jacopotagliabue>`__
@@ -189,17 +184,12 @@ The original authors of RecList are:
 * Chloe He - `LinkedIn <https://www.linkedin.com/in/chloe-he//>`__, `GitHub <https://github.com/chloeh13q>`__
 * Brian Ko - `LinkedIn <https://www.linkedin.com/in/briankosw/>`__, `GitHub <https://github.com/briankosw>`__
 
-RecList beta has been developed with the help of:
+*RecList* is a community project made possible by the generous support of awesome folks. Between June and December 2022, the development of our beta has been supported by `Comet <https://www.comet.com/>`__, `Neptune <https://neptune.ai/homepage>`__ , `Gantry <https://gantry.io/>`__.
+Our beta has been developed with the help of:
 
 * Unnati Patel - `LinkedIn <https://www.linkedin.com/in/unnati-p-16626610a/>`__
 
 If you have questions or feedback, please reach out to: :code:`jacopo dot tagliabue at nyu dot edu`.
-
-
-Supporters
------------------------
-RecList is a community project made possible by the generous support of awesome folks. Between June and December 2022, the development of our beta has been supported by `Comet <https://www.comet.com/>`__, `Neptune <https://neptune.ai/homepage>`__ , `Gantry <https://gantry.io/>`__.
-
 
 License and Citation
 --------------------
