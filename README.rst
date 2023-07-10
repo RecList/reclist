@@ -52,8 +52,6 @@ If you are not familiar with the library, we suggest first taking our small tour
 Starting
 ~~~~~~~~
 
-Here's a table
-with the main abstractions and their purpose:
 
 .. |colab1_tutorial| image:: https://colab.research.google.com/assets/colab-badge.svg
     :target: https://colab.research.google.com/drive/1GVsVB1a3H9qbRQvwtb0TBDxq8A5nXc5w?usp=sharing
@@ -62,7 +60,7 @@ with the main abstractions and their purpose:
 +--------------------------------------------------------------------------------+------------------+
 | Name                                                                           | Link             |
 +================================================================================+==================+
-| Tutorial 101 - Introduction to Reclist                                         | |colab1_tutorial||       |
+| Tutorial 101 - Introduction to Reclist                                         | |colab1_tutorial||
 +--------------------------------------------------------------------------------+------------------+
 
 Quick Links
