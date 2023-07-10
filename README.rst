@@ -30,6 +30,7 @@ RecList
         :alt: YouTube
 
 .. image:: images/reclist.png
+        :width: 50%
         :alt: Rocket Emoji
 
 
