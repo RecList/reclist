@@ -1,14 +1,13 @@
 import numpy as np
 
 
-def session_perturbation_test(model,
-                              x_test,
-                              y_preds,
-                              perturbation_fn,
-                              id_fn,
-                              k):
+def session_perturbation_test(model, x_test, y_preds, perturbation_fn, id_fn, k):
     # generate perturbations
-    perturbed_pairs = [(perturbation_fn(_x), _y_p) for _x, _y_p in zip(x_test, y_preds) if perturbation_fn(_x)]
+    perturbed_pairs = [
+        (perturbation_fn(_x), _y_p)
+        for _x, _y_p in zip(x_test, y_preds)
+        if perturbation_fn(_x)
+    ]
     # extract perturbed x and original y
     x_test_p, y_preds_o = zip(*perturbed_pairs)
     # make new predictions over perturbed inputs

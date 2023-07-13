@@ -2,6 +2,10 @@
 RecList
 =======
 
+.. image:: images/reclist.png
+        :width: 30%
+        :alt: Rocket Emoji
+
 
 .. image:: https://img.shields.io/pypi/v/reclist.svg
         :target: https://pypi.python.org/pypi/reclist
@@ -30,11 +34,6 @@ RecList
         :alt: YouTube
 
 
-RecList
-
-
-* Free software: MIT license
-* Documentation: https://reclist.readthedocs.io.
 
 Overview
 --------
@@ -46,57 +45,40 @@ While quantitative metrics over held-out data points are important, a lot more t
 to properly function in the wild and not erode our confidence in them: for example, a model may boast an accuracy improvement over the entire dataset, but actually be significantly worse than another on rare items or new users; or again, a model that correctly recommends HDMI cables as add-on for shoppers buying a TV, may also wrongly  recommend TVs to shoppers just buying a cable.
 
 *RecList* goal is to operationalize these important intuitions into a practical package for testing research and production models in a more nuanced way, without
-requiring unnecessary custom code and ad hoc procedures. To streamline comparisons among existing models, *RecList* ships with popular datasets and ready-made behavioral tests: read the `TDS blog post <https://towardsdatascience.com/ndcg-is-not-all-you-need-24eb6d2f1227>`__ as a gentle introduction to the main use cases, check the `paper <https://dl.acm.org/doi/abs/10.1145/3487553.3524215>`__ for more details on the relevant literature.
+requiring unnecessary custom code and ad hoc procedures.
 
-If you are not familiar with the library, we suggest first taking our small tour to get acquainted with the main abstractions through ready-made models and public datasets.
+If you are not familiar with the library, we suggest first taking our small tour to get acquainted with the main abstractions through ready-made models and tests.
+
+Starting
+~~~~~~~~
+
+
+
+.. |colab1_tutorial| image:: https://colab.research.google.com/assets/colab-badge.svg
+    :target: https://colab.research.google.com/drive/1GVsVB1a3H9qbRQvwtb0TBDxq8A5nXc5w?usp=sharing
+    :alt: Open In Colab
+
+
++--------------------------------------------------------------------------------+------------------+
+| Name                                                                           | Link             |
++================================================================================+==================+
+| Tutorial 101 - Introduction to Reclist                                         | |colab1_tutorial||
++--------------------------------------------------------------------------------+------------------+
 
 Quick Links
 ~~~~~~~~~~~
 
-* Our `talk <https://www.youtube.com/watch?v=cAlJYxFYA04>`__ at Stitch Fix Algo Hour, for a general presentation.
-* Our original `paper <https://dl.acm.org/doi/abs/10.1145/3487553.3524215>`__, with in-depth analysis, detailed use cases and scholarly references (`arxiv <https://arxiv.org/abs/2111.09963>`__).
-* Our CIKM Data Challenge (`paper <https://rdcu.be/c4dXy>`__, `code <https://github.com/RecList/evalRS-CIKM-2022>`__) for music recommendations, based on RecList.
-* A `colab notebook <https://colab.research.google.com/drive/1Wn5mm0csEkyWqmBBDxNBkfGR6CNfWeH-?usp=sharing>`__, showing how to train a cart recommender model from scratch and use the library to test it.
-* Our `blog post <https://towardsdatascience.com/ndcg-is-not-all-you-need-24eb6d2f1227>`__, with examples and practical tips.
+* The original `paper <https://dl.acm.org/doi/abs/10.1145/3487553.3524215>`__ (`arxiv <https://arxiv.org/abs/2111.09963>`__) and initial `release post <https://towardsdatascience.com/ndcg-is-not-all-you-need-24eb6d2f1227>`__.
+* `EvalRS22@CIKM <https://github.com/RecList/evalRS-CIKM-2022>`__ and `EvalRS23@KDD <https://reclist.io/kdd2023-cup/>`__ , for music recommendations with RecList.
+* A `colab notebook <https://colab.research.google.com/drive/1GVsVB1a3H9qbRQvwtb0TBDxq8A5nXc5w>`__, for a quick interactive tour.
+* Our `website <https://reclist.io/>`__ for past talks and presentations.
 
 
-Supporters
-~~~~~~~~~~
-RecList is a community project made possible by the generous support of awesome folks. Between June and December 2022, RecList has been supported by:
+Status
+~~~~~~~~~~~
 
-Comet
-=====
-
-.. image:: https://github.com/jacopotagliabue/reclist/raw/main/images/comet.png
-   :target: https://www.comet.com/?utm_source=jacopot&utm_medium=referral&utm_campaign=online_jacopot_2022&utm_content=github_reclist
-   :width: 100
-
-Neptune
-=======
-
-.. image:: https://github.com/jacopotagliabue/reclist/raw/main/images/neptune.png
-   :target: https://neptune.ai
-   :width: 100
-
-Gantry
-======
-
-.. image:: https://github.com/jacopotagliabue/reclist/raw/main/images/gantry.png
-   :target: https://gantry.io/
-   :width: 100
-
-
-Project updates
-~~~~~~~~~~~~~~~
-
-*Community Support*: RecList is an open source community project made possible by the support of the awesome folks at `Comet <https://www.comet.ml/site/>`__, `Neptune <https://neptune.ai/>`__ and `Gantry <https://gantry.io/>`__.
-Soon RecList tests will be natively integrated with the MLOps tools you already know and love!
-
-*January 2023*: We concluded the RecList-powered `Data Challenge <https://reclist.io/cikm2022-cup/>`__ at CIKM 2022 and released all the materials to the community. We shared our learnings in a `paper <https://www.nature.com/articles/s42256-022-00606-0>`__ on Nature Machine Intelligence, and prepare the release of RecList Beta.
-
-In the last few months, we presented this library to practioners at Tubi, eBay, NVIDIA, BBC and other RecSys companies: we are in the process of collecting our thoughts after all the feedback we received, as we plan a beta release for this package in the next few months - come back often for updates, as we will also open a call for collaboration!
-
-Please remember that the library is in alpha (i.e. enough working code to finish the paper and tinker with it). We welcome early feedback, but please be advised that the package may change substantially in the near future ("If you're not embarrassed by the first version, you've launched too late").
+* *RecList* is free software released under the MIT license, and it has been adopted by popular `open-source <https://github.com/RecList/evalRS-CIKM-2022>`__  `data challenges <https://reclist.io/kdd2023-cup/>`__.
+* After a major API re-factoring, *RecList* is now in *beta*.
 
 Summary
 ~~~~~~~
@@ -106,17 +88,13 @@ This doc is structured as follows:
 * `Quick Start`_
 * `A Guided Tour`_
 * `Capabilities`_
-* `Roadmap`_
-* `Talks and Presentations`_
 * `License and Citation`_
 * `Acknowledgments`_
 
 Quick Start
 -----------
 
-If you want to see *RecList* in action, clone the repository, create and activate a virtual env, and install the required packages from pip (you can install from root of course). If you prefer to experiment in an interactive, no-installation-required fashion, try out our `colab notebook <https://colab.research.google.com/drive/1Wn5mm0csEkyWqmBBDxNBkfGR6CNfWeH-?usp=sharing>`__.
-
-Sample scripts are divided by use-cases: similar items, complementary items or session-based recommendations. When executing one, a suitable public dataset will be downloaded, and a baseline model trained: finally, the script will run a pre-made suite of behavioral tests to show typical results.
+If you want to see *RecList* in action, clone the repository, create and activate a virtual env, and install the required packages from pip (you can install from root of course). If you prefer to experiment in an interactive, no-installation-required fashion, try out our `colab notebook <https://colab.research.google.com/drive/1GVsVB1a3H9qbRQvwtb0TBDxq8A5nXc5w>`__.
 
 .. code-block:: bash
 
@@ -125,84 +103,78 @@ Sample scripts are divided by use-cases: similar items, complementary items or s
     python3 -m venv venv
     source venv/bin/activate
     pip install reclist
-    python examples/coveo_complementary_rec.py
-
-Running *your* model on one of the supported dataset, leveraging the pre-made tests, is as easy as implementing a simple interface, *RecModel*.
+    python examples/evalrs_2023.py
 
 Once you've run successfully the sample script, take the guided tour below to learn more about the abstractions and the out-of-the-box capabilities of *RecList*.
 
 A Guided Tour
 -------------
 
-An instance of `RecList <https://github.com/jacopotagliabue/reclist/blob/main/reclist/reclist.py>`__ represents a suite of tests for recommender systems: given
-a dataset (more appropriately, an instance of `RecDataset <https://github.com/jacopotagliabue/reclist/blob/main/reclist/abstractions.py>`__)
-and a model (an instance of `RecModel <https://github.com/jacopotagliabue/reclist/blob/main/reclist/abstractions.py>`__), it will run the specified tests on the target dataset, using the supplied model.
+An instance of `RecList <https://github.com/jacopotagliabue/reclist/blob/main/reclist/reclist.py>`__ represents a suite of tests for recommender systems.
 
-For example, the following code instantiates a pre-made suite of tests that contains sensible defaults for a `cart recommendation use case <https://github.com/jacopotagliabue/reclist/blob/main/reclist/reclist.py>`__:
+As the sample `examples/evalrs_2023.py` script shows, we leave users quite a large range of options: we provide out of the box standard metrics
+in case your dataset is DataFrame-shaped (or you can / wish turn it into such a shape), but don't force you any pattern if you just want to use *RecList*
+for the scaffolding it provides.
+
+For example, the following code only assumes you have a dataset with golden labels, predictions, and metadata (e.g. item features) in the form of a DataFrame:
 
 .. code-block:: python
 
-    rec_list = CoveoCartRecList(
-        model=model,
-        dataset=coveo_dataset
+    cdf = DFSessionRecList(
+        dataset=df_events,
+        model_name="myDataFrameRandomModel",
+        predictions=df_predictions,
+        y_test=df_dataset,
+        logger=LOGGER.NEPTUNE,
+        metadata_store= METADATA_STORE.LOCAL,
+        similarity_model=my_sim_model,
+        bucket=os.environ["S3_BUCKET"],
+        NEPTUNE_KEY=os.environ["NEPTUNE_KEY"],
+        NEPTUNE_PROJECT_NAME=os.environ["NEPTUNE_PROJECT_NAME"],
     )
-    # invoke rec_list to run tests
-    rec_list(verbose=True)
 
-Our library pre-packages standard recSys KPIs and important behavioral tests, divided by use cases, but it is built with extensibility in mind: you can re-use tests in new suites, or you can write new domain-specific suites and tests.
+    # run reclist
+    cdf(verbose=True)
 
-Any suite must inherit the *RecList* interface, and then declare with Pytonic decorators its tests. In this case, the test re-uses a standard function:
+Our library pre-packages standard recSys KPIs and important behavioral tests, but it is built with extensibility in mind: you can re-use tests in new suites, or you can write new domain-specific suites and tests.
+Any suite must inherit from the main interface, and then declare its tests as functions decorated with *@rec_test*. In the example, an instance is created with one slice-based test: the decorator and return type are used to automatically generate a chart.
 
 .. code-block:: python
 
     class MyRecList(RecList):
 
-        @rec_test(test_type='stats')
-        def basic_stats(self):
+        @rec_test(test_type="AccuracyByCountry", display_type=CHART_TYPE.BARS)
+        def accuracy_by_country(self):
             """
-            Basic statistics on training, test and prediction data
+            Compute the accuracy by country
+
+            NOTE: the accuracy here is just a random number.
             """
-            from reclist.metrics.standard_metrics import statistics
-            return statistics(self._x_train,
-                self._y_train,
-                self._x_test,
-                self._y_test,
-                self._y_preds)
+            from random import randint
+            return {"US": randint(0, 100), "CA": randint(0, 100), "FR": randint(0, 100) }
 
 
-Any model can be tested, as long as its predictions are wrapped in a *RecModel*. This allows for pure "black-box" testings,
-a SaaS provider can be tested just by wrapping the proper API call in the method:
+Inheritance is powerful, as we can build new suites by re-using existing ones. Here, we inherit the tests from an existing "parent" list and just add one more to create a new suite:
 
 .. code-block:: python
 
-    class MyCartModel(RecModel):
+    class ChildRecList(MyParentRecList):
 
-        def __init__(self, **kwargs):
-            super().__init__(**kwargs)
-
-        def predict(self, prediction_input: list, *args, **kwargs):
+        @rec_test(test_type='custom_test', display_type=CHART_TYPE.SCALAR)
+        def my_test(self):
             """
-            Implement the abstract method, accepting a list of lists, each list being
-            the content of a cart: the predictions returned by the model are the top K
-            items suggested to complete the cart.
+            Custom test, returning my lucky number as an example
             """
+            from random import randint
 
-            return
+            return { "luck_number": randint(0, 100) }
 
-More generally, the logical workflow of a typical RecList implementation is as follows (see our `blog post <https://towardsdatascience.com/ndcg-is-not-all-you-need-24eb6d2f1227>`__ for a longer explanation):
 
-.. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/workflow.gif
-   :height: 400
+Any model can be tested, as no assumption is made on the model's structure, but only the availability of *predictions*
+and *ground truth*. Once again, while our example leverages a DataFrame-shaped dataset for these entities, you are free to build your own
+RecList instance with any shape you prefer, provided you implement the metrics accordingly.
 
-While many standard KPIs are available in the package, the philosophy behind *RecList* is that metrics like Hit Rate provide only a partial picture
-of the expected behavior of recommenders in the wild: two models with very similar accuracy can have very different behavior on, say, the long-tail, or
-model A can be better than model B overall, but at the expense of providing disastrous performance on a set of inputs that are particularly important in production.
-
-*RecList* recognizes that outside of academic benchmarks, some mistakes are worse than others, and not all inputs are created equal: when possible, it tries
-to operationalize through scalable code behavioral insights for debugging and error analysis; it also
-provides extensible abstractions when domain knowledge and custom logic are needed.
-
-Once you run a suite of tests, results are dumped automatically and versioned in a local folder, structured as follows
+Once you run a suite of tests, results are dumped automatically and versioned in a folder (local or on S3), structured as follows
 (name of the suite, name of the model, run timestamp):
 
 .. code-block::
@@ -213,78 +185,25 @@ Once you run a suite of tests, results are dumped automatically and versioned in
           1637357392/
           1637357404/
 
-If you start using *RecList* as part of your standard testings - either for research or production purposes - you can use the JSON report
-for machine-to-machine communication with downstream system (e.g. you may want to automatically fail the model pipeline if certain behavioral tests are not passed).
-
-Note: our app is deprecated, as RecList Beta will have connectors with existing apps (experiment trackers, model cards, etc.).
+If you use *RecList* as part of your standard testings - either for research or production purposes - you can use the JSON report
+for machine-to-machine communication with downstream system (e.g. you may want to automatically fail the `pipeline <https://github.com/jacopotagliabue/recs-at-resonable-scale>`__  if tests are not passed).
 
 Capabilities
 ------------
 
-*RecList* provides a dataset and model agnostic framework to scale up behavioral tests. As long as the proper abstractions
-are implemented, all the out-of-the-box components can be re-used. For example:
+*RecList* provides a dataset and model agnostic framework to scale up behavioral tests. We provide some suggested abstractions
+based on DataFrames to make existing tests and metrics fully re-usable, but we don't force any pattern on the user. As out of the box functionality, the package provides:
 
-* you can use a public dataset provided by *RecList* to train your new cart recommender model, and then use the *RecTests* we provide for that use case;
+* tests and metrics to be used on your own datasets and models;
 
-* you can use some baseline model on your custom dataset, to establish a baseline for your project;
+* automated storage of results, with versioning, both in a local folder or on S3;
 
-* you can use a custom model, on a private dataset and define from scratch a new suite of tests, mixing existing methods and domain-specific tests.
+* flexible, Python interface to declare tests-as-functions, and annotate them with *display_type* for automated charts;
 
-We list below what we currently support out-of-the-box, with particular focus on datasets and tests, as the models we provide
-are convenient baselines, but they are not meant to be SOTA research models.
+* pre-built connectors with popular experiment trackers (e.g. Neptune, Comet), and an extensible interface to add your own;
 
-Datasets
-~~~~~~~~
+* reference implementations based on popular data challenges that used RecList.
 
-RecList features convenient wrappers around popular datasets, to help test models over known benchmarks
-in a standardized way.
-
-* `Coveo Data Challenge <https://github.com/coveooss/SIGIR-ecom-data-challenge>`__
-* (a smaller version of) `The Million Playlist Dataset <https://engineering.atspotify.com/2018/05/30/introducing-the-million-playlist-dataset-and-recsys-challenge-2018/>`__
-* (a smaller version of) `MovieLens <https://grouplens.org/datasets/movielens/>`__
-
-Behavioral Tests
-~~~~~~~~~~~~~~~~
-
-RecList helps report standard quantitative metrics over popular (or custom) datasets, such as the ones collected in
-*standard_metrics.py*: hit rate, mrr, coverage, popularity bias, etc. However, RecList raison d'etre is providing plug-and-play
-behavioral tests, as agnostic as possible to the underlying models and datasets, while leaving open the possibility of writing
-personalized tests when domain knowledge and custom logic are necessary.
-
-Tests descriptions are available in our (WIP) `docs <https://reclist.readthedocs.io>`__, but we share here some examples from our `paper <https://dl.acm.org/doi/abs/10.1145/3487553.3524215>`__.
-
-First, RecList allows to compare the performance of models which may have similar aggregate KPIs (e.g. hit rate on the entire
-test set) in different slices. When plotting HR by product popularity, it is easy to spot that
-prod2vec works much better with rarer items than the alternatives:
-
-.. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/hit_rate_dist.png
-   :height: 175
-
-When slicing by important meta-data (in this simulated example, brands), RecList uncovers significant differences
-in performance for different groups; since the features we care about vary across datasets,
-the package allows for a generic way to partition the test set and compute per-slice metrics:
-
-.. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/slice_dist.png
-   :height: 175
-
-Finally, RecList can take advantage of the latent item space to compute the cosine distances <query item, ground truth> and
-<query item, prediction> for missed predictions in the test set. In a cart recommender use case, we expect items to
-reflect the complementary nature of the suggestions: if a TV is in the cart, a model should recommend a HDMI cable,
-not another TV. As we see in the comparison below, Google's predictions better match the label distribution,
-suggesting that the model better capture the nature of the task:
-
-.. image:: https://github.com/jacopotagliabue/reclist/blob/main/images/distance_to_query.png
-   :height: 175
-
-Roadmap
--------
-
-We have exciting news about our Beta, including the usage of RecList as main library for the `CIKM Data Challenge <https://reclist.io/cikm2022-cup/>`__!
-
-Contributing
-~~~~~~~~~~~~
-
-We will update this repo with some guidelines for contributions as soon as the codebase becomes more stable. Check back often for updates!
 
 Acknowledgments
 ---------------
@@ -297,12 +216,13 @@ The original authors are:
 * Chloe He - `LinkedIn <https://www.linkedin.com/in/chloe-he//>`__, `GitHub <https://github.com/chloeh13q>`__
 * Brian Ko - `LinkedIn <https://www.linkedin.com/in/briankosw/>`__, `GitHub <https://github.com/briankosw>`__
 
-If you have questions or feedback, please reach out to: :code:`jacopo dot tagliabue at tooso dot ai`.
+*RecList* is a community project made possible by the generous support of awesome folks. Between June and December 2022, the development of our beta has been supported by `Comet <https://www.comet.com/>`__, `Neptune <https://neptune.ai/homepage>`__ , `Gantry <https://gantry.io/>`__.
+Our beta has been developed with the help of:
 
-Talks and Presentations
------------------------
+* Unnati Patel - `LinkedIn <https://www.linkedin.com/in/unnati-p-16626610a/>`__
 
-Past and upcoming talks and presentations can be found at our new `website <https://reclist.io/>`__.
+
+If you have questions or feedback, please reach out to: :code:`jacopo dot tagliabue at nyu dot edu`.
 
 License and Citation
 --------------------

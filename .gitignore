@@ -112,3 +112,9 @@ ENV/
 
 # mac file
 .DS_Store
+
+*.png
+
+.neptune/
+
+evalrs_dataset_KDD23/
