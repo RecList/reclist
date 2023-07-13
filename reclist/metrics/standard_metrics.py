@@ -65,7 +65,7 @@ def hits_at_k(
     ])
     """
     
-    y_test_mask = ~y_test.isna().values                # N x M
+    y_test_mask = ~y_test.isna().values         # N x M
 
     y_pred_mask = ~y_pred.isna().values[:, :k]  # N x k
 
@@ -85,7 +85,7 @@ def ranks_at_k(
     k: int
 ) -> Union[np.array, pd.DataFrame]:
     """
-    Computes for every test case, n, the rank of the m-th ground truth label out of k predictions.
+    Computes for every test case, n, the rank of the m-th ground truth label out of top-k predictions.
     Rank is 0 if ground truth is not in prediction.
 
     Parameters
@@ -100,7 +100,7 @@ def ranks_at_k(
     Returns
     -------
     out : np.array, pd.DataFrame
-         array indicicating for each test case n, the rank of the m-th ground truth label in k predictions.
+         array indicicating for each test case n, the rank of the m-th ground truth label in top-k predictions.
 
     Examples
     --------
@@ -111,7 +111,7 @@ def ranks_at_k(
            [2, 0, 1]])
 
     """
-    
+
     hits = hits_at_k(y_pred, y_test, k)                     # N x M x k
     ranks = hits * np.arange(1, k + 1, 1)[None, None, :]    # N x M x k
     ranks = ranks.max(axis=2)                               # N x M
@@ -165,7 +165,7 @@ def hit_rate_at_k(
     k: int
 ) -> float:
     """
-    Computes the hit rate @ k
+    Computes the hit rate @ k.
 
     Parameters
     ----------
@@ -194,13 +194,71 @@ def hit_rate_at_k(
     return hits.max(axis=1).mean()       # 1
 
 
-def rr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int):
+def rr_at_k(
+    y_pred: pd.DataFrame,
+    y_test: pd.DataFrame,
+    k: int
+) -> Union[np.array, pd.DataFrame]:
+    """
+    Computes the reciprocal rank of ground truth in the top-k predictions for the n-th test case.
+
+    Parameters
+    ----------
+    y_pred: pd.DataFrame
+        Array of predictions with shape N x k (?)
+    y_test: pd.DataFrame
+        Array of ground truth with shape N x m
+    k: int
+        Index cut-off for prediciton 
+    
+    Returns
+    -------
+    out : np.array, pd.DataFrame
+        array indicicating, for the n-th test case, the reciprocal rank of the m-th ground truth in the k predictions.
+
+    Examples
+    --------
+    >>> y_pred = pd.DataFrame([[2, 1, 4], [3, 6, 2]])
+    >>> y_test = pd.DataFrame([[5, 1, 0], [2, 1, 0]])
+    >>> rr_at_k(y_pred, y_test, k=2)
+    array([0.5, 0.0])
+    """
+    
     ranks = ranks_at_k(y_pred, y_test, k).astype(np.float64)  # N x M
     reciprocal_ranks = np.reciprocal(ranks, out=ranks, where=ranks > 0)  # N x M
     return reciprocal_ranks.max(axis=1)  # N
 
 
-def mrr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int) -> float:
+def mrr_at_k(
+    y_pred: pd.DataFrame, 
+    y_test: pd.DataFrame, 
+    k: int
+) -> float:
+    
+    """
+    Computes the mean reciprocal rank @ k (mrr @ k)
+
+    Parameters
+    ----------
+    y_pred: pd.DataFrame
+        Array of predictions with shape N x k (?)
+    y_test: pd.DataFrame
+        Array of ground truth with shape N x m
+    k: int
+        Index cut-off for prediciton 
+    
+    Returns
+    -------
+    out : float
+         mean reciprocal rank @ k
+
+    Examples
+    --------
+    >>> y_pred = pd.DataFrame([[2, 1, 4], [3, 6, 2]])
+    >>> y_test = pd.DataFrame([[5, 1, 0], [2, 1, 0]])
+    >>> mrr_at_k(y_pred, y_test, k=2)
+    0.25
+    """
     return rr_at_k(y_pred, y_test, k=k).mean()
 
 
