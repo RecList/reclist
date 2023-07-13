@@ -4,6 +4,7 @@ import random
 import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score
+from typing import Union
 
 
 def func_per_slice(y_test, y_pred, categories, func):
@@ -25,12 +26,42 @@ def accuracy_per_slice(y_test, y_pred, categories):
     return func_per_slice(y_test, y_pred, categories, accuracy_score)
 
 def hits_at_k(
-    y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int
-) -> (np.array, pd.DataFrame):
+    y_pred: pd.DataFrame, 
+    y_test: pd.DataFrame,
+    k: int
+) -> Union[np.array, pd.DataFrame]:
     """
-    N = number test cases
-    M = number ground truth per test case
+    Computes whether for the n-th test case, the m-th ground truth is a hit with the k-th prediction
+
+    Parameters
+    ----------
+    y_pred: pd.DataFrame
+        Array of predictions with shape N x k (?)
+    y_test: pd.DataFrame
+        Array of ground truth with shape N x m
+    k: int
+        Index cut-off for prediciton 
+    
+    Returns
+    -------
+    out : np.array, pd.DataFrame
+         array indicicating whether for the n-th test case, the m-th ground truth is a hit with the k-th prediction
+
+    Examples
+    --------
+    >>> y_pred = pd.DataFrame([[1, 2, 4], [3, 6, 2]])
+    >>> y_test = pd.DataFrame([[5, 1, 0], [6, 2, 3]])
+    >>> hits_at_k(y_pred, y_test, k=2)
+    array([
+        [[False, False],
+         [True, False],
+         [False, False]],
+        [[False, True],
+         [False, False],
+         [True, False]]
+    ])
     """
+    
     y_test_mask = y_test.values != -1  # N x M
 
     y_pred_mask = y_pred.values[:, :k] != -1  # N x k
