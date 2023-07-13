@@ -53,9 +53,11 @@ Starting
 ~~~~~~~~
 
 
+
 .. |colab1_tutorial| image:: https://colab.research.google.com/assets/colab-badge.svg
     :target: https://colab.research.google.com/drive/1GVsVB1a3H9qbRQvwtb0TBDxq8A5nXc5w?usp=sharing
     :alt: Open In Colab
+
 
 +--------------------------------------------------------------------------------+------------------+
 | Name                                                                           | Link             |
@@ -218,6 +220,7 @@ The original authors are:
 Our beta has been developed with the help of:
 
 * Unnati Patel - `LinkedIn <https://www.linkedin.com/in/unnati-p-16626610a/>`__
+
 
 If you have questions or feedback, please reach out to: :code:`jacopo dot tagliabue at nyu dot edu`.
 

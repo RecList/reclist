@@ -28,9 +28,10 @@ style_packages = [
 ]
 
 setup(
-    author="Federico Bianchi",
-    author_email="f.bianchi@unibocconi.it",
-    python_requires=">=3.6",
+
+    author="RecList",
+    author_email='',
+    python_requires='>=3.6',
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
@@ -52,8 +53,9 @@ setup(
     packages=find_packages(include=["reclist", "reclist.*"]),
     test_suite="tests",
     tests_require=test_requirements,
-    url="https://github.com/jacopotagliabue/reclist",
-    version="0.2.3",
+
+    url='https://github.com/jacopotagliabue/reclist',
+    version='0.3.1',
     zip_safe=False,
     extras_require={
         "dev": style_packages + ["pre-commit==2.20.0"],
