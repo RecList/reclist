@@ -1,3 +1,6 @@
+"""
+Implement standard recommender system retrieval metrics leveraging numpy/pandas backend.
+"""
 import collections
 import itertools
 import random
@@ -31,7 +34,7 @@ def hits_at_k(
     k: int
 ) -> Union[np.array, pd.DataFrame]:
     """
-    Computes whether for the n-th test case, the m-th ground truth is a hit with the k-th prediction
+    Computes whether for the n-th test case, the m-th ground truth is a hit with the k-th prediction.
 
     Parameters
     ----------
@@ -62,48 +65,133 @@ def hits_at_k(
     ])
     """
     
-    y_test_mask = y_test.values != -1  # N x M
+    y_test_mask = ~y_test.isna().values                # N x M
 
-    y_pred_mask = y_pred.values[:, :k] != -1  # N x k
+    y_pred_mask = ~y_pred.isna().values[:, :k]  # N x k
 
-    y_test = y_test.values[:, :, None]  # N x M x 1
-    y_pred = y_pred.values[:, None, :k]  # N x 1 x k
+    y_test = y_test.values[:, :, None]        # N x M x 1
+    y_pred = y_pred.values[:, None, :k]       # N x 1 x k
 
-    hits = y_test == y_pred  # N x M x k
-    hits = hits * y_test_mask[:, :, None]  # N x M x k
-    hits = hits * y_pred_mask[:, None, :]  # N x M x k
+    hits = y_test == y_pred                   # N x M x k
+    hits = hits * y_test_mask[:, :, None]     # N x M x k
+    hits = hits * y_pred_mask[:, None, :]     # N x M x k
 
     return hits
 
 
 def ranks_at_k(
-    y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int
-) -> (np.array, pd.DataFrame):
+    y_pred: pd.DataFrame, 
+    y_test: pd.DataFrame,
+    k: int
+) -> Union[np.array, pd.DataFrame]:
     """
-    N = number test cases
-    M = number ground truth per test case
+    Computes for every test case, n, the rank of the m-th ground truth label out of k predictions.
+    Rank is 0 if ground truth is not in prediction.
+
+    Parameters
+    ----------
+    y_pred: pd.DataFrame
+        Array of predictions with shape N x k (?)
+    y_test: pd.DataFrame
+        Array of ground truth with shape N x m
+    k: int
+        Index cut-off for prediciton 
+    
+    Returns
+    -------
+    out : np.array, pd.DataFrame
+         array indicicating for each test case n, the rank of the m-th ground truth label in k predictions.
+
+    Examples
+    --------
+    >>> y_pred = pd.DataFrame([[1, 2, 4], [3, 6, 2]])
+    >>> y_test = pd.DataFrame([[5, 1, 0], [6, 2, 3]])
+    >>> hits_at_k(y_pred, y_test, k=2)
+    array([[0, 1, 0],
+           [2, 0, 1]])
+
     """
-    hits = hits_at_k(y_pred, y_test, k)  # N x M x k
-    ranks = hits * np.arange(1, k + 1, 1)[None, None, :]  # N x M x k
-    ranks = ranks.max(axis=2)  # N x M
+    
+    hits = hits_at_k(y_pred, y_test, k)                     # N x M x k
+    ranks = hits * np.arange(1, k + 1, 1)[None, None, :]    # N x M x k
+    ranks = ranks.max(axis=2)                               # N x M
     return ranks
 
 
 def misses_at_k(
-    y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int
-) -> (np.array, pd.DataFrame):
+    y_pred: pd.DataFrame,
+    y_test: pd.DataFrame,
+    k: int
+) -> Union[np.array, pd.DataFrame]:
+    """
+    Computes whether for the n-th test case, the m-th ground truth is a miss with the k-th prediction.
+
+    Parameters
+    ----------
+    y_pred: pd.DataFrame
+        Array of predictions with shape N x k (?)
+    y_test: pd.DataFrame
+        Array of ground truth with shape N x m
+    k: int
+        Index cut-off for prediciton 
+    
+    Returns
+    -------
+    out : np.array, pd.DataFrame
+         array indicicating whether for the n-th test case, the m-th ground truth is a miss with the k-th prediction
+
+    Examples
+    --------
+    >>> y_pred = pd.DataFrame([[1, 2, 4], [3, 6, 2]])
+    >>> y_test = pd.DataFrame([[5, 1, 0], [6, 2, 3]])
+    >>> misses_at_k(y_pred, y_test, k=2)
+    array([
+        [[True, True],
+         [False, True],
+         [True, True]],
+        [[True, False],
+         [True, True],
+         [False, True]]
+    ])
+    """  
+
     hits = hits_at_k(y_pred, y_test, k)  # N x M x k
-    return 1 - hits
+    return ~hits
 
 
-def hit_rate_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int):
+def hit_rate_at_k(
+    y_pred: pd.DataFrame,
+    y_test: pd.DataFrame,
+    k: int
+) -> float:
     """
-    N = number test cases
-    M = number ground truth per test case
+    Computes the hit rate @ k
+
+    Parameters
+    ----------
+    y_pred: pd.DataFrame
+        Array of predictions with shape N x k (?)
+    y_test: pd.DataFrame
+        Array of ground truth with shape N x m
+    k: int
+        Index cut-off for prediciton 
+    
+    Returns
+    -------
+    out : float
+         hit rate @ k
+
+    Examples
+    --------
+    >>> y_pred = pd.DataFrame([[1, 2, 4], [3, 6, 2]])
+    >>> y_test = pd.DataFrame([[5, 1, 0], [1, 2, 0]])
+    >>> hit_rate_at_k(y_pred, y_test, k=2)
+    0.5
     """
+
     hits = hits_at_k(y_pred, y_test, k)  # N x M x k
-    hits = hits.max(axis=1)  # N x k
-    return hits.max(axis=1).mean()  # 1
+    hits = hits.max(axis=1)              # N x k
+    return hits.max(axis=1).mean()       # 1
 
 
 def rr_at_k(y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int):
