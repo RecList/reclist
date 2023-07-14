@@ -8,7 +8,7 @@ import pandas as pd
 from reclist.charts import CHART_TYPE
 from reclist.logs import LOGGER, logger_factory
 from reclist.metadata import METADATA_STORE, metadata_store_factory
-
+import datetime
 
 def rec_test(test_type: str, display_type: CHART_TYPE = None):
     """
@@ -240,6 +240,7 @@ class RecList(ABC):
     def _dump_results_to_json(self, test_results: list, report_path: str):
         report = {
             "metadata": {
+                "finish_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "model_name": self.model_name,
                 "reclist": self.name,
                 "tests": list(self._rec_tests.keys()),
