@@ -358,16 +358,14 @@ def precision_at_k(
     return np.average(np.divide(num_intersection, num_preds, where=num_preds>0))
     
 
-    # precision_ls = [
-    #     len(set(_y).intersection(set(_p[:k]))) / len(_p[:k]) if _p else 1
-    #     for _p, _y in zip(y_preds, y_test)
-    # ]
-    # return np.average(precision_ls)
+
+def recall_at_k(y_pred, y_test, k=3):
+    hits = hits_at_k(y_pred, y_test, k=k)   # N x M x k
+    hits = hits.max(axis=1)
+    num_intersection = hits.sum(axis=1)
+    num_targets = (~y_test.isna().values).sum(axis=1)
 
 
-def recall_at_k(y_preds, y_test, k=3):
-    recall_ls = [
-        len(set(_y).intersection(set(_p[:k]))) / len(_y) if _y else 1
-        for _p, _y in zip(y_preds, y_test)
-    ]
-    return np.average(recall_ls)
+    return np.average(np.divide(num_intersection, num_targets, where=num_targets>0))
+    
+    
