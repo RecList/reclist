@@ -188,7 +188,6 @@ def hit_rate_at_k(
     >>> hit_rate_at_k(y_pred, y_test, k=2)
     0.5
     """
-    print(y_pred.size)
     assert len(y_pred.shape) == 2
     assert len(y_test.shape) == 2
     assert y_pred.shape[0] == y_test.shape[0]
@@ -263,9 +262,9 @@ def mrr_at_k(
     >>> mrr_at_k(y_pred, y_test, k=2)
     0.25
     """
-    assert len(y_pred.size) == 2
-    assert len(y_test.size) == 2
-    assert y_pred.size[0] == y_test.size[0]
+    assert len(y_pred.shape) == 2
+    assert len(y_test.shape) == 2
+    assert y_pred.shape[0] == y_test.shape[0]
 
     return rr_at_k(y_pred, y_test, k=k).mean()
 
@@ -346,8 +345,8 @@ def recall_at_k(
     
 
 def statistics(x_train, y_train, x_test, y_test, y_pred):
-    train_size = x_train.shape(0)
-    test_size = x_test.shape(0)
+    train_size = x_train.shape[0]
+    test_size = x_test.shape[0]
     # num non-zero preds
     num_preds = (~y_pred.isna().values).max(axis=1).sum()
     return {
