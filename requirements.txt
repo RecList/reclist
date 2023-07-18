@@ -4,7 +4,7 @@ appdirs==1.4.4
 wget==3.2
 requests>=2.22.0
 tqdm==4.62.3
-matplotlib
+matplotlib==3.6.3
 numpy>=1.19.5
 pathos==0.2.8
 networkx==2.6.3
