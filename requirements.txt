@@ -11,3 +11,4 @@ networkx==2.6.3
 python-Levenshtein==0.12.2
 pandas
 scikit-learn
+rich
