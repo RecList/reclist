@@ -25,10 +25,10 @@ jobs:
                     pip install -r requirements_dev.txt
                     pip install -r requirements.txt
             - name: Run tests
-              run: python -m pytest
+              run: python -m pytest --junitxml=pytest.xml
 
             - name: Upload a Test Results file
               uses: actions/upload-artifact@v3.1.2
               with:
                 name: test-results
-                path: pytest.xml
+                path: ${{ github.workspace }}/pytest.xml
