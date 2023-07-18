@@ -58,11 +58,22 @@ Starting
     :target: https://colab.research.google.com/drive/1GVsVB1a3H9qbRQvwtb0TBDxq8A5nXc5w?usp=sharing
     :alt: Open In Colab
 
+.. |colab2_tutorial| image:: https://colab.research.google.com/assets/colab-badge.svg
+    :target: https://colab.research.google.com/drive/1QeXglfCUEcscHB6L0Gch2qDKDDlfwLlq?usp=sharing
+    :alt: Open In Colab
+
+.. |colab3_tutorial| image:: https://colab.research.google.com/assets/colab-badge.svg
+    :target: https://colab.research.google.com/drive/1ek-TIT1ZJta59-O73GaXsOINvt46dnkz?usp=sharing
+    :alt: Open In Colab
 
 +--------------------------------------------------------------------------------+------------------+
 | Name                                                                           | Link             |
 +================================================================================+==================+
 | Tutorial 101 - Introduction to Reclist                                         | |colab1_tutorial||
++--------------------------------------------------------------------------------+------------------+
+| Tutorial - RecList at EvalRS2023 (KDD)                                         | |colab2_tutorial||
++--------------------------------------------------------------------------------+------------------+
+| Tutorial -  FashionCLIP Evaluation with RecList                                | |colab3_tutorial||
 +--------------------------------------------------------------------------------+------------------+
 
 Quick Links
