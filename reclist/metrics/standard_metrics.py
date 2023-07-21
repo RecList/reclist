@@ -63,6 +63,17 @@ def hits_at_k(
          [False, False],
          [True, False]]
     ])
+    Explanation:
+    
+    Considering the first test case [5, 1, 0].
+    Note: The y_pred becomes pd.DataFrame([[1, 2], [3, 6]]) because k=2. 
+
+    We now focus on the first predicted set, [1, 2].
+
+    How to interpret the output:
+        array[0][0][0] is False because our first element predicted (1) is not equal to the first element of the test case (5).
+        array[0][0][1] is False because our second element predicted (2) is not equal to the first element of the test case (5).
+        array[0][1][0] is True because our first element predicted (2) is equal to the second element of the test case (1).
     """
     
     y_test_mask = ~y_test.isna().values         # N x M
