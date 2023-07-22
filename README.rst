@@ -231,7 +231,7 @@ The original authors are:
 Our beta has been developed with the help of:
 
 * Unnati Patel - `LinkedIn <https://www.linkedin.com/in/unnati-p-16626610a/>`__
-
+* Ciro Greco - `LinkedIn <https://www.linkedin.com/in/cirogreco/>`__
 
 If you have questions or feedback, please reach out to: :code:`jacopo dot tagliabue at nyu dot edu`.
 
