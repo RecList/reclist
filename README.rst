@@ -114,12 +114,19 @@ If you want to use *RecList* locally, clone the repository, create and activate 
     python3 -m venv venv
     source venv/bin/activate
     pip install reclist
-    python examples/dummy.py
+    cd examples
+    python dummy.py
 
 The sample script will run a suite of tests on a dummy dataset and model, showcasing a typical workflow with the library. Note the commented arguments in the script, which you can use to customize the behavior of the library
-once you familiarize with the basic patterns (e.g. using S3 to store the plots and data, or leveraging a third party tool like Comet to track experiments).
+once you familiarize yourself with the basic patterns (e.g. using S3 to store the plots, leveraging a third-party tool to track experiments).
 
-Once your development setup is working as expected, you can run `python examples/evalrs_2023.py` to explore more realistic tests on the `EvalRS 2023 Dataset <https://github.com/RecList/evalRS-KDD-2023>`__: make sure the `dataset <https://github.com/RecList/evalRS-KDD-2023/blob/c1b42ec8cb81562417bbb3c2713d301dc652141d/evaluation/utils.py#L18C11-L18C11>`__ is available in the `examples` folder before you run the script.
+Once your development setup is working as expected, you can run
+
+.. code-block:: bash
+
+    python evalrs_2023.py
+
+to explore tests on a real-world `dataset <https://github.com/RecList/evalRS-KDD-2023>`__ (make sure the `files <https://github.com/RecList/evalRS-KDD-2023/blob/c1b42ec8cb81562417bbb3c2713d301dc652141d/evaluation/utils.py#L18C11-L18C11>`__ are available in the `examples` folder before you run the script).
 Finally, once you've run successfully the sample scripts, take the guided tour below to learn more about the abstractions and the full capabilities of *RecList*.
 
 A Guided Tour
@@ -127,7 +134,7 @@ A Guided Tour
 
 An instance of `RecList <https://github.com/jacopotagliabue/reclist/blob/main/reclist/reclist.py>`__ represents a suite of tests for recommender systems.
 
-As the sample `examples/evalrs_2023.py` script shows, we leave users quite a wide range of options: we provide out of the box standard metrics
+As *evalrs_2023.py* shows, we leave users quite a wide range of options: we provide out of the box standard metrics
 in case your dataset is DataFrame-shaped (or you can / wish turn it into such a shape), but don't force you any pattern if you just want to use *RecList*
 for the scaffolding it provides.
 
@@ -140,15 +147,17 @@ For example, the following code only assumes you have a dataset with golden labe
         model_name="myDataFrameRandomModel",
         predictions=df_predictions,
         y_test=df_dataset,
-        logger=LOGGER.NEPTUNE,
+        logger=LOGGER.LOCAL,
         metadata_store= METADATA_STORE.LOCAL,
         similarity_model=my_sim_model,
     )
 
     cdf(verbose=True)
 
-Our library pre-packages standard recSys KPIs and important behavioral tests, but it is built with extensibility in mind: you can re-use tests in new suites, or you can write new domain-specific suites and tests.
-Any suite must inherit from the main interface, and then declare its tests as functions decorated with *@rec_test*. In the example, an instance is created with one slice-based test: the decorator and return type are used to automatically generate a chart.
+Our library pre-packages standard recSys metrics and important behavioral tests, but it is built with extensibility in mind: you can re-use tests in new suites, or you can write new domain-specific suites and tests.
+Any suite must inherit from the main interface, and then declare its tests as functions decorated with *@rec_test*.
+
+In the example, an instance is created with one slice-based test: the decorator and return type are used to automatically generate a chart.
 
 .. code-block:: python
 
@@ -197,13 +206,13 @@ Once you run a suite of tests, results are dumped automatically and versioned in
           1637357404/
 
 If you use *RecList* as part of your standard testings - either for research or production purposes - you can use the JSON report
-for machine-to-machine communication with downstream system (e.g. you may want to automatically fail the `pipeline <https://github.com/jacopotagliabue/recs-at-resonable-scale>`__  if tests are not passed).
+for machine-to-machine communication with downstream systems (e.g. you may want to automatically fail the `pipeline <https://github.com/jacopotagliabue/recs-at-resonable-scale>`__  if tests are not passed).
 
 Capabilities
 ------------
 
 *RecList* provides a dataset and model agnostic framework to scale up behavioral tests. We provide some suggested abstractions
-based on DataFrames to make existing tests and metrics fully re-usable, but we don't force any pattern on the user. As out of the box functionality, the package provides:
+based on DataFrames to make existing tests and metrics fully re-usable, but we don't force any pattern on the user. As out-of-the box functionality, the package provides:
 
 * tests and metrics to be used on your own datasets and models;
 
@@ -211,9 +220,9 @@ based on DataFrames to make existing tests and metrics fully re-usable, but we d
 
 * flexible, Python interface to declare tests-as-functions, and annotate them with *display_type* for automated charts;
 
-* pre-built connectors with popular experiment trackers (e.g. Neptune, Comet), and an extensible interface to add your own (see the scripts in the `examples` folder for practical examples of using third-party trackers);
+* pre-built connectors with popular experiment trackers (e.g. Neptune, Comet), and an extensible interface to add your own (see the scripts in the `examples` folder for snippets on how to use third-party trackers);
 
-* reference implementations based on popular data challenges that used RecList.
+* reference implementations based on popular data challenges that used RecList: for an example of the "less wrong" latent space metric you can check the song2vec implementation `here <https://github.com/RecList/evalRS-KDD-2023/blob/c1b42ec8cb81562417bbb3c2713d301dc652141d/evaluation/eval.py#L42>`__.
 
 
 Acknowledgments
