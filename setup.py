@@ -55,7 +55,7 @@ setup(
     tests_require=test_requirements,
 
     url='https://github.com/jacopotagliabue/reclist',
-    version='1.0.0',
+    version='2.0.0',
     zip_safe=False,
     extras_require={
         "dev": style_packages + ["pre-commit==2.20.0"],
