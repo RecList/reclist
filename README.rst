@@ -49,9 +49,8 @@ requiring unnecessary custom code and ad hoc procedures.
 
 If you are not familiar with the library, we suggest first taking our small tour to get acquainted with the main abstractions through ready-made models and tests.
 
-Starting
+Colab Tutorials
 ~~~~~~~~
-
 
 
 .. |colab1_tutorial| image:: https://colab.research.google.com/assets/colab-badge.svg
@@ -105,7 +104,8 @@ This doc is structured as follows:
 Quick Start
 -----------
 
-If you want to see *RecList* in action, clone the repository, create and activate a virtual env, and install the required packages from pip (you can install from root of course). If you prefer to experiment in an interactive, no-installation-required fashion, try out our `colab notebook <https://colab.research.google.com/drive/1GVsVB1a3H9qbRQvwtb0TBDxq8A5nXc5w>`__.
+You can take a quick tour online using our `colab notebook <https://colab.research.google.com/drive/1GVsVB1a3H9qbRQvwtb0TBDxq8A5nXc5w>`__.
+If you want to use *RecList* locally, clone the repository, create and activate a virtual env, and install the required packages from pip (you can also install from root of course).
 
 .. code-block:: bash
 
@@ -114,20 +114,31 @@ If you want to see *RecList* in action, clone the repository, create and activat
     python3 -m venv venv
     source venv/bin/activate
     pip install reclist
-    python examples/evalrs_2023.py
+    cd examples
+    python dummy.py
 
-Once you've run successfully the sample script, take the guided tour below to learn more about the abstractions and the out-of-the-box capabilities of *RecList*.
+The sample script will run a suite of tests on a dummy dataset and model, showcasing a typical workflow with the library. Note the commented arguments in the script, which you can use to customize the behavior of the library
+once you familiarize yourself with the basic patterns (e.g. using S3 to store the plots, leveraging a third-party tool to track experiments).
+
+Once your development setup is working as expected, you can run
+
+.. code-block:: bash
+
+    python evalrs_2023.py
+
+to explore tests on a real-world `dataset <https://github.com/RecList/evalRS-KDD-2023>`__ (make sure the `files <https://github.com/RecList/evalRS-KDD-2023/blob/c1b42ec8cb81562417bbb3c2713d301dc652141d/evaluation/utils.py#L18C11-L18C11>`__ are available in the `examples` folder before you run the script).
+Finally, once you've run successfully the sample scripts, take the guided tour below to learn more about the abstractions and the full capabilities of *RecList*.
 
 A Guided Tour
 -------------
 
 An instance of `RecList <https://github.com/jacopotagliabue/reclist/blob/main/reclist/reclist.py>`__ represents a suite of tests for recommender systems.
 
-As the sample `examples/evalrs_2023.py` script shows, we leave users quite a large range of options: we provide out of the box standard metrics
+As *evalrs_2023.py* shows, we leave users quite a wide range of options: we provide out of the box standard metrics
 in case your dataset is DataFrame-shaped (or you can / wish turn it into such a shape), but don't force you any pattern if you just want to use *RecList*
 for the scaffolding it provides.
 
-For example, the following code only assumes you have a dataset with golden labels, predictions, and metadata (e.g. item features) in the form of a DataFrame:
+For example, the following code only assumes you have a dataset with golden labels, predictions, and metadata (e.g. item features) in the shape of a DataFrame:
 
 .. code-block:: python
 
@@ -136,19 +147,17 @@ For example, the following code only assumes you have a dataset with golden labe
         model_name="myDataFrameRandomModel",
         predictions=df_predictions,
         y_test=df_dataset,
-        logger=LOGGER.NEPTUNE,
+        logger=LOGGER.LOCAL,
         metadata_store= METADATA_STORE.LOCAL,
         similarity_model=my_sim_model,
-        bucket=os.environ["S3_BUCKET"],
-        NEPTUNE_KEY=os.environ["NEPTUNE_KEY"],
-        NEPTUNE_PROJECT_NAME=os.environ["NEPTUNE_PROJECT_NAME"],
     )
 
-    # run reclist
     cdf(verbose=True)
 
-Our library pre-packages standard recSys KPIs and important behavioral tests, but it is built with extensibility in mind: you can re-use tests in new suites, or you can write new domain-specific suites and tests.
-Any suite must inherit from the main interface, and then declare its tests as functions decorated with *@rec_test*. In the example, an instance is created with one slice-based test: the decorator and return type are used to automatically generate a chart.
+Our library pre-packages standard recSys metrics and important behavioral tests, but it is built with extensibility in mind: you can re-use tests in new suites, or you can write new domain-specific suites and tests.
+Any suite must inherit from the main interface, and then declare its tests as functions decorated with *@rec_test*.
+
+In the example, an instance is created with one slice-based test: the decorator and return type are used to automatically generate a chart.
 
 .. code-block:: python
 
@@ -183,7 +192,7 @@ Inheritance is powerful, as we can build new suites by re-using existing ones. H
 
 Any model can be tested, as no assumption is made on the model's structure, but only the availability of *predictions*
 and *ground truth*. Once again, while our example leverages a DataFrame-shaped dataset for these entities, you are free to build your own
-RecList instance with any shape you prefer, provided you implement the metrics accordingly.
+RecList instance with any shape you prefer, provided you implement the metrics accordingly (see the `examples/dummy.py` script for an example with different input types).
 
 Once you run a suite of tests, results are dumped automatically and versioned in a folder (local or on S3), structured as follows
 (name of the suite, name of the model, run timestamp):
@@ -197,13 +206,13 @@ Once you run a suite of tests, results are dumped automatically and versioned in
           1637357404/
 
 If you use *RecList* as part of your standard testings - either for research or production purposes - you can use the JSON report
-for machine-to-machine communication with downstream system (e.g. you may want to automatically fail the `pipeline <https://github.com/jacopotagliabue/recs-at-resonable-scale>`__  if tests are not passed).
+for machine-to-machine communication with downstream systems (e.g. you may want to automatically fail the `pipeline <https://github.com/jacopotagliabue/recs-at-resonable-scale>`__  if tests are not passed).
 
 Capabilities
 ------------
 
 *RecList* provides a dataset and model agnostic framework to scale up behavioral tests. We provide some suggested abstractions
-based on DataFrames to make existing tests and metrics fully re-usable, but we don't force any pattern on the user. As out of the box functionality, the package provides:
+based on DataFrames to make existing tests and metrics fully re-usable, but we don't force any pattern on the user. As out-of-the box functionality, the package provides:
 
 * tests and metrics to be used on your own datasets and models;
 
@@ -211,9 +220,9 @@ based on DataFrames to make existing tests and metrics fully re-usable, but we d
 
 * flexible, Python interface to declare tests-as-functions, and annotate them with *display_type* for automated charts;
 
-* pre-built connectors with popular experiment trackers (e.g. Neptune, Comet), and an extensible interface to add your own;
+* pre-built connectors with popular experiment trackers (e.g. Neptune, Comet), and an extensible interface to add your own (see the scripts in the `examples` folder for snippets on how to use third-party trackers);
 
-* reference implementations based on popular data challenges that used RecList.
+* reference implementations based on popular data challenges that used RecList: for an example of the "less wrong" latent space metric you can check the song2vec implementation `here <https://github.com/RecList/evalRS-KDD-2023/blob/c1b42ec8cb81562417bbb3c2713d301dc652141d/evaluation/eval.py#L42>`__.
 
 
 Acknowledgments
@@ -231,7 +240,7 @@ The original authors are:
 Our beta has been developed with the help of:
 
 * Unnati Patel - `LinkedIn <https://www.linkedin.com/in/unnati-p-16626610a/>`__
-
+* Ciro Greco - `LinkedIn <https://www.linkedin.com/in/cirogreco/>`__
 
 If you have questions or feedback, please reach out to: :code:`jacopo dot tagliabue at nyu dot edu`.
 

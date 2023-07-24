@@ -232,7 +232,8 @@ class RecList(ABC):
         ax.set_ylabel('y')
         ax.set_title(test_result['name'])
         data = test_result['result'].keys()
-        ax.bar(data, [test_result['result'][_] for _ in data])
+        # cast keys to string; matplotlib requirement
+        ax.bar([str(_) for _ in data], [test_result['result'][_] for _ in data])
 
         return fig
 
