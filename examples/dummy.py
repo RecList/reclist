@@ -1,3 +1,13 @@
+"""
+
+Example script to run a RecList over a dummy, free-form dataset.
+
+Note that if you use LOGGER.COMET, you should uncomment the COMET variables to get the script to
+log in your Comet account the relevant metrics as they are computed by the rec tests. Of course,
+make sure the Comet python library is installed in your environment.
+
+"""
+
 import numpy as np
 from reclist.logs import LOGGER
 from reclist.similarity_models import FakeSimilarityModel
@@ -111,13 +121,13 @@ cd = FreeSessionRecList(
     metadata=metadata,
     predictions=predictions,
     model_name="myRandomModel",
-    logger=LOGGER.COMET,
+    logger=LOGGER.LOCAL,
     metadata_store= METADATA_STORE.LOCAL,
     similarity_model=my_sim_model,
     # bucket=os.environ["S3_BUCKET"], # if METADATA_STORE.LOCAL you don't need this!
-    COMET_KEY=os.environ["COMET_KEY"],
-    COMET_PROJECT_NAME=os.environ["COMET_PROJECT_NAME"],
-    COMET_WORKSPACE=os.environ["COMET_WORKSPACE"],
+    # COMET_KEY=os.environ["COMET_KEY"], # if LOGGER.COMET, make sure you have the env
+    # COMET_PROJECT_NAME=os.environ["COMET_PROJECT_NAME"], # if LOGGER.COMET, make sure you have the env
+    # COMET_WORKSPACE=os.environ["COMET_WORKSPACE"], # if LOGGER.COMET, make sure you have the env
 )
 
 # run reclist
