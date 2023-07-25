@@ -192,7 +192,7 @@ Inheritance is powerful, as we can build new suites by re-using existing ones. H
 
 Any model can be tested, as no assumption is made on the model's structure, but only the availability of *predictions*
 and *ground truth*. Once again, while our example leverages a DataFrame-shaped dataset for these entities, you are free to build your own
-RecList instance with any shape you prefer, provided you implement the metrics accordingly (see the `examples/dummy.py` script for an example with different input types).
+RecList instance with any shape you prefer, provided you implement the metrics accordingly (see *dummy.py* for an example with different input types).
 
 Once you run a suite of tests, results are dumped automatically and versioned in a folder (local or on S3), structured as follows
 (name of the suite, name of the model, run timestamp):
@@ -220,10 +220,51 @@ based on DataFrames to make existing tests and metrics fully re-usable, but we d
 
 * flexible, Python interface to declare tests-as-functions, and annotate them with *display_type* for automated charts;
 
-* pre-built connectors with popular experiment trackers (e.g. Neptune, Comet), and an extensible interface to add your own (see the scripts in the `examples` folder for snippets on how to use third-party trackers);
+* pre-built connectors with popular experiment trackers (e.g. Neptune, Comet), and an extensible interface to add your own (see below);
 
 * reference implementations based on popular data challenges that used RecList: for an example of the "less wrong" latent space metric you can check the song2vec implementation `here <https://github.com/RecList/evalRS-KDD-2023/blob/c1b42ec8cb81562417bbb3c2713d301dc652141d/evaluation/eval.py#L42>`__.
 
+Using Third-Party Tracking Tools
+--------------------------------
+
+*RecList* supports streaming the results of your tests directly to your cloud platform of choice, both as metrics and charts.
+
+If you have the target [Python client installed](https://docs.neptune.ai/about/api/), you can use the
+Neptune logger by simply specifying it at init time, and either passing *NEPTUNE_KEY* and *NEPTUNE_PROJECT_NAME* as kwargs, or setting them as environment variables.
+
+.. code-block:: python
+
+    cdf = DFSessionRecList(
+        dataset=df_events,
+        model_name="myDataFrameRandomModel",
+        predictions=df_predictions,
+        y_test=df_dataset,
+        logger=LOGGER.NEPTUNE,
+        metadata_store= METADATA_STORE.LOCAL,
+        similarity_model=my_sim_model
+    )
+
+    cdf(verbose=True)
+
+If you have the target [Python client installed](https://pypi.org/project/comet-ml/), you can use the
+Comet logger by simply specifying it at init time, and either passing *COMET_KEY*, *COMET_PROJECT_NAME*, *COMET_WORKSPACE* as kwargs, or setting them as environment variables.
+
+.. code-block:: python
+
+    cdf = DFSessionRecList(
+        dataset=df_events,
+        model_name="myDataFrameRandomModel",
+        predictions=df_predictions,
+        y_test=df_dataset,
+        logger=LOGGER.COMET,
+        metadata_store= METADATA_STORE.LOCAL,
+        similarity_model=my_sim_model
+    )
+
+    cdf(verbose=True)
+
+
+If you wish to add a new platform, you can do so by simply implementing a new class inheriting from RecLogger.
 
 Acknowledgments
 ---------------
