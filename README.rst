@@ -229,7 +229,7 @@ Using Third-Party Tracking Tools
 
 *RecList* supports streaming the results of your tests directly to your cloud platform of choice, both as metrics and charts.
 
-If you have the target [Python client installed](https://docs.neptune.ai/about/api/), you can use the
+If you have the `Python client installed <https://docs.neptune.ai/about/api/>`__, you can use the
 Neptune logger by simply specifying it at init time, and either passing *NEPTUNE_KEY* and *NEPTUNE_PROJECT_NAME* as kwargs, or setting them as environment variables.
 
 .. code-block:: python
@@ -246,7 +246,7 @@ Neptune logger by simply specifying it at init time, and either passing *NEPTUNE
 
     cdf(verbose=True)
 
-If you have the target [Python client installed](https://pypi.org/project/comet-ml/), you can use the
+If you have the `Python client installed <https://pypi.org/project/comet-ml/>`__, you can use the
 Comet logger by simply specifying it at init time, and either passing *COMET_KEY*, *COMET_PROJECT_NAME*, *COMET_WORKSPACE* as kwargs, or setting them as environment variables.
 
 .. code-block:: python
