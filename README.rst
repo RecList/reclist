@@ -50,7 +50,7 @@ requiring unnecessary custom code and ad hoc procedures.
 If you are not familiar with the library, we suggest first taking our small tour to get acquainted with the main abstractions through ready-made models and tests.
 
 Colab Tutorials
-~~~~~~~~
+~~~~~~~~~~~~~~~
 
 
 .. |colab1_tutorial| image:: https://colab.research.google.com/assets/colab-badge.svg
