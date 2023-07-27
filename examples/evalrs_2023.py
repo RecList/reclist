@@ -21,8 +21,10 @@ import pandas as pd
 import numpy as np
 import os
 from reclist.reclist import rec_test
-from reclist.reclist import RecList
+from reclist.reclist import RecList, CHART_TYPE
 from random import choice
+from gensim.models import KeyedVectors
+
 
 class DFSessionRecList(RecList):
 
@@ -53,42 +55,80 @@ class DFSessionRecList(RecList):
         self.dataset = dataset
         self._y_preds = predictions
         self._y_test = kwargs.get("y_test", None)
+        self._user_metadata = kwargs.get("user_metadata", None)
+        if not isinstance(self._user_metadata, type(None)):
+            self._user_metadata = self._user_metadata.set_index("user_id")
         self.similarity_model = kwargs.get("similarity_model", None)
 
-        return
 
     @rec_test(test_type='HIT_RATE')
     def hit_rate_at_100(self):
-        hr = self.hit_rate_at_k(self._y_preds, self._y_test, k=100)
+        from reclist.metrics.standard_metrics import hit_rate_at_k
+        hr = hit_rate_at_k(self._y_preds, self._y_test, k=100)
         return hr
 
-    def hit_rate_at_k(self, y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int):
-        """
-        N = number test cases
-        M = number ground truth per test case
-        """
-        hits = self.hits_at_k(y_pred, y_test, k)  # N x M x k
-        hits = hits.max(axis=1)  # N x k
-        return hits.max(axis=1).mean()  # 1
+    @rec_test(test_type='MRR')
+    def mrr_at_100(self):
+        from reclist.metrics.standard_metrics import mrr_at_k
 
-    def hits_at_k(self, y_pred: pd.DataFrame, y_test: pd.DataFrame, k: int):
-        """
-        N = number test cases
-        M = number ground truth per test case
-        """
-        y_test_mask = y_test.values != -1  # N x M
+        return mrr_at_k(self._y_preds, self._y_test, k=100)
 
-        y_pred_mask = y_pred.values[:, :k] != -1  # N x k
+    @rec_test(test_type='MRED_COUNTRY', display_type=CHART_TYPE.BARS)
+    def mred_country(self):
+        country_list = ["US", "RU", "DE", "UK", "PL", "BR", "FI", "NL", "ES", "SE", "UA", "CA", "FR", "NaN"]
+        
+        user_countries = self._user_metadata.loc[self._y_test.index, ['country']].fillna('NaN')
+        valid_country_mask = user_countries['country'].isin(country_list)
+        y_pred_valid = self._y_preds[valid_country_mask]
+        y_test_valid = self._y_test[valid_country_mask]
+        user_countries = user_countries[valid_country_mask]
 
-        y_test = y_test.values[:, :, None]  # N x M x 1
-        y_pred = y_pred.values[:, None, :k]  # N x 1 x k
+        return self.miss_rate_equality_difference(y_pred_valid, y_test_valid, user_countries, 'country')
 
-        hits = y_test == y_pred  # N x M x k
-        hits = hits * y_test_mask[:, :, None]  # N x M x k
-        hits = hits * y_pred_mask[:, None, :]  # N x M x k
+    @rec_test(test_type='BEING_LESS_WRONG')
+    def being_less_wrong(self):
+        from reclist.metrics.standard_metrics import hits_at_k
 
-        return hits
+        hits = hits_at_k(self._y_preds, self._y_test, k=100).max(axis=2)
+        misses = (hits == False)
+        miss_gt_vectors = self.similarity_model[self._y_test.loc[misses, 'track_id'].values.reshape(-1)]
+        # we calculate the score w.r.t to the first prediction
+        miss_pred_vectors = self.similarity_model[self._y_preds.loc[misses, '0'].values.reshape(-1)]
 
+        return float(self.cosine_sim(miss_gt_vectors, miss_pred_vectors).mean())
+    
+    def cosine_sim(self, u: np.array, v: np.array) -> np.array:
+        return np.sum(u * v, axis=-1) / (np.linalg.norm(u, axis=-1) * np.linalg.norm(v, axis=-1))
+
+    def miss_rate_at_k_slice(self,
+                                   y_preds: pd.DataFrame,
+                                   y_test: pd.DataFrame,
+                                   slice_info: pd.DataFrame,
+                                   slice_key: str):
+        from reclist.metrics.standard_metrics import misses_at_k
+        # get false positives
+        m = misses_at_k(y_preds, y_test, k=100).min(axis=2)
+        # convert to dataframe
+        m = pd.DataFrame(m, columns=['mr'], index=y_test.index)
+        # grab slice info
+        m[slice_key] = slice_info[slice_key].values
+        # group-by slice and get per-slice mrr
+        return m.groupby(slice_key)['mr'].agg('mean')
+
+    def miss_rate_equality_difference(self,
+                                      y_preds: pd.DataFrame,
+                                      y_test: pd.DataFrame,
+                                      slice_info: pd.DataFrame,
+                                      slice_key: str):
+        from reclist.metrics.standard_metrics import misses_at_k
+
+        mr_per_slice = self.miss_rate_at_k_slice(y_preds, y_test, slice_info, slice_key)
+        mr = misses_at_k(y_preds, y_test, k=100).min(axis=2).mean()
+        # take negation so that higher values => better fairness
+        mred = -(mr_per_slice-mr).abs().mean()
+        res = mr_per_slice.to_dict()
+        return {'mred': mred, 'mr': mr, **res}
+    
 
 class EvalRSSimpleModel:
     """
@@ -119,7 +159,8 @@ if __name__ == '__main__':
     df_tracks = pd.read_parquet('evalrs_dataset_KDD_2023/evalrs_tracks.parquet').set_index('track_id')
     df_users = pd.read_parquet('evalrs_dataset_KDD_2023/evalrs_users.parquet')
 
-    print(df_users['user_id'].head())
+    similarity_model = KeyedVectors.load('evalrs_dataset_KDD_2023/song2vec.wv')
+
     """
         Here we would normally train a model, but we just return random predictions.
     """
@@ -129,14 +170,15 @@ if __name__ == '__main__':
     all_tracks = df_tracks.index.values
     df_dataset = pd.DataFrame(
         {
+            'user_id': df_predictions.index.tolist(),
             'track_id': [choice(all_tracks) for _ in range(len(df_predictions))]
         }
-    )
+    ).set_index('user_id')
+
 
     """
         Here we use RecList to run the evaluation.
     """
-
     # initialize with everything
     cdf = DFSessionRecList(
         dataset=df_events,
@@ -146,10 +188,8 @@ if __name__ == '__main__':
         y_test=df_dataset,
         logger=LOGGER.LOCAL,
         metadata_store=METADATA_STORE.LOCAL,
-        # bucket=os.environ["S3_BUCKET"], # if METADATA_STORE.LOCAL you don't need this!
-        #NEPTUNE_KEY=os.environ["NEPTUNE_KEY"], # if LOGGER.NEPTUNE, make sure you have the env
-        #NEPTUNE_PROJECT_NAME=os.environ["NEPTUNE_PROJECT_NAME"] # if LOGGER.NEPTUNE, make sure you have the env
+        similarity_model=similarity_model,
+        user_metadata=df_users,
     )
-
     # run reclist
     cdf(verbose=True)
