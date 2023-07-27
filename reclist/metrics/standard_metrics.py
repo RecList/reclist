@@ -122,10 +122,16 @@ def ranks_at_k(
            [2, 0, 1]])
 
     """
-
     hits = hits_at_k(y_pred, y_test, k)                     # N x M x k
-    ranks = hits * np.arange(1, k + 1, 1)[None, None, :]    # N x M x k
-    ranks = ranks.max(axis=2)                               # N x M
+    # TODO: hits_at_k can be modified to return df with last dim=k instead of preds shape
+    rank_overlap = min(k, hits.shape[-1])
+    ranks = hits * np.arange(1, rank_overlap + 1, 1)[None, None, :]    # N x M x k
+    # set to float
+    ranks = ranks.astype(float)
+    # set non-hits to infinity
+    ranks[ranks==0] = np.inf
+    # get highest rank; if no hit, rank is infinite
+    ranks = ranks.min(axis=2)                               # N x M
     return ranks
 
 
@@ -239,7 +245,8 @@ def rr_at_k(
     """
     
     ranks = ranks_at_k(y_pred, y_test, k).astype(np.float64)  # N x M
-    reciprocal_ranks = np.reciprocal(ranks, out=ranks, where=ranks > 0)  # N x M
+    reciprocal_ranks = np.reciprocal(ranks, out=ranks,)       # N x M
+    # reciprocal_ranks = np.reciprocal(ranks, out=ranks, where=ranks > 0)  # N x M
     return reciprocal_ranks.max(axis=1)  # N
 
 
