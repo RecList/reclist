@@ -81,6 +81,15 @@ def test_mrr():
         [[10, 12, 14, None, None, None], 
          [22, 8, 64, 13, 1, 0]]
     )
+    df_f = pd.DataFrame(
+        [[10, 12, 14, None, None, None], 
+         [22, 1, 64, 13, 1, 0]]
+    )
+
+    df_g = pd.DataFrame(
+        [[10, 12, 14, None, None, None], 
+         [22, 17, 64, 13, 1, 0]]
+    )
     # df_f = pd.DataFrame(
     #     [[2, 3], 
     #      [0, 1]]
@@ -95,4 +104,13 @@ def test_mrr():
     assert mrr_at_k(df_e, df_d, 2) == 1/4
     assert mrr_at_k(df_e, df_d, 3) == pytest.approx(5/12)
     assert mrr_at_k(df_e, df_d, 6) == pytest.approx(5/12)
+
+    # k larger than pred size
+    assert mrr_at_k(df_e, df_d, 20) == pytest.approx(5/12)
+    
+    # repeated prediction that is a hit
+    assert mrr_at_k(df_f, df_d, 6) == pytest.approx(5/12)
+
+    assert mrr_at_k(df_g, df_d, 6) == pytest.approx(4/15)
+    
     
