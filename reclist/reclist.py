@@ -8,6 +8,8 @@ import pandas as pd
 from reclist.charts import CHART_TYPE
 from reclist.logs import LOGGER, logger_factory
 from reclist.metadata import METADATA_STORE, metadata_store_factory
+from reclist.summarizer import summarize_statistics
+from typing import Optional
 import datetime
 
 def rec_test(test_type: str, display_type: CHART_TYPE = None):
@@ -148,7 +150,17 @@ class RecList(ABC):
 
         return
 
-    def __call__(self, verbose=True, *args, **kwargs):
+    def __call__(self, verbose: str = True, summarize: bool = False, compare_model: Optional[RecList] = None, *args, **kwargs):
+        """Call reclist
+
+        Allow to get metrics.
+        If you decide to summarize it is assumed you have an OpenAI key setup in ~/.openai_api_key
+
+        Args:
+            verbose (str): Wether to have verbose output or not
+            summarize (bool): Wether to summarize or not the metrics. If compare_model is provided will compare to it.
+            compare_model (Optional[RecList]): Optional, Model to compare to.
+        """
         from rich.progress import track
 
         self.meta_store_path = self.create_data_store()
@@ -172,7 +184,15 @@ class RecList(ABC):
         test_2_fig = self._generate_report_and_plot(self._test_results, self.meta_store_path)
         for test, fig in test_2_fig.items():
             self.logger_service.save_plot(name=test, fig=fig)
-
+        if summarize:
+            compare_model_name = None
+            compare_statistics = None
+            if compare_model is not None and hasattr(compare_model, 'model_name') and hasattr(compare_model, '_test_results'):
+                compare_model_name = compare_model.model_name
+                compare_statistics = compare_model._test_results
+            summary = summarize_statistics(model_name= self.model_name, statistics= self._test_results,
+                                           compare_model_name= compare_model_name, compare_statistics= compare_statistics)
+            print(summary)
         return
 
     def _generate_report_and_plot(self, test_results: list, meta_store_path: str):
