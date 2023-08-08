@@ -150,7 +150,7 @@ class RecList(ABC):
 
         return
 
-    def __call__(self, verbose: str = True, summarize: bool = False, compare_model: Optional[RecList] = None, *args, **kwargs):
+    def __call__(self, verbose: str = True, summarize: bool = False, compare_model: Optional[ABC] = None, *args, **kwargs):
         """Call reclist
 
         Allow to get metrics.
