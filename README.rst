@@ -78,7 +78,7 @@ Colab Tutorials
 Quick Links
 ~~~~~~~~~~~
 
-* The original `paper <https://dl.acm.org/doi/abs/10.1145/3487553.3524215>`__ (`arxiv <https://arxiv.org/abs/2111.09963>`__) and initial `release post <https://towardsdatascience.com/ndcg-is-not-all-you-need-24eb6d2f1227>`__.
+* The original `paper <https://dl.acm.org/doi/abs/10.1145/3487553.3524215>`__ (`arxiv <https://arxiv.org/abs/2111.09963>`__), initial `release post <https://towardsdatascience.com/ndcg-is-not-all-you-need-24eb6d2f1227>`__ and  `beta announcement <https://towardsdatascience.com/reclist-2-0-open-source-systematic-testing-of-ml-models-9c62b654170c>`__.
 * `EvalRS22@CIKM <https://github.com/RecList/evalRS-CIKM-2022>`__ and `EvalRS23@KDD <https://reclist.io/kdd2023-cup/>`__ , for music recommendations with RecList.
 * A `colab notebook <https://colab.research.google.com/drive/1GVsVB1a3H9qbRQvwtb0TBDxq8A5nXc5w>`__, for a quick interactive tour.
 * Our `website <https://reclist.io/>`__ for past talks and presentations.
@@ -88,7 +88,7 @@ Status
 ~~~~~~~~~~~
 
 * *RecList* is free software released under the MIT license, and it has been adopted by popular `open-source <https://github.com/RecList/evalRS-CIKM-2022>`__  `data challenges <https://reclist.io/kdd2023-cup/>`__.
-* After a major API re-factoring, *RecList* is now in *beta*.
+* After a major API re-factoring, *RecList* is now in `beta <https://towardsdatascience.com/reclist-2-0-open-source-systematic-testing-of-ml-models-9c62b654170c>`__.
 
 Summary
 ~~~~~~~
